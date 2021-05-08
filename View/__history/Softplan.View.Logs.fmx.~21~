@@ -7,7 +7,7 @@ object frmLogs: TfrmLogs
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
-  OnActivate = FormActivate
+  OnCreate = FormCreate
   OnDestroy = FormDestroy
   DesignerMasterStyle = 0
   object LayoutContainer: TLayout
@@ -30,7 +30,7 @@ object frmLogs: TfrmLogs
         594s
         594s
         594s)
-      object TabListagemClientes: TTabItem
+      object TabListagemLogs: TTabItem
         CustomIcon = <
           item
           end>
@@ -61,24 +61,20 @@ object frmLogs: TfrmLogs
           Viewport.Width = 550.000000000000000000
           Viewport.Height = 397.000000000000000000
           object StringColumn1: TStringColumn
-            Header = 'Track ID'
-            Size.Width = 60.000000000000000000
+            Header = 'C'#211'DIGO'
+            Size.Width = 55.000000000000000000
           end
           object StringColumn2: TStringColumn
-            Header = 'Artist Name'
-            Size.Width = 135.000000000000000000
+            Header = 'URL'
+            Size.Width = 178.000000000000000000
           end
           object StringColumn3: TStringColumn
-            Header = 'Collection Name'
-            Size.Width = 160.000000000000000000
+            Header = 'DATA INICIO'
+            Size.Width = 150.000000000000000000
           end
           object StringColumn4: TStringColumn
-            Header = 'Track Name'
-            Size.Width = 140.000000000000000000
-          end
-          object StringColumn5: TStringColumn
-            Header = 'Nota'
-            Size.Width = 35.000000000000000000
+            Header = 'DATA FIM'
+            Size.Width = 150.000000000000000000
           end
         end
         object LayoutAcoesPesquisa: TLayout
@@ -178,15 +174,15 @@ object frmLogs: TfrmLogs
             Size.Height = 50.000000000000000000
             Size.PlatformDefault = False
             TabOrder = 4
-            object btnVotar: TRectangle
+            object btnAlterar: TRectangle
               Align = Left
               Cursor = crHandPoint
               Fill.Kind = None
-              Size.Width = 97.000000000000000000
+              Size.Width = 113.000000000000000000
               Size.Height = 50.000000000000000000
               Size.PlatformDefault = False
               Stroke.Kind = None
-              OnClick = btnVotarClick
+              OnClick = btnAlterarClick
               object imgAlterar: TImage
                 MultiResBitmap.Height = 48
                 MultiResBitmap.Width = 48
@@ -197,33 +193,23 @@ object frmLogs: TfrmLogs
                     PNG = {
                       89504E470D0A1A0A0000000D49484452000000300000003008060000005702F9
                       87000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
-                      02D1494441546843EDD84BC80D611CC7F1E34E2CDC6FB9968592CB421252C206
-                      91624572896C5DB2602359C9CEC2AD140B898552B66281055928A4506E91BBA4
-                      502EDFDF39CF537F4F33E7CC99F73CD3999A5F7D9AE7CC3CF33CCFBCEF99799E
-                      39B52A55AA44CD3CA7B439E79432A3F1C351394A7ABB6D8C6CC7006787769429
-                      7DF1127F1D95B5AF3459073F786F3D4A93EB082FE0064A91590807EFCD46D7E7
-                      24ECA09F98F269747586E13BEC05EC36651D1B8EAECD1ED8C14B78517BD195D1
-                      9CF21476F0A29C82FFFC0C31E79FDC59053B704F096FECD5E8487AB96D968C80
-                      BE0E13300A43311E63A0FD8BA063617C1F7A8C2E6E146BAF70079FA049EE832B
-                      BFC15B577E879649BA809D988FC9D00DA7814E42DEF83E34915D6C1433E73574
-                      311FF102B771024DA3BF66D24494974FB8BC6897C6A4B1FD97B4AF507F9CC186
-                      FAA79EC5F631079ACCC641FF5D7D15F5B55359A62029E7B105BFEA9FDAC82124
-                      FD35DAD14E364183B4E71F468FB21961A3EDC89A83B0E7A9CFADE84896E20B6C
-                      0759B54A3F9C853DE72B96A3A39981E7B01D65D12C7AC25D83ADAFA7CD4C44C9
-                      58DC85EDB095B4E8867D005BF71E34B744CD605C81EDB899A46866D6A465EB5D
-                      C51014923E38063B80344959095BE738D466A1D1EF3D76106992A209E9377C9D
-                      05C8959EAC0A17BA6D9E7CC6C346B19EDC6D15710103DD36CC4DB755B4102C3C
-                      E14D9846AF942B1066237C9DF7485BD644C934D8416671195AE1FA4C853D3E1D
-                      8545CB0BDB79567AB5DC0F2D1615BD17F863DBB4A3A8E8D7053BB034F79D70FF
-                      632CC305B34FABDFC2F208764021AD657641EF00A2B2F685F5EC7DA48B2A2423
-                      F107762096D6EE49CB01EDD3B1A473446D46FB15DB660D9206A0E7FA12B48AEA
-                      A86E521B6B113D47603BFD867DD0B2386B5457E7E85CDBD65144CF2DF80E2F61
-                      22F246E7AA0DDF9E5EDAA346B3EA4FE886EBE40B87DA529B6A7B9076C4CA5C1C
-                      807F8E77326A536DAB8F2A55AA5429456AB57F4B118E46310157320000000049
-                      454E44AE426082}
+                      01A8494441546843ED99CD4DC43010850308D10107E00825D1079570A4002490
+                      E8027AA0000EC0091AE0FF3D25410F6B92786C12EFAEFC499F9C5D12CF3CB28E
+                      B29BA65298AD6EF4F0DD8D3D29732859F36D77E3DA520394662AC021BC86CF90
+                      9FD5F0F34AFAF7530DE9DF67CD2BC81E9238802F508B95903D2485B884D68425
+                      E49970F300ADC94AF8044DC6AEB96F70B7DD5C09CC5EEB65B4341B1D20F71E67
+                      11D6FE0C8CF10EF552B6345A7BB07E5DC4A5A98B38837378D66ECEC3079C5C44
+                      89B0F97EDEA1105A9BBA992B80364F6FA085EE43DDCC11C06A7E075AE87ED4CD
+                      7F07F0344F745FEAE613C64C700CF7DBCD41BCCD13DD9FBA890970021FE13D1C
+                      0A91D23CD163A89BA9007B50BFB55921529B277A1C751373064EA1DE3369889C
+                      E6891E4BDDC4AE012BC485BCA6DEE6891E4FDD7CC1D809C2106A4AF3249CC78D
+                      2700B142A4364F741EEAC61B8068889CE689D68EADFF8794008421F873644EF3
+                      446B0FD61FBB656600FDFBD2B7D761D366FDFA7DA0341B1D80BFCF2BE1A29A5B
+                      25ECE597B10077DDB80ADC76A38B23F80AADFFCE92263FE0200C113E625ACAEC
+                      474C954AA532374DF303579398E35945EF760000000049454E44AE426082}
                     FileName = 
-                      'C:\Users\SERGIO\Documents\RUNTEC\Teste 1\Library\baseline_star_h' +
-                      'alf_black_24dp.png'
+                      'C:\Users\SERGIO\Documents\SOFTPLAN\Library\baseline_event_availa' +
+                      'ble_black_24dp.png'
                   end>
                 Align = Left
                 Cursor = crHandPoint
@@ -245,20 +231,20 @@ object frmLogs: TfrmLogs
                 Locked = True
                 Margins.Left = 5.000000000000000000
                 Position.X = 48.000000000000000000
-                Size.Width = 41.000000000000000000
+                Size.Width = 57.000000000000000000
                 Size.Height = 50.000000000000000000
                 Size.PlatformDefault = False
                 TextSettings.Font.StyleExt = {00070000000000000004000000}
-                Text = 'VOTAR'
+                Text = 'ALTERAR'
                 TabOrder = 1
               end
             end
             object btnExcluir: TRectangle
-              Align = Left
+              Align = Right
               Cursor = crHandPoint
               Fill.Kind = None
               Margins.Left = 125.000000000000000000
-              Position.X = 222.000000000000000000
+              Position.X = 450.000000000000000000
               Size.Width = 104.000000000000000000
               Size.Height = 50.000000000000000000
               Size.PlatformDefault = False
@@ -312,103 +298,56 @@ object frmLogs: TfrmLogs
                 TabOrder = 1
               end
             end
-            object btnExcluirAll: TRectangle
-              Align = Left
-              Cursor = crHandPoint
-              Fill.Kind = None
-              Margins.Left = 125.000000000000000000
-              Position.X = 451.000000000000000000
-              Size.Width = 99.000000000000000000
-              Size.Height = 50.000000000000000000
-              Size.PlatformDefault = False
-              Stroke.Kind = None
-              OnClick = btnExcluirAllClick
-              object btnExcluirTodas: TImage
-                MultiResBitmap.Height = 48
-                MultiResBitmap.Width = 48
-                MultiResBitmap = <
-                  item
-                    Width = 48
-                    Height = 48
-                    PNG = {
-                      89504E470D0A1A0A0000000D49484452000000300000003008060000005702F9
-                      87000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
-                      00B9494441546843EDD5DD0DC2300C46D1C01A0CCB34DD8369786207C827A512
-                      202B24ADA9FB738F64E5A5756CC9491200001DAE399E3F42DFAC524BF1632CD6
-                      C4A9ACEF54C03F597B4E762EEB66D1008EAE762378DF46DF7B4DCDFF9187431C
-                      6DF30D449E01178C5034CE4087B9EF80592B23148D33D08177C04203D1D6FC0E
-                      349D194628DAAE1BB897D583954B335E8B26B5066E65F5E099ABD925C723876E
-                      8B39A11CCA15421B0F3934025671B5D03FFA37AC7800C0DEA5F402AAB441AB9A
-                      460D1C0000000049454E44AE426082}
-                    FileName = 
-                      'C:\Users\SERGIO\Documents\RUNTEC\Teste 1\Library\baseline_delete' +
-                      '_sweep_black_24dp.png'
-                  end>
-                Align = Left
-                Cursor = crHandPoint
-                Locked = True
-                HitTest = False
-                Margins.Left = 5.000000000000000000
-                Position.X = 5.000000000000000000
-                Size.Width = 33.000000000000000000
-                Size.Height = 50.000000000000000000
-                Size.PlatformDefault = False
-                ParentShowHint = False
-                ShowHint = False
-              end
-              object Label16: TLabel
-                Align = Left
-                AutoSize = True
-                StyledSettings = []
-                Locked = True
-                Margins.Left = 5.000000000000000000
-                Position.X = 43.000000000000000000
-                Size.Width = 60.000000000000000000
-                Size.Height = 50.000000000000000000
-                Size.PlatformDefault = False
-                TextSettings.Font.StyleExt = {00070000000000000004000000}
-                Text = 'EXCLUIR ARTISTA'
-                TabOrder = 1
-              end
-            end
           end
-          object chkID: TCheckBox
+          object chkDataIni: TCheckBox
             Cursor = crHandPoint
-            Position.X = 432.000000000000000000
+            Position.X = 304.000000000000000000
             Position.Y = 48.000000000000000000
-            Size.Width = 81.000000000000000000
+            Size.Width = 89.000000000000000000
             Size.Height = 19.000000000000000000
             Size.PlatformDefault = False
-            TabOrder = 7
-            Text = 'Track ID'
-            OnClick = chkIDClick
+            TabOrder = 8
+            Text = 'DATA INICIO'
+            OnClick = chkDataIniClick
           end
-          object chkArtist: TCheckBox
+          object chkCodigo: TCheckBox
             Cursor = crHandPoint
             IsChecked = True
             Position.X = 56.000000000000000000
             Position.Y = 48.000000000000000000
-            Size.Width = 121.000000000000000000
+            Size.Width = 73.000000000000000000
             Size.Height = 19.000000000000000000
             Size.PlatformDefault = False
             TabOrder = 6
-            Text = 'Artist Name'
-            OnClick = chkArtistClick
+            Text = 'C'#211'DIGO'
+            OnClick = chkCodigoClick
           end
-          object chkCollection: TCheckBox
+          object chkURL: TCheckBox
             Cursor = crHandPoint
-            Position.X = 224.000000000000000000
+            Position.X = 184.000000000000000000
             Position.Y = 48.000000000000000000
-            Size.Width = 121.000000000000000000
+            Size.Width = 49.000000000000000000
             Size.Height = 19.000000000000000000
             Size.PlatformDefault = False
             TabOrder = 5
-            Text = 'Collection Name'
-            OnClick = chkCollectionClick
+            Text = 'URL'
+            OnClick = chkURLClick
+          end
+          object chkDataFim: TCheckBox
+            Cursor = crHandPoint
+            Position.X = 472.000000000000000000
+            Position.Y = 48.000000000000000000
+            Size.Width = 73.000000000000000000
+            Size.Height = 19.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 7
+            Text = 'DATA FIM'
+            OnChange = chkDataFimChange
+            OnClick = chkDataIniClick
           end
         end
       end
-      object TabCadastroClientes: TTabItem
+      object TabCadastroLogs: TTabItem
         CustomIcon = <
           item
           end>
