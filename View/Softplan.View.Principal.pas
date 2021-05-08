@@ -5,7 +5,7 @@ sistema
 
 Dev.: Sérgio de Siqueira Silva
 
-Data Alteração: 09/05/2021
+Data Alteração: 08/05/2021
 Dev.: Sérgio de Siqueira Silva
 Alteração: Alteração na forma de abrir os forms dentro do LayoutMaster antes
            tinha uma procedure que carregava o layout através de um laço FOR
@@ -26,10 +26,10 @@ type
     ImageFundo: TImage;
     LayoutMaster: TLayout;
     ImageMenuSuperior: TImage;
-    RectangleMenuImportacao: TRectangle;
+    RectangleMenuDownload: TRectangle;
     RectangleSelecionado: TRectangle;
     FloatAnimation1: TFloatAnimation;
-    RectangleMenuMusicas: TRectangle;
+    RectangleMenuLogs: TRectangle;
     Image1: TImage;
     Label2: TLabel;
     Label1: TLabel;
@@ -40,10 +40,11 @@ type
     StyleBook1: TStyleBook;
     RectangleInicial: TRectangle;
     procedure FormShow(Sender: TObject);
-    procedure RectangleMenuImportacaoClick(Sender: TObject);
-    procedure RectangleMenuMusicasClick(Sender: TObject);
+    procedure RectangleMenuDownloadClick(Sender: TObject);
+    procedure RectangleMenuLogsClick(Sender: TObject);
     procedure RectangleMenuSairClick(Sender: TObject);
     procedure RectangleInicialClick(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   private
     { Private declarations }
     procedure AnimaSelecaoMenu(Inicio,Fim:TPosition);
@@ -62,7 +63,7 @@ implementation
 uses Softplan.View.Inicial, Softplan.Model.ConexaoBD, Softplan.View.Dowload,
      Softplan.View.Logs;
 
-//Procedure para exibição dos formulários da aplicação no LayoutMaster
+{Procedure para exibição dos formulários da aplicação no LayoutMaster}
 procedure CarregarForm(const FormClass: TComponentClass);
 var LayoutPadrao : TComponent;
 begin
@@ -87,15 +88,45 @@ begin
           frmPrincipal.LayoutMaster.AddObject(TLayout(LayoutPadrao));
 end;
 
+
+{Antes de fechar o sistema verifica se tem algum download em andamento}
+procedure TfrmPrincipal.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+var ProgressBar:  TComponent;
+    btnDownload:  TComponent;
+begin
+  if FormAtivo.Name = 'frmDownload' then
+  begin
+    ProgressBar := FormAtivo.FindComponent('ProgressBar');
+    btnDownload := FormAtivo.FindComponent('btnDownload');
+
+    if not TRectangle(btnDownload).Enabled then
+    begin
+
+      if TProgressBar(ProgressBar).Max <> TProgressBar(ProgressBar).Value then
+      begin
+       MessageDlg('Existe um download em andamento, por favor cancele antes de sair do sistema!',
+                  TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
+       CanClose := False;
+      end;
+
+    end;
+
+  end;
+end;
+
+{Inicialização do sistema, aqui e usado a classe de conexao com o Banco de Dados
+ para gerar o arquivo de dados caso não existir na mesma pasta do executavel e
+ ao mesmo tempo carrega o form inicial do sistema}
 procedure TfrmPrincipal.FormShow(Sender: TObject);
 Var Conn: TConexao;
 begin
   Conn := TConexao.Create;
+  FreeAndNil(Conn);
 
   CarregarForm(TfrmInicial);
 end;
 
-//Procedure para Animação do RectangleSelecionado
+{Procedure para Animação do RectangleSelecionado}
 procedure TfrmPrincipal.AnimaSelecaoMenu(Inicio, Fim: TPosition);
 begin
     FloatAnimation1.StartValue := Inicio.Y;
@@ -103,27 +134,31 @@ begin
     FloatAnimation1.Start;
 end;
 
+{Fechar o sistema}
 procedure TfrmPrincipal.RectangleMenuSairClick(Sender: TObject);
 begin
     Close;
 end;
 
-procedure TfrmPrincipal.RectangleMenuMusicasClick(Sender: TObject);
+{Menu: Tela de histórico de Logs}
+procedure TfrmPrincipal.RectangleMenuLogsClick(Sender: TObject);
 begin
   CarregarForm(TfrmLogs);
-  AnimaSelecaoMenu(RectangleSelecionado.Position,RectangleMenuMusicas.Position);
+  AnimaSelecaoMenu(RectangleSelecionado.Position,RectangleMenuLogs.Position);
 end;
 
+{Menu: Tela da pagina inicial}
 procedure TfrmPrincipal.RectangleInicialClick(Sender: TObject);
 begin
   CarregarForm(TfrmInicial);
   AnimaSelecaoMenu(RectangleSelecionado.Position,RectangleInicial.Position);
 end;
 
-procedure TfrmPrincipal.RectangleMenuImportacaoClick(Sender: TObject);
+{Menu: Tela de Download}
+procedure TfrmPrincipal.RectangleMenuDownloadClick(Sender: TObject);
 begin
-  CarregarForm(TfrmImportacao);
-  AnimaSelecaoMenu(RectangleSelecionado.Position,RectangleMenuImportacao.Position);
+  CarregarForm(TfrmDownload);
+  AnimaSelecaoMenu(RectangleSelecionado.Position,RectangleMenuDownload.Position);
 end;
 
 end.

@@ -4,7 +4,7 @@ Objetivo: Classe para manipulação da entidade MUSICA
 
 Dev.: Sérgio de Siqueira Silva
 
-Data Alteração: 09/05/2021
+Data Alteração: 08/05/2021
 Dev.: Sérgio de Siqueira Silva
 Alteração: Alteração no metódo de Ação sobre a classe antes utilizava uma cadeia
            de decisões com IF's alterado pra CASE
@@ -64,28 +64,17 @@ begin
   Result := False;
 
   case Tipo of
-    tacIncluir:   begin
-                    if Incluir then
-                      Result := True;
-                  end;
+    tacIncluir:   Result := Incluir;
     tacCarregar:  begin
+                    if Codigo = 0 then
+                      raise Exception.Create('Informe o código!');
+
                     if Buscar(Codigo) then
                       Result := True;
                   end;
-    tacAlterar:   begin
-                    Alterar;
-                  end;
-    tacGravar:    begin
-                    if Gravar then
-                      Result := True;
-                  end;
-    tacExcluir:   begin
-                    if Codigo = 0 then
-                      raise Exception.Create('Nenhum código informado!');
-
-                    if Apagar then
-                      Result := True;
-                  end;
+    tacAlterar:   Result := Alterar;
+    tacGravar:    Result := Gravar;
+    tacExcluir:   Result := Apagar;
   end;
 end;
 
@@ -244,7 +233,7 @@ begin
       begin
         Active := False;
         SQL.Clear;
-        S := 'UPDATE LOGDOWNLOAD SET URL = :URL '
+        S := 'UPDATE LOGDOWNLOAD SET URL = :URL, '
                                    +'DATAINICIO = :DATAINICIO, '
                                    +'DATAFIM = :DATAFIM '
                    +'WHERE CODIGO = :CODIGO';

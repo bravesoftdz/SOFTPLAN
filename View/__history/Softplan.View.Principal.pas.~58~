@@ -1,0 +1,167 @@
+{-------------------------------------------------------------------------------
+Tela: frmPrincipal                                               Data:08/05/2021
+Objetivo: Tela com o objetivo de ser um menu e container para as outras telas do
+sistema
+
+Dev.: Sérgio de Siqueira Silva
+
+Data Alteração: 08/05/2021
+Dev.: Sérgio de Siqueira Silva
+Alteração: Alteração na forma de abrir os forms dentro do LayoutMaster antes
+           tinha uma procedure que carregava o layout através de um laço FOR
+-------------------------------------------------------------------------------}
+
+unit Softplan.View.Principal;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects,
+  FMX.Layouts, FMX.Ani, FMX.Controls.Presentation, FMX.StdCtrls;
+
+type
+  TfrmPrincipal = class(TForm)
+    LayoutMenu: TLayout;
+    ImageFundo: TImage;
+    LayoutMaster: TLayout;
+    ImageMenuSuperior: TImage;
+    RectangleMenuDownload: TRectangle;
+    RectangleSelecionado: TRectangle;
+    FloatAnimation1: TFloatAnimation;
+    RectangleMenuLogs: TRectangle;
+    Image1: TImage;
+    Label2: TLabel;
+    Label1: TLabel;
+    Image2: TImage;
+    RectangleMenuSair: TRectangle;
+    Image4: TImage;
+    Label4: TLabel;
+    StyleBook1: TStyleBook;
+    RectangleInicial: TRectangle;
+    procedure FormShow(Sender: TObject);
+    procedure RectangleMenuDownloadClick(Sender: TObject);
+    procedure RectangleMenuLogsClick(Sender: TObject);
+    procedure RectangleMenuSairClick(Sender: TObject);
+    procedure RectangleInicialClick(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+  private
+    { Private declarations }
+    procedure AnimaSelecaoMenu(Inicio,Fim:TPosition);
+  public
+    { Public declarations }
+  end;
+
+var
+  frmPrincipal: TfrmPrincipal;
+  FormAtivo : TForm;
+
+implementation
+
+{$R *.fmx}
+
+uses Softplan.View.Inicial, Softplan.Model.ConexaoBD, Softplan.View.Dowload,
+     Softplan.View.Logs;
+
+{Procedure para exibição dos formulários da aplicação no LayoutMaster}
+procedure CarregarForm(const FormClass: TComponentClass);
+var LayoutPadrao : TComponent;
+begin
+  //Busca se o Form já esta dentro do LayoutMaster
+  if Assigned(FormAtivo) then
+  begin
+    if FormAtivo.ClassType = FormClass then
+      exit
+    else
+    begin
+      FormAtivo.DisposeOf;
+      FormAtivo := nil;
+    end;
+  end;
+
+  Application.CreateForm(FormClass, FormAtivo);
+
+  // Busca pelo LayoutContainer no form a ser aberto
+  LayoutPadrao := FormAtivo.FindComponent('LayoutContainer');
+
+  if Assigned(LayoutPadrao) then
+          frmPrincipal.LayoutMaster.AddObject(TLayout(LayoutPadrao));
+end;
+
+
+{Antes de fechar o sistema verifica se tem algum download em andamento}
+procedure TfrmPrincipal.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+var ProgressBar:  TComponent;
+    btnDownload:  TComponent;
+    FAsyncResult: IAsyncResult;
+begin
+  if FormAtivo.Name = 'frmDownload' then
+  begin
+    ProgressBar := FormAtivo.FindComponent('ProgressBar');
+    btnDownload := FormAtivo.FindComponent('btnDownload');
+
+    if not TRectangle(btnDownload).Enabled then
+    begin
+      if TProgressBar(ProgressBar).Max <> TProgressBar(ProgressBar).Value then
+      begin
+
+        if MessageDlg('Deseja realmente abortar o download?',
+                TMsgDlgType.mtWarning,
+                [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], 0) = mrYes then
+          begin
+            FormAtivo.FAsyncResult.Cancel;
+          end else CanClose := False;
+
+      end;
+    end;
+  end;
+end;
+
+{Inicialização do sistema, aqui e usado a classe de conexao com o Banco de Dados
+ para gerar o arquivo de dados caso não existir na mesma pasta do executavel e
+ ao mesmo tempo carrega o form inicial do sistema}
+procedure TfrmPrincipal.FormShow(Sender: TObject);
+Var Conn: TConexao;
+begin
+  Conn := TConexao.Create;
+  FreeAndNil(Conn);
+
+  CarregarForm(TfrmInicial);
+end;
+
+{Procedure para Animação do RectangleSelecionado}
+procedure TfrmPrincipal.AnimaSelecaoMenu(Inicio, Fim: TPosition);
+begin
+    FloatAnimation1.StartValue := Inicio.Y;
+    FloatAnimation1.StopValue := Fim.Y;
+    FloatAnimation1.Start;
+end;
+
+{Fechar o sistema}
+procedure TfrmPrincipal.RectangleMenuSairClick(Sender: TObject);
+begin
+    Close;
+end;
+
+{Menu: Tela de histórico de Logs}
+procedure TfrmPrincipal.RectangleMenuLogsClick(Sender: TObject);
+begin
+  CarregarForm(TfrmLogs);
+  AnimaSelecaoMenu(RectangleSelecionado.Position,RectangleMenuLogs.Position);
+end;
+
+{Menu: Tela da pagina inicial}
+procedure TfrmPrincipal.RectangleInicialClick(Sender: TObject);
+begin
+  CarregarForm(TfrmInicial);
+  AnimaSelecaoMenu(RectangleSelecionado.Position,RectangleInicial.Position);
+end;
+
+{Menu: Tela de Download}
+procedure TfrmPrincipal.RectangleMenuDownloadClick(Sender: TObject);
+begin
+  CarregarForm(TfrmDownload);
+  AnimaSelecaoMenu(RectangleSelecionado.Position,RectangleMenuDownload.Position);
+end;
+
+end.

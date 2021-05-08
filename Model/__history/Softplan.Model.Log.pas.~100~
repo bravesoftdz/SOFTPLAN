@@ -1,0 +1,303 @@
+{-------------------------------------------------------------------------------
+Classe: TLog                                                     Data:08/05/2021
+Objetivo: Classe para manipulação da entidade MUSICA
+
+Dev.: Sérgio de Siqueira Silva
+
+Data Alteração: 09/05/2021
+Dev.: Sérgio de Siqueira Silva
+Alteração: Alteração no metódo de Ação sobre a classe antes utilizava uma cadeia
+           de decisões com IF's alterado pra CASE
+-------------------------------------------------------------------------------}
+
+unit Softplan.Model.Log;
+
+interface
+
+uses
+  SysUtils, UITypes, StrUtils, DateUtils, Softplan.Model.ConexaoBD,
+  FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
+  FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
+  FireDAC.Phys.FB, FireDAC.Phys.FBDef, FireDAC.FMXUI.Wait, Data.DB,
+  FireDAC.Comp.Client, FireDAC.Stan.Intf, FireDAC.Dapt, uEnums;
+
+type
+  TLog = class
+  private
+    Conexao: TConexao;
+    Query: TFDQuery;
+    Status: TStatus;
+    FCodigo: Int64;
+    FURL: String;
+    FDataIni: TDateTime;
+    FDataFim: TDateTime;
+
+    procedure LimpaLog();
+    function ConsistenciaDados: Boolean;
+
+    {CRUD}
+    function Incluir:Boolean;
+    function Alterar: Boolean;
+    function Buscar(Codigo: Int64): Boolean;
+    function Gravar: Boolean;
+    function Apagar: Boolean;
+  public
+    {Atributos}
+    property Codigo: Int64 read FCodigo write FCodigo;
+    property URL: String read FURL write FURL;
+    property DataIni: TDateTime read FDataIni write FDataIni;
+    property DataFim: TDateTime read FDataFim write FDataFim;
+
+    {Metodos}
+    constructor Create;
+    destructor Destroy;
+    function Acao(const Tipo: TAcao; Codigo: Int64 = 0): Boolean;
+  end;
+
+implementation
+
+{ TLog }
+
+{Ações: Da acesso aos métodos privados de CRUD para o Controller}
+function TLog.Acao(const Tipo: TAcao; Codigo: Int64 = 0): Boolean;
+begin
+  Result := False;
+
+  case Tipo of
+    tacIncluir:   begin
+                    if Incluir then
+                      Result := True;
+                  end;
+    tacCarregar:  begin
+                    if Codigo = 0 then
+                      raise Exception.Create('Informe o código!');
+
+                    if Buscar(Codigo) then
+                      Result := True;
+                  end;
+    tacAlterar:   begin
+                    Alterar;
+                  end;
+    tacGravar:    begin
+                    if Gravar then
+                      Result := True;
+                  end;
+    tacExcluir:   begin
+                    if Apagar then
+                      Result := True;
+                  end;
+  end;
+end;
+
+{Alterar: Primeira faz a busca pra se certificar que os Atributos são os que
+          estão persistidos e após isso coloca o Status para Alteração}
+function TLog.Alterar: Boolean;
+begin
+  Result := False;
+
+  {Busca para carregar os dados persistidos no BD}
+  if not Buscar(Self.FCodigo) then exit;
+
+  Status := tstAlteracao;
+  Result := True;
+end;
+
+{Apagar: Primeiro faz uma busca para se certificar que existe um Log valido para
+         exclusão e após isso executa o DELETE}
+function TLog.Apagar: Boolean;
+begin
+  Result := False;
+
+  {Verifica se não está Incluindo ou Alterando}
+  if Status <> tstNavegando then
+    raise Exception.Create('Log atual está em modo de inserção ou alteração!');
+
+  {Localiza pra excluir}
+  if not Buscar(Self.FCodigo) then exit;
+
+  with Query do
+  begin
+    {Exclusão}
+    Active := False;
+    SQL.Clear;
+    SQL.Add('DELETE FROM LOGDOWNLOAD WHERE CODIGO = :CODIGO');
+    ParamByName('CODIGO').AsLargeInt:= Codigo;
+    ExecSQL;
+
+    {Conferência da exclusão}
+    Active := False;
+    SQL.Clear;
+    SQL.Add('SELECT * FROM LOGDOWNLOAD WHERE CODIGO = :CODIGO');
+    ParamByName('CODIGO').AsLargeInt:= Codigo;
+    Active := True;
+
+    if RecordCount = 0 then
+      Result := True;
+  end;
+end;
+
+{Buscar: Localiza um Log e carrega seus os atributos}
+function TLog.Buscar(Codigo: Int64): Boolean;
+begin
+  Result := False;
+
+  with Query do
+  begin
+    Active := False;
+    SQL.Clear;
+    SQL.Add('SELECT * FROM LOGDOWNLOAD WHERE CODIGO = :CODIGO');
+    ParamByName('CODIGO').AsLargeInt := Codigo;
+    Active := True;
+
+    if RecordCount = 0 then
+    begin
+      exit;
+    end else
+      Result := True;
+
+    Self.FCodigo  := FieldByName('CODIGO').AsLargeInt;
+    Self.FURL     := FieldByName('URL').AsString;
+    Self.FDataIni := FieldByName('DATAINICIO').AsDateTime;
+    Self.FDataFim := FieldByName('DATAFIM').AsDateTime;
+  end;
+end;
+
+{ConsistenciaDados: Analisa as regras de negócio antes de algumas ações}
+function TLog.ConsistenciaDados: Boolean;
+begin
+  Result := False;
+
+  if Self.Codigo <= 0 then
+    raise Exception.Create('Verifique o código do Download!');
+
+  if Self.URL = EmptyStr then
+    raise Exception.Create('URL em branco!');
+
+  if Self.FDataIni <= 0 then
+    raise Exception.Create('Data inicial incorreta!');
+
+  Result := True;
+end;
+
+constructor TLog.Create;
+begin
+  {Cria a conexão com BD e já conecta em uma Query}
+  Query := TFDQuery.Create(nil);
+  Conexao := TConexao.Create;
+  Query.Connection := Conexao.Conn;
+
+  {Inicializa os atributos}
+  LimpaLog;
+end;
+
+destructor TLog.Destroy;
+begin
+  FreeAndNil(Conexao);
+  FreeAndNil(Query);
+end;
+
+{Gravar: Método para persistência dos dados da Classe, o metodo ele verifica
+         qual e o Status da Classe e baseado nesse faz o INSERT ou UPDATE}
+function TLog.Gravar: Boolean;
+Var S: String;
+begin
+  Result := False;
+
+  if not ConsistenciaDados then exit;
+
+  {Inclusão}
+  if Status = tstInclusao then
+  begin
+
+      if Buscar(Self.FCodigo) then
+        raise Exception.Create('Download '+ Self.FCodigo.ToString +' já cadastrada!');
+
+      with Query do
+      begin
+        Active := False;
+        SQL.Clear;
+        S := 'INSERT INTO LOGDOWNLOAD VALUES(:CODIGO,:URL, :DATAINICIO, :DATAFIM)';
+        SQL.Add(S);
+
+        ParambyName('CODIGO').AsLargeInt     := Self.FCodigo;
+        ParambyName('URL').AsString          := Self.FURL;
+        ParamByName('DATAINICIO').AsDateTime := Self.DataIni;
+
+        if Self.FDataFim <> 0 then
+          ParamByName('DATAFIM').AsDateTime  := Self.DataFim
+        else
+          ParamByName('DATAFIM').AsString    := EmptyStr;
+        ExecSQL;
+
+        if Buscar(Self.FCodigo) then
+          Result := True
+        else
+          Result := False;
+      end;
+  end;
+
+
+  {Alteração}
+  if Status = tstAlteracao then
+  begin
+      with Query do
+      begin
+        Active := False;
+        SQL.Clear;
+        S := 'UPDATE LOGDOWNLOAD SET URL = :URL '
+                                   +'DATAINICIO = :DATAINICIO, '
+                                   +'DATAFIM = :DATAFIM '
+                   +'WHERE CODIGO = :CODIGO';
+        SQL.Add(S);
+
+        ParambyName('CODIGO').AsLargeInt     := Self.FCodigo;
+
+        ParambyName('URL').AsString          := Self.FURL;
+        ParamByName('DATAINICIO').AsDateTime := Self.FDataIni;
+
+        if Self.FDataFim <> 0 then
+          ParamByName('DATAFIM').AsDateTime  := Self.DataFim
+        else
+          ParamByName('DATAFIM').AsString    := EmptyStr;
+        ExecSQL;
+
+        Result := True
+      end;
+  end;
+
+  LimpaLog;
+end;
+
+{Incluir: Seta o Status da Classe para Inclusao e busca um novo codigo}
+function TLog.Incluir: Boolean;
+begin
+  Result := False;
+
+  with Query do
+  begin
+    Active := False;
+    SQL.Clear;
+    SQL.Add('SELECT MAX(CODIGO) AS NOVOID FROM LOGDOWNLOAD');
+    Active := True;
+
+    LimpaLog;
+    if FieldByName('NOVOID').AsString = '' then
+      Self.FCodigo := 1
+    else
+      Self.FCodigo := FieldByName('NOVOID').AsLargeInt + 1;
+  end;
+
+  Status := tstInclusao;
+  Result := True;
+end;
+
+{Limpa os atributos da classe}
+procedure TLog.LimpaLog;
+begin
+  Self.FCodigo := 0;
+  Self.FURL := EmptyStr;
+  Self.FDataIni := 0;
+  Self.FDataFim := 0;
+end;
+
+end.

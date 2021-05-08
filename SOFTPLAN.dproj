@@ -390,7 +390,7 @@
         <DCCReference Include="Model\Softplan.Model.ConexaoBD.pas"/>
         <DCCReference Include="Extras\uEnums.pas"/>
         <DCCReference Include="View\Softplan.View.Dowload.pas">
-            <Form>frmImportacao</Form>
+            <Form>frmDownload</Form>
             <FormType>fmx</FormType>
         </DCCReference>
         <DCCReference Include="Extras\uFuncoes.pas"/>

@@ -4,9 +4,9 @@ Objetivo: Tela de manutenção dos Logs
 
 Dev.: Sérgio de Siqueira Silva
 
-Data Alteração: 09/05/2021
+Data Alteração: 08/05/2021
 Dev.: Sérgio de Siqueira Silva
-Alteração:
+Alteração: Botão excluir todos os logs listados na GRID
 -------------------------------------------------------------------------------}
 
 unit Softplan.View.Logs;
@@ -24,10 +24,11 @@ uses
   System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt,
   Fmx.Bind.DBEngExt, Data.Bind.Components, Data.Bind.Grid, Data.Bind.DBScope,
   FMX.TabControl, uEnums, Softplan.Controller.Log, Softplan.Model.ConexaoBD,
-  FMX.ListBox, FMX.DateTimeCtrls;
+  FMX.ListBox, FMX.DateTimeCtrls, FMX.Memo, DateUtils;
 
 type
-  TTipoBusca = (tPesqCodigo, tPesqURL, tPesqDataIni, tPesqDataFim, tPesqTodas);
+  {Enum com os tipos de busca possiveis}
+  TTipoBusca = (tPesqCodigo, tPesqURL, tPesqDataIni, tPesqTodas);
 
   TfrmLogs = class(TForm)
     LayoutContainer: TLayout;
@@ -46,43 +47,45 @@ type
     TabCadastroLogs: TTabItem;
     LayoutCadastroClientes: TLayout;
     Layout3: TLayout;
-    btnCancelar: TImage;
-    btnGravar: TImage;
+    btnVoltar: TImage;
     Grid: TStringGrid;
     StringColumn1: TStringColumn;
     StringColumn2: TStringColumn;
     StringColumn3: TStringColumn;
     StringColumn4: TStringColumn;
     Label7: TLabel;
-    lblCodigo: TLabel;
-    StyleBook1: TStyleBook;
     Label8: TLabel;
     Label9: TLabel;
     Label10: TLabel;
-    lblDataInicial: TLabel;
-    lblURL: TLabel;
     Image1: TImage;
     Label15: TLabel;
-    btnAlterar: TRectangle;
-    imgAlterar: TImage;
+    btnDetalhar: TRectangle;
+    imgDetalhar: TImage;
     Label14: TLabel;
     btnExcluir: TRectangle;
-    lblDataFinal: TLabel;
-    chkDataFim: TCheckBox;
+    btExcluirTodos: TRectangle;
+    imgExluirTodos: TImage;
+    Label2: TLabel;
+    StyleBook1: TStyleBook;
+    eCodigo: TEdit;
+    eDataInicial: TEdit;
+    eDataFinal: TEdit;
+    eURL: TMemo;
+    Label3: TLabel;
+    eTotalTempo: TEdit;
     procedure edtPesquisaKeyDown(Sender: TObject; var Key: Word;
       var KeyChar: Char; Shift: TShiftState);
     procedure btnPesquisarClick(Sender: TObject);
-    procedure btnGravarClick(Sender: TObject);
-    procedure btnCancelarClick(Sender: TObject);
-    procedure lblURLClick(Sender: TObject);
-    procedure btnAlterarClick(Sender: TObject);
+    procedure btnVoltarClick(Sender: TObject);
+    procedure btnDetalharClick(Sender: TObject);
     procedure btnExcluirClick(Sender: TObject);
     procedure chkCodigoClick(Sender: TObject);
     procedure chkURLClick(Sender: TObject);
     procedure chkDataIniClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure chkDataFimChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure btExcluirTodosClick(Sender: TObject);
+    procedure eURLClick(Sender: TObject);
   private
     { Private declarations }
     Show: Boolean;
@@ -94,13 +97,13 @@ type
     procedure LimpaGrideDados();
     procedure AbrirURL(const URL: String);
     procedure Checks(const Opcao: Integer);
-    procedure AlterarLog(const Codigo: Integer);
+    procedure CarregarLog(const Codigo: Integer);
     function CodigoSelecionado: Int64;
-  public
-    { Public declarations }
     procedure LocalizarLog();
     procedure PopularGrid;
     procedure CarregaLogs(TipoBusca:TTipoBusca);
+  public
+    { Public declarations }
   end;
 
 var
@@ -122,16 +125,41 @@ begin
   {$ENDIF MSWINDOWS}
 end;
 
-{Alterar: Primeiro faz a carga dos labels do TabCadastroLog e deixa o objeto de
-          controle em modo de alteração}
-procedure TfrmLogs.AlterarLog(const Codigo: Integer);
+{Carregar: Carrega o Controller com Log com os dados e após isso carga dos
+           componentes do TabCadastroLog e faz o calculo de tempo total}
+procedure TfrmLogs.CarregarLog(const Codigo: Integer);
+Var HoraInicial: String;
+    HoraFinal:   String;
 begin
   if not CtrlLog.Acao(tacCarregar, CodigoSelecionado) then exit;
 
-  lblCodigo.Text      := CtrlLog.Log.Codigo.ToString;
-  lblURL.Text         := CtrlLog.Log.URL;
-  lblDataInicial.Text := DateTimeToStr(CtrlLog.Log.DataIni);
-  lblDataFinal.Text   := DateTimeToStr(CtrlLog.Log.DataFim);
+  eCodigo.Text      := CtrlLog.Log.Codigo.ToString;
+  eURL.Text         := CtrlLog.Log.URL;
+
+  //Data e Hora Inicial
+  if CtrlLog.Log.DataIni <> 0 then
+  begin
+    eDataInicial.Text := DateTimeToStr(CtrlLog.Log.DataIni);
+    HoraInicial       :=  FormatDateTime('hh:mm:ss',CtrlLog.Log.DataIni);
+  end else
+    eDataInicial.Text := EmptyStr;
+
+  //Data e Hora Final
+  if CtrlLog.Log.DataFim <> 0 then
+  begin
+    eDataFinal.Text := DateTimeToStr(CtrlLog.Log.DataFim);
+    HoraFinal       := FormatDateTime('hh:mm:ss',CtrlLog.Log.DataFim);
+  end else
+    eDataFinal.Text := EmptyStr;
+
+  //Se tiver finalizado o download faz o calculo de tempo total
+  if (HoraInicial <> EmptyStr) and (HoraFinal <> EmptyStr) then
+  begin
+    eTotalTempo.Text := TimetoStr(StrtoTime(HoraInicial) - StrtoTime(HoraFinal));
+  end else
+  begin
+    eTotalTempo.Text := 'Download não finalizado!';
+  end;
 end;
 
 {Pesquisar: Utiliza a procedure LocalizarLog se o edtPesquisa tiver conteudo
@@ -148,7 +176,13 @@ begin
   end;
 end;
 
-{Criação dos objetos na memoria}
+{Função auxiliar para abrir o link do download no browse padrão do SO}
+procedure TfrmLogs.eURLClick(Sender: TObject);
+begin
+  AbrirURL(eURL.Text);
+end;
+
+{Criação dos objetos na memoria: Controller, Conexao BD, Query}
 procedure TfrmLogs.FormCreate(Sender: TObject);
 begin
   CtrlLog := TControlLog.Create;
@@ -157,6 +191,7 @@ begin
   Query.Connection := Conexao.Conn;
 
   CarregaLogs(tPesqTodas);
+  TabControl.TabIndex := 0;
 end;
 
 {Libera objetos da memoria}
@@ -167,7 +202,7 @@ begin
   FreeAndNil(Query);
 end;
 
-{Procedure de carga de dados dos LOGS para carga do GRID}
+{Procedure de carga de dados dos LOGS para exibição no GRID}
 procedure TfrmLogs.CarregaLogs(TipoBusca:TTipoBusca);
 var sSQL: String;
 begin
@@ -197,18 +232,7 @@ begin
                     end;
 
     tPesqDataIni:   begin
-                      sSQL := sSQL + 'WHERE DATAINICIO = :BUSCA';
-                      Query.SQL.Add(sSQL);
-                      try
-                        Query.ParamByName('BUSCA').AsDate := StrToDate(edtPesquisa.Text);
-                      except
-                        ShowMessage('Data inválida!');
-                        exit;
-                      end;
-                    end;
-
-    tPesqDataFim:   begin
-                      sSQL := sSQL + 'WHERE DATAFIM = :BUSCA';
+                      sSQL := sSQL + 'WHERE DATE(DATAINICIO) = :BUSCA';
                       Query.SQL.Add(sSQL);
                       try
                         Query.ParamByName('BUSCA').AsDate := StrToDate(edtPesquisa.Text);
@@ -237,22 +261,14 @@ begin
     1 : begin
           chkURL.IsChecked     := False;
           chkDataIni.IsChecked := False;
-          chkDataFim.IsChecked := False;
         end;
     2 : begin
           chkCodigo.IsChecked  := False;
           chkDataIni.IsChecked := False;
-          chkDataFim.IsChecked := False;
         end;
     3 : begin
           chkCodigo.IsChecked  := False;
           chkURL.IsChecked     := False;
-          chkDataFim.IsChecked := False;
-        end;
-    4 : begin
-          chkCodigo.IsChecked  := False;
-          chkURL.IsChecked     := False;
-          chkDataIni.IsChecked := False;
         end;
   end;
 end;
@@ -267,20 +283,9 @@ begin
   Checks(2);
 end;
 
-procedure TfrmLogs.chkDataFimChange(Sender: TObject);
-begin
-  Checks(4);
-end;
-
 procedure TfrmLogs.chkDataIniClick(Sender: TObject);
 begin
   Checks(3);
-end;
-
-{Função auxiliar para abrir o link do download no browse padrão do SO}
-procedure TfrmLogs.lblURLClick(Sender: TObject);
-begin
-  AbrirURL(lblURL.Text);
 end;
 
 {Função auxiliar só pra pegar o código selecionado no GRID}
@@ -297,10 +302,17 @@ end;
           depois confirma se o usuario deseja realmente excluir}
 procedure TfrmLogs.btnExcluirClick(Sender: TObject);
 begin
+  if Grid.RowCount = 0 then
+  begin
+    ShowMessage('Não há o que excluir!');
+    exit;
+  end;
+
   CtrlLog.Acao(tacCarregar, CodigoSelecionado);
   if MessageDlg('Deseja realmente apagar o log '+ CtrlLog.Log.Codigo.ToString +' ?', System.UITypes.TMsgDlgType.mtConfirmation,
-             [System.UITypes.TMsgDlgBtn.mbYes, System.UITypes.TMsgDlgBtn.mbNO], 0) = mrYes then
-    CtrlLog.Acao(tacExcluir);
+             [System.UITypes.TMsgDlgBtn.mbYes, System.UITypes.TMsgDlgBtn.mbNO], 0) = mrNo then exit;
+
+  CtrlLog.Acao(tacExcluir);
 
   CarregaLogs(tPesqTodas);
 end;
@@ -315,32 +327,56 @@ begin
     CarregaLogs(tPesqTodas);
 end;
 
-{Alterar: Acessa procedure AlterarLog para colocar o Log selecionado no Grid
-          em alteração}
-procedure TfrmLogs.btnAlterarClick(Sender: TObject);
+{Excluir Tudo: Gera um array com todos os códigos que estão na GRID e apaga
+         através do Controller do Log}
+procedure TfrmLogs.btExcluirTodosClick(Sender: TObject);
+Var aCodigos:  Array of Int64;
+    iAux:      Integer;
 begin
-  AlterarLog(CodigoSelecionado);
+  if Grid.RowCount = 0 then
+  begin
+    ShowMessage('Não há o que excluir!');
+    exit;
+  end;
+
+  aCodigos := nil;
+
+  if MessageDlg('Deseja realmente apagar todos os logs da listagem?', System.UITypes.TMsgDlgType.mtConfirmation,
+             [System.UITypes.TMsgDlgBtn.mbYes, System.UITypes.TMsgDlgBtn.mbNO], 0) = mrNo then exit;
+
+   SetLength(aCodigos,Grid.RowCount);
+   for iAux := 0 to Grid.RowCount-1 do
+   begin
+     aCodigos[iAux] := Grid.Cells[0,iAux].ToInt64;
+   end;
+
+   for iAux := Low(aCodigos) to High(aCodigos) do
+   begin
+    CtrlLog.Acao(tacCarregar,aCodigos[iAux]);
+    CtrlLog.Acao(tacExcluir);
+   end;
+
+   CarregaLogs(tPesqTodas);
+end;
+
+{Carregar: Consulta detalhada com a possibilidade de abrir o link do download
+           no navegador padrão}
+procedure TfrmLogs.btnDetalharClick(Sender: TObject);
+begin
+  if Grid.RowCount = 0 then
+  begin
+    ShowMessage('Não há logs!');
+    exit;
+  end;
+
+  CarregarLog(CodigoSelecionado);
   TabControl.Next();
 end;
 
-{Cancelar: O cancelamento se da só pelo fato de voltar o TabControl}
-procedure TfrmLogs.btnCancelarClick(Sender: TObject);
+{Voltar: Volta para a listagem de downloads}
+procedure TfrmLogs.btnVoltarClick(Sender: TObject);
 begin
   TabControl.Previous();
-end;
-
-{Gravar: Gravação dos dados através da classe de Controle Log}
-procedure TfrmLogs.btnGravarClick(Sender: TObject);
-begin
-  CtrlLog.Log.Codigo  := lblCodigo.Text.ToInt64;
-  CtrlLog.Log.URL     := lblURL.Text;
-  CtrlLog.Log.DataIni := StrToDateTime(lblDataInicial.Text);
-  CtrlLog.Log.DataFim := StrToDateTime(lblDataFinal.Text);
-
-  CtrlLog.Acao(tacGravar);
-
-  TabControl.Previous();
-  LocalizarLog();
 end;
 
 {Limpeza do Grid}
@@ -351,35 +387,8 @@ end;
 
 {Procedure auxiliar para pesquisas que precisam usar os Checkbox}
 procedure TfrmLogs.LocalizarLog;
-Var i: Integer;
+Var TesteData: TDate;
 begin
-  i := 0;
-
-  if (chkCodigo.IsChecked) then
-  begin
-    Inc(i,1);
-  end;
-
-  if (chkURL.IsChecked) then
-  begin
-    Inc(i,1);
-  end;
-
-  if (chkDataIni.IsChecked) then
-  begin
-    Inc(i,1);
-  end;
-
-  if (chkDataFim.IsChecked) then
-  begin
-    Inc(i,1);
-  end;
-
-  if i > 1 then
-  begin
-    ShowMessage('Escolha somente uma opção para pesquisa!');
-  end;
-
   if (chkCodigo.IsChecked) then
   begin
     CarregaLogs(tPesqCodigo);
@@ -393,11 +402,6 @@ begin
   if (chkDataIni.IsChecked) then
   begin
     CarregaLogs(tPesqDataIni);
-  end;
-
-  if (chkDataFim.IsChecked) then
-  begin
-    CarregaLogs(tPesqDataFim);
   end;
 end;
 
@@ -427,7 +431,6 @@ begin
         Grid.Cells[3,iAux] := DateTimeToStr(FieldByName('DATAFIM').AsDateTime)
       else
         Grid.Cells[3,iAux] := EmptyStr;
-
       Next;
     end;
 

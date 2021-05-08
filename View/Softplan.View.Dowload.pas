@@ -1,5 +1,5 @@
 {-------------------------------------------------------------------------------
-Tela: frmImportacao                                              Data:08/05/2021
+Tela: frmDonwload                                                Data:08/05/2021
 Objetivo: Tela para download e geração do LOG
 
 Dev.: Sérgio de Siqueira Silva
@@ -23,7 +23,7 @@ uses
   System.Threading;
 
 type
-  TfrmImportacao = class(TForm)
+  TfrmDownload = class(TForm)
     LayoutContainer: TLayout;
     LayoutAcoesPesquisa: TLayout;
     Label1: TLabel;
@@ -41,10 +41,14 @@ type
     Label4: TLabel;
     Memo: TMemo;
     StyleBook1: TStyleBook;
+    btnProgressoAtual: TRectangle;
+    Image3: TImage;
+    Label3: TLabel;
     procedure btnDownloadClick(Sender: TObject);
     procedure btnCancelarClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure btnProgressoAtualClick(Sender: TObject);
   private
     { Private declarations }
     FLog: TControlLog;
@@ -52,28 +56,28 @@ type
 
     FClient: THTTPClient;
     FGlobalStart: Cardinal;
-    FAsyncResult: IAsyncResult;
     FDownloadStream: TStream;
+    FAsyncResult: IAsyncResult;
 
+    procedure Download(const PathDownload, URL: String);
     procedure ProcFinalDownload(const AsyncResult: IAsyncResult);
     procedure ThreadSincronizacaoGUI(const Sender: TObject; AContentLength,
       AReadCount: Int64; var Abort: Boolean);
   public
     { Public declarations }
-    procedure Download(const PathDownload, URL: String);
   end;
 
 var
-  frmImportacao: TfrmImportacao;
+  frmDownload: TfrmDownload;
 
 implementation
 
 {$R *.fmx}
 
-
 { TfrmImportacao }
 
-procedure TfrmImportacao.btnCancelarClick(Sender: TObject);
+{Cancelar: Pede a confirmação e seta FAsyncResult para cancelado abortando Thread}
+procedure TfrmDownload.btnCancelarClick(Sender: TObject);
 begin
   if MessageDlg('Deseja realmente abortar o download?',
                 TMsgDlgType.mtWarning,
@@ -83,9 +87,18 @@ begin
   FAsyncResult.Cancel;
 end;
 
-procedure TfrmImportacao.btnDownloadClick(Sender: TObject);
+{Download: Confirma se tem algum link digitado, limpa o histórico do download
+           anterior, seta o path para download, cria um novo log por fim start
+           a Thread paralela atraves do IAsyncResult}
+procedure TfrmDownload.btnDownloadClick(Sender: TObject);
 var PathDownload: String;
 begin
+  if edtURL.Text = EmptyStr then
+  begin
+    ShowMessage('Preencha o link para download!');
+    exit;
+  end;
+
   Memo.Lines.Clear;
 
   //Seleção do diretorio para o download
@@ -106,12 +119,18 @@ begin
     btnCancelar.Enabled := False;
   end;
 
-  //Procedure de Download com 1º Parametro Path download 2º URL
+  //Procedure de Download com 1º Parametro Path para download 2º URL
   Download(PathDownload, edtURL.Text);
 end;
 
-{Procedure para executar no final do download}
-procedure TfrmImportacao.ProcFinalDownload(const AsyncResult: IAsyncResult);
+{Exibe o progresso atual}
+procedure TfrmDownload.btnProgressoAtualClick(Sender: TObject);
+begin
+  ShowMessage('Total de bytes até o momento: ' + ProgressBar.Value.ToString +' bytes');
+end;
+
+{Procedure para executar no FINAL do download}
+procedure TfrmDownload.ProcFinalDownload(const AsyncResult: IAsyncResult);
 var LAsyncResponse: IHTTPResponse;
 begin
   try
@@ -135,22 +154,27 @@ begin
     FreeandNil(FDownloadStream);
 
     //Grava no Log a Data e Hora final do download
-    if FLog.Acao(tacAlterar) then
+    if ProgressBar.Value = ProgressBar.Max then
     begin
-      FLog.Log.DataFim := Now;
-      FLog.Acao(tacGravar);
+    if FLog.Acao(tacCarregar, FCodigoLog) then
+      begin
+        FLog.Acao(tacAlterar);
+        FLog.Log.DataFim := Now;
+        FLog.Acao(tacGravar);
+      end;
     end;
 
-    //Controle dos botões Download e Cancelar
-    btnCancelar.Enabled := False;
-    btnDownload.Enabled := True;
+    //Controle dos botões
+    btnDownload.Enabled       := True;
+    btnProgressoAtual.Enabled := False;
+    btnCancelar.Enabled       := False;
   end;
 
 end;
 
 {Download: Procedure para download com dois parametros 1º path aonde o arquivo
            ira ser salvo e 2º URL do arquivo a ser baixado}
-procedure TfrmImportacao.Download(const PathDownload, URL: String);
+procedure TfrmDownload.Download(const PathDownload, URL: String);
 var HTTPResponse   :IHTTPResponse;
     TamanhoArquivo :Int64;
 begin
@@ -176,26 +200,31 @@ begin
     //Tempo em milissegundos de start da Thread para calculo do tempo decorrido
     FGlobalStart := TThread.GetTickCount;
 
-    {Inicia oficialmente o download com sincronismo na Thread e já deixa
-    registrado um processo para o final do donwload}
+    {IAsyncResult e uma interface que internamente isola o processo em uma Thread
+    paralela aonde inicio o download através do request e já deixa registrado um
+    processo para o final desse processo paralelo}
     FAsyncResult := FClient.BeginGet(ProcFinalDownload, URL, FDownloadStream);
 
   finally
-    //Controle dos botões de download e cancelar
-    btnCancelar.Enabled := FAsyncResult <> nil;
-    btnDownload.Enabled := FAsyncResult = nil;
+    //Controle dos botões
+    btnDownload.Enabled       := FAsyncResult = nil;
+    btnCancelar.Enabled       := FAsyncResult <> nil;
+    btnProgressoAtual.Enabled := FAsyncResult <> nil;
   end;
 end;
 
 //Procedure com Thread de sincronização da GUI
-procedure TfrmImportacao.ThreadSincronizacaoGUI(const Sender: TObject;
+procedure TfrmDownload.ThreadSincronizacaoGUI(const Sender: TObject;
           AContentLength, AReadCount: Int64; var Abort: Boolean);
 var
   LTime: Cardinal;
   LSpeed: Integer;
 begin
+  //Tempo e velocidade se quiser mostrar na tela
   LTime := TThread.GetTickCount - FGlobalStart;
   LSpeed := (AReadCount * 1000) div LTime;
+
+  //Atualiza ProgressBar
   TThread.Queue(nil,
     procedure
     begin
@@ -206,7 +235,7 @@ end;
 {Na criação do form já instancia o componente de HTTP para o Resquest
  e ja seta a procedure com Thread de sincronização da GUI e cria o objeto
  de controle do Log}
-procedure TfrmImportacao.FormCreate(Sender: TObject);
+procedure TfrmDownload.FormCreate(Sender: TObject);
 begin
   FClient := THTTPClient.Create;
   FClient.OnReceiveData := ThreadSincronizacaoGUI;
@@ -215,7 +244,7 @@ begin
 end;
 
 //Na destruição faz a liberação dos objetos da memoria
-procedure TfrmImportacao.FormDestroy(Sender: TObject);
+procedure TfrmDownload.FormDestroy(Sender: TObject);
 begin
   if not btnDownload.Enabled then
   begin

@@ -7,7 +7,7 @@ uses
   Softplan.View.Inicial in 'View\Softplan.View.Inicial.pas' {frmInicial},
   Softplan.Model.ConexaoBD in 'Model\Softplan.Model.ConexaoBD.pas',
   uEnums in 'Extras\uEnums.pas',
-  Softplan.View.Dowload in 'View\Softplan.View.Dowload.pas' {frmImportacao},
+  Softplan.View.Dowload in 'View\Softplan.View.Dowload.pas' {frmDownload},
   uFuncoes in 'Extras\uFuncoes.pas',
   Softplan.Model.Log in 'Model\Softplan.Model.Log.pas',
   Softplan.Controller.Log in 'Controller\Softplan.Controller.Log.pas',

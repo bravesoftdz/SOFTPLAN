@@ -1,7 +1,6 @@
-object frmImportacao: TfrmImportacao
+object frmDownload: TfrmDownload
   Left = 0
   Top = 0
-  Caption = 'Importa'#231#227'o'
   ClientHeight = 594
   ClientWidth = 594
   StyleBook = StyleBook1
@@ -65,7 +64,7 @@ object frmImportacao: TfrmImportacao
           Size.Width = 514.000000000000000000
           Size.Height = 34.000000000000000000
           Size.PlatformDefault = False
-          TextPrompt = 'DIGITE AQUI UM TERMO PARA BUSCA'
+          TextPrompt = 'DIGITE AQUI O LINK PARA O DOWNLOAD'
           StyledSettings = []
           CharCase = ecLowerCase
         end
@@ -139,7 +138,7 @@ object frmImportacao: TfrmImportacao
           Size.Height = 40.000000000000000000
           Size.PlatformDefault = False
           TextSettings.Font.StyleExt = {00070000000000000004000000}
-          Text = 'DOWNLOAD'
+          Text = 'INICIAR DOWNLOAD'
           TabOrder = 1
         end
       end
@@ -209,7 +208,71 @@ object frmImportacao: TfrmImportacao
           Size.Height = 40.000000000000000000
           Size.PlatformDefault = False
           TextSettings.Font.StyleExt = {00070000000000000004000000}
-          Text = 'CANCELAR'
+          Text = 'PARAR DOWNLOAD'
+          TabOrder = 1
+        end
+      end
+      object btnProgressoAtual: TRectangle
+        Align = Center
+        Cursor = crHandPoint
+        Enabled = False
+        Fill.Kind = None
+        Size.Width = 125.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Kind = None
+        OnClick = btnProgressoAtualClick
+        object Image3: TImage
+          MultiResBitmap.Height = 48
+          MultiResBitmap.Width = 48
+          MultiResBitmap = <
+            item
+              Width = 48
+              Height = 48
+              PNG = {
+                89504E470D0A1A0A0000000D49484452000000300000003008060000005702F9
+                87000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+                0236494441546843ED993B6B14511886D70B82450AB5D06011C4465041C10BC4
+                5AC44B63A35DFE82ADAD0141B017047F8085208217D2472C042F4425A8906863
+                5011141B8BA8CF0B67C2E4F39D75B33B33C921FBC0C357ECEC3973EE97E90C19
+                B2CED990E2A06CC193780C0FE3511CC5329FF105BEC6E7781FBFE1AAB207AFE1
+                02FE0946E2EFBFF01E5EC0CDD82ADBF016FEC6F8628511F74CE11B3C8DAD7011
+                5D8D4723EE99E823DC858DB0116FA0CBD81971CF383FE221AC150DD2DBE832AC
+                32E29EA9F2279EC15AD8840FD165147D8FD7D1F5E75378059FA2FB6F5485A8A5
+                25AEA2CBA0EC333C8FEA66BD7004EFA04BABEC071C684CA82617D1252E35155E
+                46B5523FA855F4922EED420DECBED054F9055DA2F22B1EC741D9894FD0E551D8
+                D77898449798FC84FBB12EB6E234BABCA4D689152D76DBF13BBAC4D46DC6B16E
+                76E03B74794AADD83DD3ADF62F6153A862AAC69CB61D3D338B2E9197D8EB4CD3
+                2F37D1E5AD9657CFF82F7BD12520CF61D3688358D50A13B80C579B67538CCCA3
+                B6C04D33875A381DDAAA2FC315E0448A91BB29B6C183142307535CC215201E44
+                0AA6526C83C729460EA4D895B7E8FADF3ECC821FE80A30826B8EA6A7C4C67105
+                D069CBB13BC535C54A0A3096621B68B671DDF89F777305D046CDA1AD6F5B544D
+                E5AF525CC215A06A0AD381A52DAA16D39914BB92D556A28AAC377322FBED74F6
+                071A91F59152647FA817595FAB14647DB125B2BF5A14595FEE16A87B647BBD5E
+                26DB0F1C65B2FEC45466D53FF2ADFBCFAC4386E44DA7F3173F9606F57441EE33
+                0000000049454E44AE426082}
+              FileName = 
+                'C:\Users\SERGIO\Documents\GitHub\SOFTPLAN\Library\baseline_donut' +
+                '_large_black_24dp.png'
+            end>
+          Align = Left
+          Locked = True
+          HitTest = False
+          Size.Width = 50.000000000000000000
+          Size.Height = 40.000000000000000000
+          Size.PlatformDefault = False
+        end
+        object Label3: TLabel
+          Align = Left
+          AutoSize = True
+          StyledSettings = []
+          Locked = True
+          Position.X = 50.000000000000000000
+          Size.Width = 77.000000000000000000
+          Size.Height = 40.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.Font.StyleExt = {00070000000000000004000000}
+          Text = 'EXBIR MENSAGEM'
           TabOrder = 1
         end
       end
