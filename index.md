@@ -1,5 +1,7 @@
+![Logo Softplan](https://octodex.github.com/images/yaktocat.png)
 ## SOFTPLAN   
 ### GERENCIADOR DE DOWNLOADS
+
 
 You can use the [editor on GitHub](https://github.com/sergiodsiqueira/SOFTPLAN/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
 
