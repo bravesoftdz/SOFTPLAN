@@ -10,6 +10,6 @@ Sistema desenvolvido em Delphi 10.3 CE com o _paradigma orientado a objetos_ e a
 
 
 #### Contato   
-Linkedin [in/sergio-siqueira-silva-44251726/](https://www.linkedin.com/in/sergio-siqueira-silva-44251726/)
-Celular (19) 9 9291-1075
-Email [sergiodsiqueira@yahoo.com.br](mailto:sergiodsiqueira@yahoo.com.br)
+Linkedin [in/sergio-siqueira-silva-44251726/](https://www.linkedin.com/in/sergio-siqueira-silva-44251726/)   
+Celular (19) 9 9291-1075   
+Email [sergiodsiqueira@yahoo.com.br](mailto:sergiodsiqueira@yahoo.com.br)   
