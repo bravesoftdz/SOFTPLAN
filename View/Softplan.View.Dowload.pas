@@ -4,9 +4,10 @@ Objetivo: Tela para download e geração do LOG
 
 Dev.: Sérgio de Siqueira Silva
 
-Data Alteração: 09/05/2021
+Data Alteração: 08/05/2021
 Dev.: Sérgio de Siqueira Silva
-Alteração: Inserido um memo para exibição do Status do download
+Alteração: Substituição do componente IdHTTP (Indy) por NetHTTP (Net) para o
+           o request em paginas HTTPS
 -------------------------------------------------------------------------------}
 
 unit Softplan.View.Dowload;

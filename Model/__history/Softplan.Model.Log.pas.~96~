@@ -222,7 +222,11 @@ begin
         ParambyName('CODIGO').AsLargeInt     := Self.FCodigo;
         ParambyName('URL').AsString          := Self.FURL;
         ParamByName('DATAINICIO').AsDateTime := Self.DataIni;
-        ParamByName('DATAFIM').AsDateTime    := Self.DataFim;
+
+        if Self.FDataFim <> 0 then
+          ParamByName('DATAFIM').AsDateTime  := Self.DataFim
+        else
+          ParamByName('DATAFIM').AsString    := EmptyStr;
         ExecSQL;
 
         if Buscar(Self.FCodigo) then
@@ -250,7 +254,11 @@ begin
 
         ParambyName('URL').AsString          := Self.FURL;
         ParamByName('DATAINICIO').AsDateTime := Self.FDataIni;
-        ParamByName('DATAFIM').AsDateTime    := Self.FDataFim;
+
+        if Self.FDataFim <> 0 then
+          ParamByName('DATAFIM').AsDateTime  := Self.DataFim
+        else
+          ParamByName('DATAFIM').AsString    := EmptyStr;
         ExecSQL;
 
         Result := True
@@ -273,8 +281,10 @@ begin
     Active := True;
 
     LimpaLog;
-    Self.FCodigo := Inc(FieldByName('NOVOID').AsLargeInt,1);
-    if Self.FCodigo = 0 then Self.FCodigo := 1;
+    if FieldByName('NOVOID').AsString = '' then
+      Self.FCodigo := 1
+    else
+      Self.FCodigo := FieldByName('NOVOID').AsLargeInt + 1;
   end;
 
   Status := tstInclusao;

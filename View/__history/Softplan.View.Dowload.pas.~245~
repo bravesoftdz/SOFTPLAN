@@ -4,7 +4,7 @@ Objetivo: Tela para download e geração do LOG
 
 Dev.: Sérgio de Siqueira Silva
 
-Data Alteração: 09/05/2021
+Data Alteração: 08/05/2021
 Dev.: Sérgio de Siqueira Silva
 Alteração: Inserido um memo para exibição do Status do download
 -------------------------------------------------------------------------------}
@@ -47,7 +47,7 @@ type
   private
     { Private declarations }
     FLog: TControlLog;
-    FCodigoLog: Integer;
+    FCodigoLog: Int64;
 
     FClient: THTTPClient;
     FGlobalStart: Cardinal;
@@ -93,12 +93,17 @@ begin
 
   btnDownload.Enabled := False;
 
-  //Inclusão do Log
-  FLog.Acao(tacIncluir);
-  FCodigoLog       := FLog.Log.Codigo;
-  FLog.Log.URL     := edtURL.Text;
-  FLog.Log.DataIni := Now;
-  FLog.Acao(tacGravar);
+  //Inclusão dos dados no objeto de controle do Log
+  try
+    FLog.Acao(tacIncluir);
+    FCodigoLog       := FLog.Log.Codigo;
+    FLog.Log.URL     := edtURL.Text;
+    FLog.Log.DataIni := Now;
+    FLog.Acao(tacGravar);
+  except
+    btnDownload.Enabled := True;
+    btnCancelar.Enabled := False;
+  end;
 
   //Procedure de Download com 1º Parametro Path download 2º URL
   Download(PathDownload, edtURL.Text);
@@ -115,16 +120,25 @@ begin
     TThread.Synchronize(nil,
       procedure
       begin
-        Memo.Lines.Add('Arquivo baixado!');
-        Memo.Lines.Add(Format('Status: %d - %s', [LAsyncResponse.StatusCode, LAsyncResponse.StatusText]));
+        if ProgressBar.Max = ProgressBar.Value then
+        begin
+          Memo.Lines.Add('Arquivo baixado!');
+        end else
+        begin
+          Memo.Lines.Add('Download abortado!');
+        end;
       end);
 
   finally
     LAsyncResponse := nil;
     FreeandNil(FDownloadStream);
 
-    FLog.Acao(tacCarregar, FCodigoLog);
-    FLog.Acao();
+    //Grava no Log a Data e Hora final do download
+    if FLog.Acao(tacAlterar) then
+    begin
+      FLog.Log.DataFim := Now;
+      FLog.Acao(tacGravar);
+    end;
 
     //Controle dos botões Download e Cancelar
     btnCancelar.Enabled := False;

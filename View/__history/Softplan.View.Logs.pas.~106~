@@ -42,8 +42,8 @@ type
     chkCodigo: TCheckBox;
     chkURL: TCheckBox;
     TabControl: TTabControl;
-    TabListagemClientes: TTabItem;
-    TabCadastroClientes: TTabItem;
+    TabListagemLogs: TTabItem;
+    TabCadastroLogs: TTabItem;
     LayoutCadastroClientes: TLayout;
     Layout3: TLayout;
     btnCancelar: TImage;
@@ -80,9 +80,9 @@ type
     procedure chkCodigoClick(Sender: TObject);
     procedure chkURLClick(Sender: TObject);
     procedure chkDataIniClick(Sender: TObject);
-    procedure FormActivate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure chkDataFimChange(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
     Show: Boolean;
@@ -114,6 +114,7 @@ uses {$IFDEF MSWINDOWS}
      Winapi.ShellAPI, Winapi.Windows;
      {$ENDIF MSWINDOWS}
 
+{Função auxiliar para abrir browse padrão do SO}
 procedure TfrmLogs.AbrirURL(const URL: String);
 begin
   {$IFDEF MSWINDOWS}
@@ -121,6 +122,8 @@ begin
   {$ENDIF MSWINDOWS}
 end;
 
+{Alterar: Primeiro faz a carga dos labels do TabCadastroLog e deixa o objeto de
+          controle em modo de alteração}
 procedure TfrmLogs.AlterarLog(const Codigo: Integer);
 begin
   if not CtrlLog.Acao(tacCarregar, CodigoSelecionado) then exit;
@@ -145,7 +148,8 @@ begin
   end;
 end;
 
-procedure TfrmLogs.FormActivate(Sender: TObject);
+{Criação dos objetos na memoria}
+procedure TfrmLogs.FormCreate(Sender: TObject);
 begin
   CtrlLog := TControlLog.Create;
   Conexao := TConexao.Create;

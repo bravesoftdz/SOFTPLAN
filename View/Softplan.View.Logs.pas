@@ -417,8 +417,16 @@ begin
     begin
       Grid.Cells[0,iAux] := FieldByName('CODIGO').AsString;
       Grid.Cells[1,iAux] := FieldByName('URL').AsString;
-      Grid.Cells[2,iAux] := DateTimeToStr(FieldByName('DATAINICIO').AsDateTime);
-      Grid.Cells[3,iAux] := DateTimeToStr(FieldByName('DATAFIM').AsDateTime);
+
+      if FieldByName('DATAINICIO').AsDateTime <> 0 then
+        Grid.Cells[2,iAux] := DateTimeToStr(FieldByName('DATAINICIO').AsDateTime)
+      else
+        Grid.Cells[2,iAux] := EmptyStr;
+
+      if FieldByName('DATAFIM').AsDateTime <> 0 then
+        Grid.Cells[3,iAux] := DateTimeToStr(FieldByName('DATAFIM').AsDateTime)
+      else
+        Grid.Cells[3,iAux] := EmptyStr;
 
       Next;
     end;
