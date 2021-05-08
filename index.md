@@ -4,7 +4,7 @@ Sistema desenvolvido em Delphi 10.3 CE com o _paradigma orientado a objetos_ e a
 
 ![Tela Inicial](https://drive.google.com/file/d/1DO-foAJQCJioDiUUvfbiwgsvVP7cK8RA/view?usp=sharing)
 
-![Tela Download](https://github.com/sergiodsiqueira/SOFTPLAN/blob/gh-pages/Tela_Download.png)
+![Tela Download](/Tela_Download.png)
 
 ![Tela Histórico](https://github.com/sergiodsiqueira/SOFTPLAN/blob/gh-pages/Tela_Historico.png)
 
