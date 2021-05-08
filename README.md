@@ -1,2 +1,2 @@
 # SOFTPLAN
-#### Site para Gerenciador de Downloads | Object Pascal Delphi
+#### Site para o Gerenciador de Downloads | Object Pascal Delphi
