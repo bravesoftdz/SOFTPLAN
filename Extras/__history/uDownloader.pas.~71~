@@ -1,0 +1,38 @@
+unit uDownloader;
+
+interface
+
+uses
+  System.IOUtils, System.SysUtils, System.Types, System.UITypes, System.Classes,
+  System.Variants, FMX.Types, FMX.Dialogs, System.Net.URLClient, FMX.Edit,
+  System.Net.HttpClient, System.Net.HttpClientComponent, FMX.StdCtrls,
+  FMX.Controls.Presentation, FMX.ScrollBox, FMX.Memo, System.ImageList,
+  FMX.ImgList;
+
+type
+  TDownloadThreadDataEvent = procedure(const Sender: TObject; ThreadNo, ASpeed: Integer; AContentLength: Int64; AReadCount: Int64; var Abort: Boolean) of object;
+  TDownloadThread = class(TThread)
+  private
+    FOnThreadData: TDownloadThreadDataEvent;
+
+  protected
+    FURL, FFileName: string;
+    FStartPoint, FEndPoint: Int64;
+    FThreadNo: Integer;
+    FTimeStart: Cardinal;
+
+    procedure ReceiveDataEvent(const Sender: TObject; AContentLength: Int64; AReadCount: Int64; var Abort: Boolean);
+  public
+    constructor Create(const URL, FileName: string; ThreadNo: Integer; StartPoint, EndPoint: Int64);
+    destructor Destroy; override;
+    procedure Execute; override;
+
+    property OnThreadData: TDownloadThreadDataEvent write FOnThreadData;
+  end;
+
+implementation
+
+{ TDownloadThread }
+
+
+end.

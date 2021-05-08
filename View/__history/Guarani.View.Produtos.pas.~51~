@@ -1,0 +1,265 @@
+{-------------------------------------------------------------------------------
+Tela: Produtos [frmProdutos]                                      Data:18/04/2021
+Objetivo: Tela de cadastro de novas vendas com operações de CRD
+
+Dev.: Sérgio de Siqueira Silva
+
+Data Alteração: -
+Dev.: -
+Alteração: -
+-------------------------------------------------------------------------------}
+unit Guarani.View.Produtos;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.StdCtrls,
+  FMX.Controls.Presentation, FMX.Edit, FMX.Objects, FMX.Layouts, FMX.ScrollBox,
+  FMX.Memo, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
+  FireDAC.Stan.Async, FireDAC.DApt, Data.DB, FireDAC.Comp.DataSet,
+  FireDAC.Comp.Client, System.Rtti, FMX.Grid.Style, Fmx.Bind.Grid,
+  System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt,
+  Fmx.Bind.DBEngExt, Data.Bind.Components, Data.Bind.Grid, FMX.Grid,
+  Data.Bind.DBScope, Guarani.Model.Produto, Guarani.Controller.Produto,
+  FMX.TabControl;
+
+type
+  TfrmProdutos = class(TForm)
+    LayoutContainer: TLayout;
+    memProdutos: TFDMemTable;
+    memProdutosID: TIntegerField;
+    memProdutosDESCRICAO: TStringField;
+    memProdutosMARCA: TStringField;
+    memProdutosPRECO: TCurrencyField;
+    BindSourceDB1: TBindSourceDB;
+    BindingsList1: TBindingsList;
+    TabControl: TTabControl;
+    TabItem1: TTabItem;
+    TabItem2: TTabItem;
+    LayoutAcoesPesquisa: TLayout;
+    Label1: TLabel;
+    RectangleEdtNomeFantasia: TRectangle;
+    edtPesquisa: TEdit;
+    Image4: TImage;
+    LayoutAcoes: TLayout;
+    Image1: TImage;
+    Image2: TImage;
+    Image3: TImage;
+    chkID: TCheckBox;
+    chkDescricao: TCheckBox;
+    chkMarca: TCheckBox;
+    GridProdutos: TStringGrid;
+    LayoutCadastroClientes: TLayout;
+    Rectangle1: TRectangle;
+    edtPreco: TEdit;
+    Label2: TLabel;
+    RectangleEdtRazaoSocial: TRectangle;
+    edtMarca: TEdit;
+    Label3: TLabel;
+    Layout3: TLayout;
+    Image6: TImage;
+    Image7: TImage;
+    RectangleEdtCNPJ: TRectangle;
+    edtDescricao: TEdit;
+    Label4: TLabel;
+    StyleBook1: TStyleBook;
+    procedure Image2Click(Sender: TObject);
+    procedure Image7Click(Sender: TObject);
+    procedure Image6Click(Sender: TObject);
+    procedure Image4Click(Sender: TObject);
+    procedure edtPesquisaKeyDown(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure Image3Click(Sender: TObject);
+    procedure Image1Click(Sender: TObject);
+    procedure Label1Paint(Sender: TObject; Canvas: TCanvas;
+      const ARect: TRectF);
+  private
+    { Private declarations }
+    procedure LocalizarProduto();
+    procedure AlterarProduto(IdProduto: Integer);
+    procedure IncluirProduto;
+    procedure LimpaGrid();
+  public
+    { Public declarations }
+    procedure PopularGridProdutos(sSQL: String);
+  end;
+
+var
+  frmProdutos: TfrmProdutos;
+  Produto: TProduto;
+  ProdutoControl: TControlProduto;
+
+implementation
+
+{$R *.fmx}
+
+uses Guarani.View.Principal, Guarani.Model.ConexaoBD;
+
+procedure TfrmProdutos.AlterarProduto(IdProduto: Integer);
+begin
+  Produto := TProduto.Create;
+
+  if not Produto.Alterar(IdProduto) then exit;
+
+  edtDescricao.Text    := Produto.Descricao;
+  edtMarca.Text        := Produto.Marca;
+  edtPreco.Text        := CurrToStr(Produto.Preco);
+end;
+
+procedure TfrmProdutos.edtPesquisaKeyDown(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  if Key = vkReturn then
+    LocalizarProduto;
+end;
+
+procedure TfrmProdutos.Image1Click(Sender: TObject);
+begin
+  IncluirProduto;
+end;
+
+procedure TfrmProdutos.Image2Click(Sender: TObject);
+var Produto: TProduto;
+begin
+  try
+    Produto := TProduto.Create;
+    Produto.Buscar(memProdutosID.AsInteger);
+
+    if MessageDlg('Deseja realmente apagar o produto '+ Produto.Descricao +' ?', System.UITypes.TMsgDlgType.mtConfirmation,
+               [System.UITypes.TMsgDlgBtn.mbYes, System.UITypes.TMsgDlgBtn.mbNO], 0) = mrYes then
+      Produto.Apagar;
+  finally
+    Produto.Free;
+  end;
+  PopularGridProdutos('');
+end;
+
+procedure TfrmProdutos.Image3Click(Sender: TObject);
+begin
+  AlterarProduto(memProdutosID.AsInteger);
+  TelaCadastro;
+end;
+
+procedure TfrmProdutos.Image4Click(Sender: TObject);
+begin
+  LocalizarProduto;
+end;
+
+procedure TfrmProdutos.Image6Click(Sender: TObject);
+begin
+  Produto.Free;
+
+  //frmPrincipal.TelaProduto;
+end;
+
+procedure TfrmProdutos.Image7Click(Sender: TObject);
+begin
+  Produto.Descricao := edtDescricao.Text;
+  Produto.Marca     := edtMarca.Text;
+  Produto.Preco     := StrtoCurr(edtPreco.Text);
+
+  ProdutoControl.Gravar(Produto);
+
+  Produto.Free;
+
+  //frmPrincipal.TelaProduto;
+end;
+
+procedure TfrmProdutos.IncluirProduto;
+begin
+    Produto := TProduto.Create;
+    ProdutoControl := TControlProduto.Create;
+
+    Produto.Incluir;
+end;
+
+procedure TfrmProdutos.Label1Paint(Sender: TObject; Canvas: TCanvas;
+  const ARect: TRectF);
+begin
+  PopularGridProdutos('');
+end;
+
+procedure TfrmProdutos.LimpaGrid;
+begin
+  memProdutos.EmptyDataSet;
+end;
+
+procedure TfrmProdutos.LocalizarProduto;
+var Teste: Integer;
+    Campo: String;
+begin
+  Teste := 0;
+
+  if chkID.IsChecked then
+  begin
+   Inc(Teste,1);
+   Campo := 'ID';
+  end;
+  if chkDescricao.IsChecked then
+  begin
+   Inc(Teste,1);
+   Campo := 'DESCRICAO';
+  end;
+  if chkMarca.IsChecked then
+  begin
+   Inc(Teste,1);
+   Campo := 'MARCA';
+  end;
+
+  if Teste > 1 then
+  begin
+    ShowMessage('Selecione apenas uma opção de busca!');
+    exit;
+  end;
+
+  if edtPesquisa.Text <> '' then
+    memProdutos.Locate(Campo,edtPesquisa.Text,[loCaseInsensitive,loPartialKey]);
+end;
+
+procedure TfrmProdutos.PopularGridProdutos(sSQL: String);
+var Conexao: TConexao;
+    Query:   TFDQuery;
+    iAux:    Integer;
+begin
+  LimpaGrid;
+
+  if sSQL = '' then
+  begin
+    sSQL := 'SELECT * FROM PRODUTOS';
+  end;
+
+  try
+    Conexao := TConexao.Create;
+    Query := TFDQuery.Create(nil);
+    Query.Connection := Conexao.BD;
+
+    with Query do
+    begin
+      SQL.Clear;
+      SQL.Add(sSQL);
+      Active := True;
+
+      First;
+      for iAux := 1 to RecordCount do
+      begin
+        memProdutos.Insert;
+        memProdutosID.AsInteger          := FieldByName('ID').AsInteger;
+        memProdutosDESCRICAO.AsString    := FieldByName('DESCRICAO').AsString;
+        memProdutosMARCA.AsString        := FieldByName('MARCA').AsString;
+        memProdutosPRECO.AsCurrency      := FieldByName('PRECO').AsCurrency;
+        memProdutos.Post;
+
+        Next;
+      end;
+
+    end;
+  finally
+    Query.Free;
+    Conexao.Free;
+  end;
+
+end;
+
+end.

@@ -1,0 +1,239 @@
+unit Guarani.Model.Produto;
+
+interface
+
+uses
+  SysUtils, UITypes, StrUtils, Guarani.Model.ConexaoBD,
+  FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
+  FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
+  FireDAC.Phys.FB, FireDAC.Phys.FBDef, FireDAC.FMXUI.Wait, Data.DB,
+  FireDAC.Comp.Client, FireDAC.Stan.Intf, FireDAC.Dapt;
+
+type
+  TStatus = (Inclusao, Alteracao, Navegacao);
+
+  TProduto = class
+  private
+    FId: Integer;
+    FDescricao: String;
+    FMarca: String;
+    Status: TStatus;
+    FPreco: Currency;
+    procedure LimpaProduto();
+  public
+    constructor Create;
+    property Id: Integer read FId write FId;
+    property Descricao: String read FDescricao write FDescricao;
+    property Marca: String read FMarca write FMarca;
+    property Preco: Currency read FPreco write FPreco;
+
+
+    {CRUD}
+    function Incluir:Boolean;
+    function Buscar(IdProduto: Integer):Boolean;
+    function Alterar(IdProduto: Integer):Boolean;
+
+    function Gravar(ProdutoRecebido: TProduto):Boolean;
+    function Apagar:Boolean;
+  end;
+
+implementation
+
+var Conexao: TConexao;
+
+{ TProduto }
+
+function TProduto.Alterar(IdProduto: Integer): Boolean;
+begin
+  Result := False;
+
+  if not Buscar(IdProduto) then exit;
+
+  Status := Alteracao;
+  Result := True;
+end;
+
+function TProduto.Apagar: Boolean;
+Var Query: TFDQuery;
+begin
+  Result := False;
+
+  try
+    Query := TFDQuery.Create(nil);
+    Conexao := TConexao.Create;
+    Query.Connection := Conexao.BD;
+
+    with Query do
+    begin
+      Active := False;
+      SQL.Clear;
+      SQL.Add('DELETE FROM PRODUTOS WHERE ID = :ID');
+      ParamByName('ID').AsInteger := Id;
+      ExecSQL;
+
+      Active := False;
+      SQL.Clear;
+      SQL.Add('SELECT * FROM PRODUTOS WHERE ID = :ID');
+      ParamByName('ID').AsInteger := Id;
+      Active := True;
+
+      if RecordCount = 0 then
+        Result := True
+      else
+        Result := False;
+    end;
+  finally
+    Query.Free;
+    Conexao.Free;
+  end;
+end;
+
+function TProduto.Buscar(IdProduto: Integer): Boolean;
+Var Query: TFDQuery;
+begin
+  Result := False;
+
+  if Status = Inclusao then exit;
+
+  try
+    Query := TFDQuery.Create(nil);
+    Conexao := TConexao.Create;
+    Query.Connection := Conexao.BD;
+
+    with Query do
+    begin
+      Active := False;
+      SQL.Clear;
+      SQL.Add('SELECT * FROM PRODUTOS WHERE ID = :ID');
+      ParamByName('ID').AsInteger := IdProduto;
+      Active := True;
+
+      if RecordCount = 0 then
+        exit
+      else
+        Result := True;
+
+      Id        := FieldByName('ID').AsInteger;
+      Descricao := FieldByName('DESCRICAO').AsString;
+      Marca     := FieldByName('MARCA').AsString;
+      Preco     := FieldByName('PRECO').AsCurrency;
+    end;
+  finally
+    Query.Free;
+    Conexao.Free;
+  end;
+
+end;
+
+constructor TProduto.Create;
+begin
+  LimpaProduto;
+end;
+
+function TProduto.Gravar(ProdutoRecebido: TProduto): Boolean;
+Var Query: TFDQuery;
+begin
+  Result := False;
+
+  if Status = Inclusao then
+  begin
+    try
+      Query := TFDQuery.Create(nil);
+      Conexao := TConexao.Create;
+      Query.Connection := Conexao.BD;
+
+      with Query do
+      begin
+        Active := False;
+        SQL.Clear;
+        SQL.Add('INSERT INTO PRODUTOS VALUES(:ID, :DESCRICAO, :MARCA, :PRECO)');
+
+        ParamByName('ID').AsInteger         := ProdutoRecebido.Id;
+        ParamByName('DESCRICAO').AsString   := ProdutoRecebido.Descricao;
+        ParamByName('MARCA').AsString       := ProdutoRecebido.Marca;
+        ParamByName('PRECO').AsCurrency     := ProdutoRecebido.Preco;
+        ExecSQL;
+
+        if Buscar(Id) then
+          Result := True
+        else
+          Result := False;
+      end;
+    finally
+      Query.Free;
+      Conexao.Free;
+    end;
+  end;
+
+  if Status = Alteracao then
+  begin
+      try
+      Query := TFDQuery.Create(nil);
+      Conexao := TConexao.Create;
+      Query.Connection := Conexao.BD;
+
+      with Query do
+      begin
+        Active := False;
+        SQL.Clear;
+        SQL.Add('UPDATE PRODUTOS SET DESCRICAO = :DESCRICAO,'
+                                  +' MARCA = :MARCA ,'
+                                  +' PRECO = :PRECO '
+                   +' WHERE ID = :ID');
+
+        ParamByName('ID').AsInteger         := ProdutoRecebido.Id;
+        ParamByName('DESCRICAO').AsString   := ProdutoRecebido.Descricao;
+        ParamByName('MARCA').AsString       := ProdutoRecebido.Marca;
+        ParamByName('PRECO').AsCurrency     := ProdutoRecebido.Preco;
+        ExecSQL;
+
+        Result := True
+      end;
+    finally
+      Query.Free;
+      Conexao.Free;
+    end;
+  end;
+
+  LimpaProduto;
+end;
+
+function TProduto.Incluir: Boolean;
+Var Query: TFDQuery;
+begin
+  Result := False;
+
+  try
+    Query := TFDQuery.Create(nil);
+    Conexao := TConexao.Create;
+    Query.Connection := Conexao.BD;
+
+    with Query do
+    begin
+      Active := False;
+      SQL.Clear;
+      SQL.Add('SELECT MAX(ID)+1 AS NOVOID FROM PRODUTOS');
+      Active := True;
+
+      LimpaProduto;
+      Id := FieldByName('NOVOID').AsInteger;
+      if Id = 0 then Id := 1;
+    end;
+  finally
+    Query.Free;
+    Conexao.Free;
+  end;
+
+  Status := Inclusao;
+end;
+
+procedure TProduto.LimpaProduto;
+begin
+ FId        := 0;
+ FDescricao := '';
+ FMarca     := '';
+ FPreco     := 0;
+ Status     := Navegacao;
+end;
+
+end.

@@ -1,0 +1,287 @@
+object frmImportacao: TfrmImportacao
+  Left = 0
+  Top = 0
+  Caption = 'Importa'#231#227'o'
+  ClientHeight = 594
+  ClientWidth = 594
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object LayoutContainer: TLayout
+    Align = Client
+    Size.Width = 594.000000000000000000
+    Size.Height = 594.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object LayoutAcoesPesquisa: TLayout
+      Align = Top
+      Margins.Left = 20.000000000000000000
+      Margins.Top = 30.000000000000000000
+      Margins.Right = 20.000000000000000000
+      Position.X = 20.000000000000000000
+      Position.Y = 30.000000000000000000
+      Size.Width = 554.000000000000000000
+      Size.Height = 59.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      object Label1: TLabel
+        AutoSize = True
+        StyledSettings = []
+        Position.Y = 16.000000000000000000
+        Size.Width = 41.000000000000000000
+        Size.Height = 16.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Text = 'BUSCA'
+        TabOrder = 2
+      end
+      object RectangleEdtNomeFantasia: TRectangle
+        Fill.Kind = None
+        Margins.Left = 3.000000000000000000
+        Margins.Top = 3.000000000000000000
+        Margins.Right = 10.000000000000000000
+        Margins.Bottom = 3.000000000000000000
+        Position.X = 48.000000000000000000
+        Position.Y = 8.000000000000000000
+        Size.Width = 505.000000000000000000
+        Size.Height = 34.000000000000000000
+        Size.PlatformDefault = False
+        XRadius = 10.000000000000000000
+        YRadius = 10.000000000000000000
+        object edtPesquisa: TEdit
+          Touch.InteractiveGestures = [LongTap, DoubleTap]
+          Align = Client
+          StyleLookup = 'transparentedit'
+          TabOrder = 0
+          Margins.Left = 2.000000000000000000
+          Margins.Right = 5.000000000000000000
+          Size.Width = 455.000000000000000000
+          Size.Height = 34.000000000000000000
+          Size.PlatformDefault = False
+          TextPrompt = 'DIGITE AQUI UM TERMO PARA BUSCA'
+          StyledSettings = []
+          CharCase = ecUpperCase
+          OnKeyDown = edtPesquisaKeyDown
+        end
+        object btnPesquisar: TImage
+          MultiResBitmap.Height = 48
+          MultiResBitmap.Width = 48
+          MultiResBitmap = <
+            item
+              Width = 48
+              Height = 48
+              PNG = {
+                89504E470D0A1A0A0000000D49484452000000300000003008060000005702F9
+                87000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+                01DE494441546843ED98BB4AC440148657B154D0D24B258885A59DA060E10B58
+                F802BE838ABADA586AE55B58588BF7C7F0025A088AAD6261E1E5FFE5040EC324
+                2699CC6413E6838FB39B9D3973C924996C271289446AA54F6219A6E0325C8493
+                70149217F800AFE031BC873DC52CBC803F396559D6A99D017808BFA1ADA359B2
+                0EEB32472D8CC04B68EB5C119983B982C2594BEBFC195C85BC1E06457EE631FE
+                66ABC35C41CF044FBDD9895BB800FF836558D6ACCF9C41E0C567AEF96B380CF3
+                C2B2ACA3733067900BFB1CEA86399B453A9FC03AE699606EAF4C43DD20CDB36C
+                D2605D331FDBF0C61AD48D9D42579843E7641B4EF44BB4B12431E148A20B660E
+                B38D4AB9817AB6AA38DDE6B2641BDE7883BAB121E80A73E89C6CC389AC251402
+                97CDE41F59037896983026D10533C7ABC4D2640DE04962C2BC4417CC1C8F124B
+                933500EE65342B125D3073787D98857890CD40AFF8DC4A9C40EFF8DACC7DC139
+                18041FDBE97D188CAA5F683EE1040C4A55AF94ECBCFEBE0B83E1FA527F00C7D5
+                B1C41D1894A27FABF06EA32F585B99E083205CEBEB901DBC83EFF003F2E9CA63
+                1BD0769FE7B2B10DA20B1B0367BCB583D8868D8133DEDA416CC1C6C0196FED20
+                36612A75BF526AF660A3D67E1A5C36B966BF9761C71BDBF9482412690C9DCE2F
+                042F2C59CBE11DDF0000000049454E44AE426082}
+              FileName = 
+                'C:\Users\SERGIO\Documents\GUARANI\Library\baseline_search_black_' +
+                '24dp.png'
+            end>
+          Align = Right
+          Cursor = crHandPoint
+          Margins.Right = 10.000000000000000000
+          Position.X = 462.000000000000000000
+          Size.Width = 33.000000000000000000
+          Size.Height = 34.000000000000000000
+          Size.PlatformDefault = False
+          OnClick = btnPesquisarClick
+          OnPainting = btnPesquisarPainting
+        end
+      end
+    end
+    object btnImportar: TRectangle
+      Align = Top
+      Cursor = crHandPoint
+      Fill.Kind = None
+      Margins.Left = 20.000000000000000000
+      Margins.Top = 10.000000000000000000
+      Margins.Right = 20.000000000000000000
+      Position.X = 20.000000000000000000
+      Position.Y = 547.000000000000000000
+      Size.Width = 554.000000000000000000
+      Size.Height = 31.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Kind = None
+      OnClick = btnImportarClick
+      object Image1: TImage
+        MultiResBitmap.Height = 48
+        MultiResBitmap.Width = 48
+        MultiResBitmap = <
+          item
+            Width = 48
+            Height = 48
+            PNG = {
+              89504E470D0A1A0A0000000D49484452000000300000003008060000005702F9
+              87000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+              0215494441546843EDD83B6B145118C6F1F5D688492B11B1F523A44B15032209
+              2AEA8790A488903208365E40443B451044EC0411AC6C05D14F20A633215E8A40
+              82162A5EFECFB0843579CC99739955F03CF023303B67E67D373373664FAFA6A6
+              A6A6E6BFCEAEFEDF12D98B494C611C8770185FF1116FF102CFF01C5FF04FE400
+              16F10E3F5BD2BE0B18C55FCD497C802BB28DF73881A167376EC11595E22674CC
+              A1640F1EC21592E31E86D2C475B8024AB8814E731AEEC4A5FC4067F7C40856E0
+              4E5C929E50FB512407318F4758863B61172E202B2AFC3E34D9B813746D159A18
+              9372066B70076E231437C6994074CEE33BDC01DB0AC58D712E232A9A55F51470
+              078B118A1BE37CC62BDCC631EC38471C41CE6533281437A68DD7D0CBA2CD5DB8
+              4129427163625CC26FD1B7AF575EB7738A50DC985857B09939B89D5285E2C6C4
+              D2BD3A83264FE1764A158A1B936209CD5CF1A6BF21D645948A8EE5CE11720EBD
+              8D810DB14A34915ABC3C40560392D3444EF1A2ABA779BEBA0F63A434915BBCE8
+              CB2F7613C73451A278691AD0FB8FFB30459B264A152FBA7A9AB59B6FFD0D25EC
+              D444C9E2A5B989953B703BA4724D942E5ECEA28956D1D6E1764A35D84417C56B
+              22DB87CD4C23F7B7C0562ABC8BE2E514B66516A59BE8C235FC31FA4FE44E6E5D
+              BA8AE002D8187463977C3AE5D235BFEDB2092DAFEB11ABD7D6E3380A35A6D5E8
+              61E413B446F4124FF018FA426B6A6A6A6A6AFAE9F57E01E0A2C1B552E9F66A00
+              00000049454E44AE426082}
+            FileName = 
+              'C:\Users\SERGIO\Documents\RUNTEC\Teste 1\Library\baseline_cloud_' +
+              'download_black_24dp.png'
+          end>
+        Align = Left
+        HitTest = False
+        Margins.Left = 240.000000000000000000
+        Position.X = 240.000000000000000000
+        Size.Width = 50.000000000000000000
+        Size.Height = 31.000000000000000000
+        Size.PlatformDefault = False
+      end
+      object Label2: TLabel
+        Align = Left
+        AutoSize = True
+        StyledSettings = []
+        Position.X = 290.000000000000000000
+        Size.Width = 77.000000000000000000
+        Size.Height = 31.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Text = 'IMPORTAR'
+        TabOrder = 1
+      end
+    end
+    object StringGridBindSourceDB1: TStringGrid
+      Align = Top
+      CanFocus = True
+      ClipChildren = True
+      Margins.Left = 20.000000000000000000
+      Margins.Top = 10.000000000000000000
+      Margins.Right = 20.000000000000000000
+      Position.X = 20.000000000000000000
+      Position.Y = 99.000000000000000000
+      Size.Width = 554.000000000000000000
+      Size.Height = 438.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 3
+      Options = [ColumnResize, ColumnMove, ColLines, RowLines, Tabs, Header, HeaderClick, AutoDisplacement]
+      Viewport.Width = 534.000000000000000000
+      Viewport.Height = 413.000000000000000000
+    end
+  end
+  object mtMusicas: TFDMemTable
+    FetchOptions.AssignedValues = [evMode]
+    FetchOptions.Mode = fmAll
+    ResourceOptions.AssignedValues = [rvSilentMode]
+    ResourceOptions.SilentMode = True
+    UpdateOptions.AssignedValues = [uvCheckRequired, uvAutoCommitUpdates]
+    UpdateOptions.CheckRequired = False
+    UpdateOptions.AutoCommitUpdates = True
+    Left = 448
+    Top = 464
+    object mtMusicaswrapperType: TStringField
+      FieldName = 'wrapperType'
+      Size = 100
+    end
+    object mtMusicasKind: TStringField
+      FieldName = 'Kind'
+      Size = 100
+    end
+    object mtMusicasartistId: TLargeintField
+      FieldName = 'artistId '
+    end
+    object mtMusicascollectionId: TLargeintField
+      FieldName = 'collectionId '
+    end
+    object mtMusicastrackId: TLargeintField
+      FieldName = 'trackId '
+    end
+    object mtMusicasartistName: TStringField
+      FieldName = 'artistName'
+      Size = 100
+    end
+    object mtMusicascollectionName: TStringField
+      FieldName = 'collectionName'
+      Size = 300
+    end
+    object mtMusicastrackName: TStringField
+      FieldName = 'trackName'
+      Size = 300
+    end
+    object mtMusicasartistViewUrl: TStringField
+      FieldName = 'artistViewUrl'
+      Size = 300
+    end
+    object mtMusicascollectionViewUrl: TStringField
+      FieldName = 'collectionViewUrl'
+      Size = 300
+    end
+    object mtMusicastrackViewUrl: TStringField
+      FieldName = 'trackViewUrl'
+      Size = 300
+    end
+    object mtMusicasNota: TIntegerField
+      FieldName = 'Nota'
+    end
+  end
+  object BindSourceDB1: TBindSourceDB
+    DataSet = mtMusicas
+    ScopeMappings = <>
+    Left = 448
+    Top = 416
+  end
+  object BindingsList1: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 444
+    Top = 365
+    object LinkGridToDataSourceBindSourceDB1: TLinkGridToDataSource
+      Category = 'Quick Bindings'
+      DataSource = BindSourceDB1
+      GridControl = StringGridBindSourceDB1
+      Columns = <
+        item
+          MemberName = 'trackId '
+          Header = 'Track ID'
+          Width = 80
+        end
+        item
+          MemberName = 'artistName'
+          Header = 'Artist Name'
+          Width = 111
+        end
+        item
+          MemberName = 'collectionName'
+          Header = 'Collection Name'
+          Width = 180
+        end
+        item
+          MemberName = 'trackName'
+          Header = 'Track Name'
+          Width = 160
+        end>
+    end
+  end
+end

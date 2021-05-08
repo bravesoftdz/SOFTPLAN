@@ -1,0 +1,53 @@
+unit Guarani.Controller.ClienteJuridica;
+
+interface
+
+uses System.SysUtils, System.Types, System.UITypes, System.Classes,
+     System.Variants, FMX.Dialogs, Guarani.Model.ClienteJuridica;
+
+type
+  TControlClienteJuridica = class
+  private
+    FCliente: TClienteJuridica;
+    function ValidarCNPJ(CNPJ:String):Boolean;
+    procedure SetCliente(const Value: TClienteJuridica);
+  public
+    constructor Create;
+    property Cliente: TClienteJuridica read FCliente write SetCliente;
+    procedure Gravar(Cliente: TClienteJuridica);
+  end;
+
+implementation
+
+{ TControlClienteJuridica }
+
+
+constructor TControlClienteJuridica.Create;
+begin
+  FCliente := TClienteJuridica.Create;
+end;
+
+procedure TControlClienteJuridica.Gravar(Cliente: TClienteJuridica);
+begin
+  if Cliente.ID = 0 then
+    raise Exception.Create('Id do cliente em branco');
+
+  if Cliente.NomeFantisia = '' then
+    raise Exception.Create('Nome Fantasia em branco');
+
+  if Cliente.RazaoSocial = '' then
+    raise Exception.Create('Razão Social em branco');
+
+end;
+
+procedure TControlClienteJuridica.SetCliente(const Value: TClienteJuridica);
+begin
+  FCliente := Value;
+end;
+
+function TControlClienteJuridica.ValidarCNPJ(CNPJ: String): Boolean;
+begin
+
+end;
+
+end.

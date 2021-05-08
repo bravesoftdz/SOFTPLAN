@@ -1,0 +1,36 @@
+{-------------------------------------------------------------------------------
+Programa: Home                                                   Data:17/04/2021
+Objetivo: Tela de apresentação da HOME com o logo da empresa
+
+Dev.: Sérgio de Siqueira Silva
+-------------------------------------------------------------------------------}
+
+unit Guarani.View.Inicial;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Layouts,
+  FMX.Controls.Presentation, FMX.Edit, FMX.Objects, FMX.StdCtrls;
+
+type
+  TfrmInicial = class(TForm)
+    LayoutContainer: TLayout;
+    LabelAppName: TLabel;
+    ImageMenuSuperior: TImage;
+    LabelDev: TLabel;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmInicial: TfrmInicial;
+
+implementation
+
+{$R *.fmx}
+
+end.

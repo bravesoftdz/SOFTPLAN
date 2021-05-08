@@ -1,0 +1,48 @@
+unit Runtec.Controller.Musica;
+
+interface
+
+uses System.SysUtils, System.Types, System.UITypes, System.Classes,
+     System.Variants, FMX.Dialogs, Runtec.Model.Musica, uEnums;
+
+type
+  TControlMusica = class
+  private
+    objMusica: TMusica;
+    FAcao: TAcao;
+  public
+    constructor Create;
+    destructor Destroy;
+
+    property Musica: TMusica read objMusica write objMusica;
+    procedure Acao(Tipo: TAcao; ID: Integer = 0);
+    function ApagarTodasMusicas(const Cantor: String):Boolean;
+  end;
+
+implementation
+
+
+{ TControlMusica }
+
+procedure TControlMusica.Acao(Tipo: TAcao; ID: Integer = 0);
+begin
+  case Tipo of
+    tacIncluir:  objMusica.Acao(tacIncluir);
+    tacCarregar: objMusica.Acao(tacCarregar, ID);
+    tacAlterar:  objMusica.Acao(tacAlterar, ID);
+    tacGravar:   objMusica.Acao(tacGravar);
+    tacExcluir:  objMusica.Acao(tacExcluir);
+  end;
+end;
+
+constructor TControlMusica.Create;
+begin
+  objMusica := TMusica.Create;
+end;
+
+destructor TControlMusica.Destroy;
+begin
+  FreeAndNil(objMusica);
+end;
+
+end.

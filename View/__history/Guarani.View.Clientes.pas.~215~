@@ -1,0 +1,344 @@
+{-------------------------------------------------------------------------------
+Tela: Clientes [frmCliente]                                      Data:17/04/2021
+Objetivo: Tela cadastro de clientes realizando operações de CRUD
+
+Dev.: Sérgio de Siqueira Silva
+
+Data Alteração: 19/04/2021
+Dev.: Sérgio de Siqueira Silva
+Alteração: Aplicação de mascara no campo CNPJ e Telefone
+-------------------------------------------------------------------------------}
+
+unit Guarani.View.Clientes;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, System.Rtti,
+  FMX.Grid.Style, FMX.Controls.Presentation, FMX.ScrollBox, FMX.Grid,
+  FMX.Layouts, FMX.Objects, FMX.Edit, FMX.StdCtrls, FireDAC.Stan.Intf,
+  FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
+  FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
+  Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client, Fmx.Bind.Grid,
+  System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt,
+  Fmx.Bind.DBEngExt, Data.Bind.Components, Data.Bind.Grid, Data.Bind.DBScope,
+  Guarani.Model.ClienteJuridica, Guarani.Controller.ClienteJuridica,
+  Guarani.Model.ConexaoBD, FMX.TabControl, uFuncoes;
+
+type
+  TTipoBusca = (tBuscaID, tBuscaNomeFantasia, tBuscaRazaoSocial, tBuscaCNPJ, tBuscaTodos);
+
+  TfrmClientes = class(TForm)
+    LayoutContainer: TLayout;
+    LayoutAcoesPesquisa: TLayout;
+    Label1: TLabel;
+    RectangleEdtNomeFantasia: TRectangle;
+    edtPesquisa: TEdit;
+    btnPesquisar: TImage;
+    LayoutAcoes: TLayout;
+    btnIncluir: TImage;
+    btnExcluir: TImage;
+    btnAlterar: TImage;
+    chkID: TCheckBox;
+    chkFantasia: TCheckBox;
+    chkRazao: TCheckBox;
+    chkCNPJ: TCheckBox;
+    TabControlClientes: TTabControl;
+    TabListagemClientes: TTabItem;
+    TabCadastroClientes: TTabItem;
+    LayoutCadastroClientes: TLayout;
+    Rectangle1: TRectangle;
+    edtNomeFantasia: TEdit;
+    Label2: TLabel;
+    RectangleEdtRazaoSocial: TRectangle;
+    EdtRazaoSocial: TEdit;
+    Label3: TLabel;
+    Layout3: TLayout;
+    btnCancelar: TImage;
+    btnGravar: TImage;
+    RectangleEdtCNPJ: TRectangle;
+    edtCNPJ: TEdit;
+    Label4: TLabel;
+    Label5: TLabel;
+    Rectangle2: TRectangle;
+    edtTelefone: TEdit;
+    Label6: TLabel;
+    Rectangle3: TRectangle;
+    edtEndereco: TEdit;
+    Grid: TStringGrid;
+    StringColumn1: TStringColumn;
+    StringColumn2: TStringColumn;
+    StringColumn3: TStringColumn;
+    StringColumn4: TStringColumn;
+    Label7: TLabel;
+    lblID: TLabel;
+    StyleBook1: TStyleBook;
+    procedure btnIncluirClick(Sender: TObject);
+    procedure edtPesquisaKeyDown(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure btnPesquisarClick(Sender: TObject);
+    procedure btnAlterarClick(Sender: TObject);
+    procedure btnExcluirClick(Sender: TObject);
+    procedure btnGravarClick(Sender: TObject);
+    procedure btnCancelarClick(Sender: TObject);
+    procedure edtCNPJTyping(Sender: TObject);
+    procedure btnPesquisarPaint(Sender: TObject; Canvas: TCanvas;
+      const ARect: TRectF);
+  private
+    { Private declarations }
+    Show: Boolean;
+
+    procedure AlterarCliente(IdCliente: Integer);
+    procedure IncluirCliente;
+    procedure LimpaGrid();
+    function IdSelecionado:Integer;
+  public
+    { Public declarations }
+    procedure LocalizarCliente();
+    procedure PopularGridClientes;
+    procedure CarregaClientes(TipoBusca:TTipoBusca);
+  end;
+
+var
+  frmClientes: TfrmClientes;
+  Cliente: TClienteJuridica;
+  ClienteControl: TControlClienteJuridica;
+  QueryClientes: TFDQuery;
+  Conexao: TConexao;
+
+implementation
+
+{$R *.fmx}
+
+uses Guarani.View.Principal;
+
+procedure TfrmClientes.AlterarCliente(IdCliente: Integer);
+begin
+  Cliente := TClienteJuridica.Create;
+
+  if not Cliente.Alterar(IdCliente) then exit;
+
+  lblID.Text           := Cliente.Id.ToString;
+  edtCNPJ.Text         := Cliente.CNPJ;
+  EdtRazaoSocial.Text  := Cliente.RazaoSocial;
+  edtNomeFantasia.Text := Cliente.NomeFantisia;
+  edtEndereco.Text     := Cliente.Endereco;
+  edtTelefone.Text     := Cliente.Telefone;
+end;
+
+
+procedure TfrmClientes.edtCNPJTyping(Sender: TObject);
+begin
+  inherited;
+  MaskTelefone(Sender);
+end;
+
+procedure TfrmClientes.edtPesquisaKeyDown(Sender: TObject;
+  var Key: Word; var KeyChar: Char; Shift: TShiftState);
+begin
+  if Key = vkReturn then
+  begin
+    if edtPesquisa.Text <> '' then
+      LocalizarCliente
+    else
+      CarregaClientes(tBuscaTodos);
+  end;
+end;
+
+procedure TfrmClientes.CarregaClientes(TipoBusca:TTipoBusca);
+var sSQL: String;
+begin
+  sSQL := 'SELECT * FROM CLIENTES ';
+
+  //Verifica se a Query já esta criada
+  if not Assigned(QueryClientes) then
+  begin
+    QueryClientes := TFDQuery.Create(nil);
+    Conexao := TConexao.Create;
+
+    QueryClientes.Connection := Conexao.BD;
+  end;
+
+  //Monstagem da instrução SQL
+  QueryClientes.Close;
+  QueryClientes.SQL.Clear;
+
+  //Tipo de Busca
+  case TipoBusca of
+    tBuscaID:           begin
+                          sSQL := sSQL + 'WHERE ID = :BUSCA';
+                          QueryClientes.SQL.Add(sSQL);
+                          QueryClientes.ParamByName('BUSCA').AsString := UpperCase(edtPesquisa.Text);
+                        end;
+    tBuscaNomeFantasia: begin
+                          sSQL := sSQL + 'WHERE NOMEFANTASIA LIKE :BUSCA';
+                          QueryClientes.SQL.Add(sSQL);
+                          QueryClientes.ParamByName('BUSCA').AsString := UpperCase(edtPesquisa.Text) + '%';
+                        end;
+    tBuscaRazaoSocial:  begin
+                          sSQL := sSQL + 'WHERE RAZAOSOCIAL LIKE :BUSCA';
+                          QueryClientes.SQL.Add(sSQL);
+                          QueryClientes.ParamByName('BUSCA').AsString := UpperCase(edtPesquisa.Text) + '%';
+                        end;
+    tBuscaCNPJ:         begin
+                          sSQL := sSQL + 'WHERE CNPJ LIKE :BUSCA';
+                          QueryClientes.SQL.Add(sSQL);
+                          QueryClientes.ParamByName('BUSCA').AsString := UpperCase(edtPesquisa.Text) + '%';
+                        end;
+    tBuscaTodos:        QueryClientes.SQL.Add(sSQL);
+  end;
+
+  QueryClientes.Open;
+
+  PopularGridClientes;
+end;
+
+function TfrmClientes.IdSelecionado: Integer;
+begin
+  try
+    Result := Grid.Cells[0,Grid.Row].ToInteger;
+  except
+    raise Exception.Create('Selecione pelo menos um cliente!');          
+  end;
+end;
+
+procedure TfrmClientes.btnIncluirClick(Sender: TObject);
+begin
+  IncluirCliente;
+  TabControlClientes.Next();
+end;
+
+procedure TfrmClientes.btnExcluirClick(Sender: TObject);
+var Cliente: TClienteJuridica;
+begin
+  try
+    Cliente := TClienteJuridica.Create;
+    Cliente.Buscar(IdSelecionado);
+
+    if MessageDlg('Deseja realmente apagar o cliente '+ Cliente.RazaoSocial +' ?', System.UITypes.TMsgDlgType.mtConfirmation,
+               [System.UITypes.TMsgDlgBtn.mbYes, System.UITypes.TMsgDlgBtn.mbNO], 0) = mrYes then
+      Cliente.Apagar;
+  finally
+    Cliente.Free;
+  end;
+  CarregaClientes(tBuscaTodos);
+end;
+
+procedure TfrmClientes.btnAlterarClick(Sender: TObject);
+begin
+  AlterarCliente(IdSelecionado);
+  TabControlClientes.Next();
+end;
+
+procedure TfrmClientes.btnPesquisarClick(Sender: TObject);
+begin
+  if edtPesquisa.Text = '' then
+    LocalizarCliente;
+
+  CarregaClientes(tBuscaTodos);
+end;
+
+procedure TfrmClientes.btnPesquisarPaint(Sender: TObject; Canvas: TCanvas;
+  const ARect: TRectF);
+begin
+  if not Show then
+    CarregaClientes(tBuscaTodos);
+
+  Show := True;
+end;
+
+procedure TfrmClientes.btnCancelarClick(Sender: TObject);
+begin
+  if Assigned(Cliente) then Cliente.Free;
+
+  TabControlClientes.Previous();
+end;
+
+procedure TfrmClientes.btnGravarClick(Sender: TObject);
+begin
+  Cliente.CNPJ          := edtCNPJ.Text;
+  Cliente.RazaoSocial   := EdtRazaoSocial.Text;
+  Cliente.NomeFantisia  := edtNomeFantasia.Text;
+  Cliente.Endereco      := edtEndereco.Text;
+  Cliente.Telefone      := edtTelefone.Text;
+
+  ClienteControl.Gravar(Cliente);
+
+  if Assigned(Cliente) then Cliente.Free;
+
+  TabControlClientes.Previous();
+  CarregaClientes(tBuscaTodos);
+end;
+
+procedure TfrmClientes.IncluirCliente;
+begin
+    Cliente := TClienteJuridica.Create;
+    ClienteControl := TControlClienteJuridica.Create;
+
+    Cliente.Incluir;
+
+    lblID.Text := Cliente.Id.ToString;
+end;
+
+procedure TfrmClientes.LimpaGrid;
+begin
+  Grid.RowCount := 0;
+end;
+
+procedure TfrmClientes.LocalizarCliente;
+Var i: Integer;
+begin
+  i := 0;
+
+  if (chkID.IsChecked) and (i = 0) then
+  begin
+    CarregaClientes(tBuscaID);
+    Inc(i,1);
+  end;
+
+  if (chkFantasia.IsChecked) and (i = 0) then
+  begin
+    CarregaClientes(tBuscaNomeFantasia);
+    Inc(i,1);
+  end;
+
+  if (chkRazao.IsChecked) and (i = 0) then
+  begin
+    CarregaClientes(tBuscaRazaoSocial);
+    Inc(i,1);
+  end;
+
+  if (chkCNPJ.IsChecked) and (i = 0) then
+  begin
+    CarregaClientes(tBuscaCNPJ);
+  end;
+end;
+
+procedure TfrmClientes.PopularGridClientes;
+var iAux: Integer;
+begin
+  LimpaGrid;
+
+  with QueryClientes do
+  begin
+
+    if not Assigned(QueryClientes) then
+      CarregaClientes(tBuscaTodos);
+
+    First;
+    Grid.RowCount := RecordCount;
+    for iAux := 0 to RecordCount - 1 do
+    begin
+      Grid.Cells[0,iAux] := FieldByName('ID').AsString;
+      Grid.Cells[1,iAux] := FieldByName('NOMEFANTASIA').AsString;
+      Grid.Cells[2,iAux] := FieldByName('RAZAOSOCIAL').AsString;
+      Grid.Cells[3,iAux] := FieldByName('CNPJ').AsString;
+
+      Next;
+    end;
+
+  end;
+end;
+
+end.

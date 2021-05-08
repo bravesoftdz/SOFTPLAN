@@ -1,0 +1,235 @@
+unit Guarani.Model.PedidoItem;
+
+interface
+
+uses SysUtils, DateUtils, StrUtils, Guarani.Model.ConexaoBD,
+     Data.DB, FireDAC.Dapt, FireDAC.Comp.Client;
+
+type
+  TStatus = (Inclusao, Alteracao, Navegacao);
+
+  TPedidoItem = class
+    private
+      FId: Integer;
+      FIdPedido: Integer;
+      FIdProduto: Integer;
+      FPreco: Currency;
+      FQuantidade: Integer;
+      Status: TStatus;
+      procedure LimpaItem();
+    public
+      constructor Create();
+      property Id: Integer read FId write FId;
+      property IdPedido: Integer read FIdPedido write FIdPedido;
+      property IdProduto: Integer read FIdProduto write FIdProduto;
+      property PrecoUnitario: Currency read FPreco write FPreco;
+      property Quantidade: Integer read FQuantidade write FQuantidade;
+
+      {CRUD}
+      function Incluir:Boolean;
+      function Buscar(IdItem: Integer):Boolean;
+      function Alterar(IdItem: Integer):Boolean;
+
+      function Gravar(ItemValidado: TPedidoItem):Boolean;
+      function Apagar:Boolean;
+  end;
+
+implementation
+
+var Conexao: TConexao;
+
+{ TPedido }
+
+function TPedidoItem.Alterar(IdItem: Integer): Boolean;
+begin
+  Result := False;
+
+  if not Buscar(IdItem) then exit;
+
+  Status := Alteracao;
+  Result := True;
+end;
+
+function TPedidoItem.Apagar: Boolean;
+Var Query: TFDQuery;
+begin
+  Result := False;
+
+  if not Buscar(id) then exit;
+
+  try
+    Query := TFDQuery.Create(nil);
+    Conexao := TConexao.Create;
+    Query.Connection := Conexao.BD;
+
+    with Query do
+    begin
+      Active := False;
+      SQL.Clear;
+      SQL.Add('DELETE FROM PEDIDOITEMS WHERE ID = :ID');
+      ParamByName('ID').AsInteger := Id;
+      ExecSQL;
+
+      Active := False;
+      SQL.Clear;
+      SQL.Add('SELECT * FROM PEDIDOITEMS WHERE ID = :ID');
+      ParamByName('ID').AsInteger := Id;
+      Active := True;
+
+      if RecordCount = 0 then
+        Result := True
+      else
+        Result := False;
+    end;
+  finally
+    Query.Free;
+    Conexao.Free;
+  end;
+
+end;
+
+function TPedidoItem.Buscar(IdItem: Integer): Boolean;
+Var Query: TFDQuery;
+begin
+  Result := False;
+
+  if Status = Inclusao then exit;
+
+  try
+    Query := TFDQuery.Create(nil);
+    Conexao := TConexao.Create;
+    Query.Connection := Conexao.BD;
+
+    with Query do
+    begin
+      Active := False;
+      SQL.Clear;
+      SQL.Add('SELECT * FROM PEDIDOITEMS WHERE ID = :ID');
+      ParamByName('ID').AsInteger := IdItem;
+      Active := True;
+
+      if RecordCount = 0 then
+        exit
+      else
+        Result := True;
+
+      FId         := FieldByName('ID').AsInteger;
+      FIdPedido   := FieldByName('IDPEDIDO').AsInteger;
+      FIdProduto  := FieldByName('IDPRODUTO').AsInteger;
+      FPreco      := FieldByName('PRECOUNITARIO').AsCurrency;
+      FQuantidade := FieldByName('QUANTIDADE').AsInteger;
+    end;
+  finally
+    Query.Free;
+    Conexao.Free;
+  end;
+end;
+
+constructor TPedido.Create;
+begin
+  LimpaPedido;
+  inherited
+end;
+
+function TPedidoItem.Gravar(PedidoValidado: TPedido): Boolean;
+Var Query: TFDQuery;
+begin
+  Result := False;
+
+  if Status = Inclusao then
+  begin
+    try
+      Query := TFDQuery.Create(nil);
+      Conexao := TConexao.Create;
+      Query.Connection := Conexao.BD;
+
+      with Query do
+      begin
+        Active := False;
+        SQL.Clear;
+        SQL.Add('INSERT INTO PEDIDOS VALUES(:ID, :DATAPEDIDO, :IDCLIENTE)');
+
+        ParamByName('ID').AsInteger        := PedidoValidado.Id;
+        ParamByName('DATAPEDIDO').AsString := PedidoValidado.DataPedido;
+        ParamByName('IDCLIENTE').AsString  := PedidoValidado.IdCliente;
+        ExecSQL;
+
+        if Buscar(Id) then
+          Result := True
+        else
+          Result := False;
+      end;
+    finally
+      Query.Free;
+    end;
+  end;
+
+  if Status = Alteracao then
+  begin
+      try
+      Query := TFDQuery.Create(nil);
+      Conexao := TConexao.Create;
+      Query.Connection := Conexao.BD;
+
+      with Query do
+      begin
+        Active := False;
+        SQL.Clear;
+        SQL.Add('UPDATE PEDIDOS SET ID = :ID,'
+                                  +' DATAPEDIDO = :DATAPEDIDO ,'
+                                  +' IDCLIENTE = :IDCLIENTE '
+                   +' WHERE ID = :ID');
+
+        ParamByName('ID').AsInteger        := PedidoValidado.Id;
+        ParamByName('DATAPEDIDO').AsString := PedidoValidado.DataPedido;
+        ParamByName('IDCLIENTE').AsString  := PedidoValidado.IdCliente;
+        ExecSQL;
+
+        Result := True
+      end;
+    finally
+      Query.Free;
+      Conexao.Free;
+    end;
+  end;
+
+  LimpaPedido;
+end;
+
+function TPedidoItem.Incluir: Boolean;
+Var Query: TFDQuery;
+begin
+  Result := False;
+
+  try
+    Query := TFDQuery.Create(nil);
+    Conexao := TConexao.Create;
+    Query.Connection := Conexao.BD;
+
+    with Query do
+    begin
+      Active := False;
+      SQL.Clear;
+      SQL.Add('SELECT MAX(ID)+1 AS NOVOID FROM PEDIDOS');
+      Active := True;
+
+      LimpaPedido;
+      Id := FieldByName('NOVOID').AsInteger;
+      if Id = 0 then Id := 1;
+    end;
+  finally
+    Query.Free;
+    Conexao.Free;
+  end;
+
+  Status := Inclusao;
+end;
+
+procedure TPedidoItem.LimpaItem;
+begin
+  FId := 0;
+  FIdCliente := 0;
+  FData := StrtoDate('01/01/1900');
+end;
+
+end.

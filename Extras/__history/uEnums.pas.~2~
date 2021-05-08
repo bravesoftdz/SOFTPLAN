@@ -1,0 +1,10 @@
+unit uEnums;
+
+interface
+
+type
+  TAcao = (tacIncluir, tacAlterar, tacGravar, tacExcluir);
+
+implementation
+
+end.

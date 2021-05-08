@@ -1,0 +1,240 @@
+object frmClientesCadastro: TfrmClientesCadastro
+  Size.Width = 600.000000000000000000
+  Size.Height = 580.000000000000000000
+  Size.PlatformDefault = False
+  object LayoutCadastroClientes: TLayout
+    Align = Client
+    Size.Width = 600.000000000000000000
+    Size.Height = 580.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object RectangleEdtNomeFantasia: TRectangle
+      Fill.Kind = None
+      Margins.Left = 3.000000000000000000
+      Margins.Top = 3.000000000000000000
+      Margins.Right = 10.000000000000000000
+      Margins.Bottom = 3.000000000000000000
+      Position.X = 96.000000000000000000
+      Position.Y = 128.000000000000000000
+      Size.Width = 393.000000000000000000
+      Size.Height = 34.000000000000000000
+      Size.PlatformDefault = False
+      XRadius = 10.000000000000000000
+      YRadius = 10.000000000000000000
+      object edtNomeFantasia: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Client
+        StyleLookup = 'transparentedit'
+        TabOrder = 0
+        Margins.Left = 2.000000000000000000
+        Margins.Right = 10.000000000000000000
+        Size.Width = 381.000000000000000000
+        Size.Height = 34.000000000000000000
+        Size.PlatformDefault = False
+        TextPrompt = 'DIGITE AQUI O NOME FANTASIA DO CLIENTE'
+        StyledSettings = []
+        CharCase = ecUpperCase
+      end
+    end
+    object Label1: TLabel
+      AutoSize = True
+      StyledSettings = []
+      Position.X = 16.000000000000000000
+      Position.Y = 80.000000000000000000
+      Size.Width = 89.000000000000000000
+      Size.Height = 16.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      Text = 'Raz'#227'o Social'
+      TabOrder = 4
+    end
+    object RectangleEdtRazaoSocial: TRectangle
+      Fill.Kind = None
+      Margins.Left = 3.000000000000000000
+      Margins.Top = 3.000000000000000000
+      Margins.Right = 10.000000000000000000
+      Margins.Bottom = 3.000000000000000000
+      Position.X = 96.000000000000000000
+      Position.Y = 72.000000000000000000
+      Size.Width = 393.000000000000000000
+      Size.Height = 34.000000000000000000
+      Size.PlatformDefault = False
+      XRadius = 10.000000000000000000
+      YRadius = 10.000000000000000000
+      object EdtRazaoSocial: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Client
+        StyleLookup = 'transparentedit'
+        TabOrder = 0
+        Margins.Left = 2.000000000000000000
+        Margins.Right = 10.000000000000000000
+        Size.Width = 381.000000000000000000
+        Size.Height = 34.000000000000000000
+        Size.PlatformDefault = False
+        TextPrompt = 'DIGITE AQUI A RAZ'#195'O SOCIAL DO CLIENTE'
+        StyledSettings = []
+        CharCase = ecUpperCase
+      end
+    end
+    object Label2: TLabel
+      AutoSize = True
+      StyledSettings = []
+      Position.X = 8.000000000000000000
+      Position.Y = 136.000000000000000000
+      Size.Width = 89.000000000000000000
+      Size.Height = 16.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      Text = 'Nome Fantasia'
+      TabOrder = 3
+    end
+    object Layout2: TLayout
+      Align = Bottom
+      Position.Y = 530.000000000000000000
+      Size.Width = 600.000000000000000000
+      Size.Height = 50.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 6
+      object Image1: TImage
+        MultiResBitmap.Height = 48
+        MultiResBitmap.Width = 48
+        MultiResBitmap = <
+          item
+            Width = 48
+            Height = 48
+            PNG = {
+              89504E470D0A1A0A0000000D49484452000000300000003008060000005702F9
+              87000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+              00D1494441546843ED92410AC2401004176F9ED4BF68FC9957DF25BE401FA3F9
+              81F6440796902CD93D3833D20585468C5B1D4C8410420821FFC91E9E3E6FE321
+              F10FF88267F9201279BC3A3B62F57DF5C2015EE16EB80A86C43F61FEE48B4FDF
+              138CB782F15630DE8A0E32BE960DBCC0E370D58659FC16DEA01CD6C3961166F1
+              6B7887F9A1B523E4BB724FFE1BE2CFFEF372D0F8F0A523CCE39596116EE2959A
+              11EEE2952523DCC62BA511EEE395B91121E295A91163DDC62BA511EEE395A911
+              61E2957C44B87845C2C3C613420821A48D94DE1BD3B1680FBCF15D0000000049
+              454E44AE426082}
+            FileName = 
+              'C:\Users\SERGIO\Documents\GUARANI\Library\baseline_check_black_2' +
+              '4dp.png'
+          end>
+        Align = Left
+        Cursor = crHandPoint
+        Margins.Left = 50.000000000000000000
+        Position.X = 50.000000000000000000
+        Size.Width = 33.000000000000000000
+        Size.Height = 50.000000000000000000
+        Size.PlatformDefault = False
+      end
+      object Image2: TImage
+        MultiResBitmap.Height = 48
+        MultiResBitmap.Width = 48
+        MultiResBitmap = <
+          item
+            Width = 48
+            Height = 48
+            PNG = {
+              89504E470D0A1A0A0000000D49484452000000300000003008060000005702F9
+              87000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+              00E0494441546843ED98C10A8330104443FB8DFDC542BFB1079B290E7848829A
+              DD6403F360111566DFA827931042082116E299E79DE7F53FB30599C8C60E1710
+              FCC9B3E5F9E6B12C812C64221B3B5C4AE0E96001C7AAC4519E835DE69416F596
+              F0C86C62B970B83CB1583C4D9EF4084C97277744C2C8932B42E1E4C919B1B0F2
+              A425185E9ED444979027A512C7092D4F6A255CE41FFB51EC2CFD0995E4715EBA
+              16AE444D1ED75BF7427046306C892B62E14ADC110A53A247647A090B8169252C
+              170F2FE1B1706889E57FAB2CFF630B20184FC7E3152313D96EF242082184B025
+              A51F39D704527B70A1FD0000000049454E44AE426082}
+            FileName = 
+              'C:\Users\SERGIO\Documents\GUARANI\Library\baseline_close_black_2' +
+              '4dp.png'
+          end>
+        Align = Right
+        Cursor = crHandPoint
+        Margins.Right = 50.000000000000000000
+        Position.X = 517.000000000000000000
+        Size.Width = 33.000000000000000000
+        Size.Height = 50.000000000000000000
+        Size.PlatformDefault = False
+      end
+    end
+    object RectangleEdtCNPJ: TRectangle
+      Fill.Kind = None
+      Margins.Left = 3.000000000000000000
+      Margins.Top = 3.000000000000000000
+      Margins.Right = 10.000000000000000000
+      Margins.Bottom = 3.000000000000000000
+      Position.X = 96.000000000000000000
+      Position.Y = 24.000000000000000000
+      Size.Width = 249.000000000000000000
+      Size.Height = 34.000000000000000000
+      Size.PlatformDefault = False
+      XRadius = 10.000000000000000000
+      YRadius = 10.000000000000000000
+      object edtCNPJ: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Client
+        StyleLookup = 'transparentedit'
+        TabOrder = 0
+        Margins.Left = 2.000000000000000000
+        Margins.Right = 10.000000000000000000
+        Size.Width = 237.000000000000000000
+        Size.Height = 34.000000000000000000
+        Size.PlatformDefault = False
+        TextPrompt = 'DIGITE AQUI O CNPJ DO CLIENTE'
+        StyledSettings = []
+        CharCase = ecUpperCase
+      end
+    end
+    object Label3: TLabel
+      AutoSize = True
+      StyledSettings = []
+      Position.X = 56.000000000000000000
+      Position.Y = 32.000000000000000000
+      Size.Width = 33.000000000000000000
+      Size.Height = 16.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      Text = 'CNPJ'
+      TabOrder = 2
+    end
+    object Label5: TLabel
+      AutoSize = True
+      StyledSettings = []
+      Position.X = 40.000000000000000000
+      Position.Y = 248.000000000000000000
+      Size.Width = 49.000000000000000000
+      Size.Height = 16.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      Text = 'Telefone'
+      TabOrder = 1
+    end
+    object Rectangle2: TRectangle
+      Fill.Kind = None
+      Margins.Left = 3.000000000000000000
+      Margins.Top = 3.000000000000000000
+      Margins.Right = 10.000000000000000000
+      Margins.Bottom = 3.000000000000000000
+      Position.X = 96.000000000000000000
+      Position.Y = 240.000000000000000000
+      Size.Width = 249.000000000000000000
+      Size.Height = 34.000000000000000000
+      Size.PlatformDefault = False
+      XRadius = 10.000000000000000000
+      YRadius = 10.000000000000000000
+      object edtTelefone: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Client
+        StyleLookup = 'transparentedit'
+        TabOrder = 0
+        Margins.Left = 2.000000000000000000
+        Margins.Right = 10.000000000000000000
+        Size.Width = 237.000000000000000000
+        Size.Height = 34.000000000000000000
+        Size.PlatformDefault = False
+        TextPrompt = 'DIGITE AQUI OTELEFONE DO CLIENTE'
+        StyledSettings = []
+        CharCase = ecUpperCase
+      end
+    end
+  end
+end

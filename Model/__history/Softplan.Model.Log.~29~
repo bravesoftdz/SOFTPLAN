@@ -1,0 +1,325 @@
+{-------------------------------------------------------------------------------
+Classe: TMusica                                                  Data:01/05/2021
+Objetivo: Classe para manipulação da entidade MUSICA
+
+Dev.: Sérgio de Siqueira Silva
+
+Data Alteração: 02/05/2021
+Dev.: Sérgio de Siqueira Silva
+Alteração: Criada a procedure de Exclusão de Artista
+-------------------------------------------------------------------------------}
+
+unit Softplan.Model;
+
+interface
+
+uses
+  SysUtils, UITypes, StrUtils, Softplan.Model.ConexaoBD,
+  FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
+  FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
+  FireDAC.Phys.FB, FireDAC.Phys.FBDef, FireDAC.FMXUI.Wait, Data.DB,
+  FireDAC.Comp.Client, FireDAC.Stan.Intf, FireDAC.Dapt, uEnums;
+
+type
+  TLog = class
+  private
+    Status: TStatus;
+    FCodigo: Int64;
+    FURL: String;
+
+    procedure LimpaLog();
+
+    {CRUD}
+    function Incluir:Boolean;
+    function Alterar(ID: Int64): Boolean;
+    function Buscar(ID: Int64): Boolean;
+    function Gravar: Boolean;
+    function Apagar(ID: Int64): Boolean;
+  public
+    constructor Create;
+    destructor Destroy;
+
+    property Codigo: Int64 read FCodigo write FCodigo;
+    property URL: String read FURL write FURL;
+
+    function Acao(const Tipo: TAcao; Id: Int64 = 0): Boolean;
+    function ApagarTodasMusicas(const Cantor: String): Boolean;
+  end;
+
+implementation
+
+var Conexao: TConexao;
+
+{ TProduto }
+
+function TLog.Acao(const Tipo: TAcao; Id: Int64 = 0): Boolean;
+begin
+  Result := False;
+
+  if Tipo = tacIncluir then
+  begin
+    if Incluir then
+      Result := True;
+
+    exit;
+  end;
+
+  if Tipo = tacAlterar then
+  begin
+    if id = 0 then
+      raise Exception.Create('Selecione pelo menos uma música para alterar!');
+
+    if Alterar(id) then
+      Result := True;
+
+    exit;
+  end;
+
+  if Tipo = tacCarregar then
+  begin
+    if id = 0 then
+      raise Exception.Create('Nenhum ID informado!');
+
+    if Buscar(Id) then
+      Result := True;
+
+    exit;
+  end;
+
+  if Tipo = tacGravar then
+  begin
+    if Gravar then
+      Result := True;
+
+    exit;
+  end;
+
+
+  if Tipo = tacExcluir then
+  begin
+    if id = 0 then
+      raise Exception.Create('Nenhum ID informado!');
+
+    if Apagar(Id) then
+      Result := True;
+
+    exit;
+  end;
+
+end;
+
+function TLog.Alterar(ID: Int64): Boolean;
+begin
+  Result := False;
+
+  if not Buscar(ID) then exit;
+
+  Status := tstAlteracao;
+  Result := True;
+end;
+
+function TLog.Apagar(ID: Int64): Boolean;
+Var Query: TFDQuery;
+begin
+  Result := False;
+
+  if not Buscar(Self.FCodigo) then exit;
+  
+  try
+    Query := TFDQuery.Create(nil);
+    Conexao := TConexao.Create;
+    Query.Connection := Conexao.Conn;
+
+    with Query do
+    begin
+      Active := False;
+      SQL.Clear;
+      SQL.Add('DELETE FROM MUSICAS WHERE TRACKID = :ID');
+      ParamByName('ID').AsLargeInt:= ID;
+      ExecSQL;
+
+      Active := False;
+      SQL.Clear;
+      SQL.Add('SELECT * FROM MUSICAS WHERE TRACKID = :ID');
+      ParamByName('ID').AsLargeInt:= ID;
+      Active := True;
+
+      if RecordCount = 0 then      
+        Result := True;
+    end;
+  finally
+    Query.Free;
+    Conexao.Free;
+  end;
+end;
+
+function TLog.Buscar(ID: Int64): Boolean;
+Var Query: TFDQuery;
+begin
+  Result := False;
+
+  try
+    Query := TFDQuery.Create(nil);
+    Conexao := TConexao.Create;
+    Query.Connection := Conexao.Conn;
+
+    with Query do
+    begin
+      Active := False;
+      SQL.Clear;
+      SQL.Add('SELECT * FROM MUSICAS WHERE TRACKID = :ID');
+      ParamByName('ID').AsLargeInt := ID;
+      Active := True;
+
+      if RecordCount = 0 then
+      begin
+        exit;
+      end else
+        Result := True;
+
+      Self.FCodigo       := FieldByName('CODIGO').AsLargeInt;
+    end;
+  finally
+    Query.Free;
+    Conexao.Free;
+  end;
+end;
+
+constructor TLog.Create;
+begin
+  LimpaLog;
+  inherited
+end;
+
+destructor TLog.Destroy;
+begin
+  if Assigned (Conexao) then
+    FreeAndNil(Conexao);
+end;
+
+function TLog.Gravar: Boolean;
+Var Query: TFDQuery;
+    S:     String;
+begin
+  Result := False;
+
+  if Status = tstInclusao then
+  begin
+    try
+      Query := TFDQuery.Create(nil);
+      Conexao := TConexao.Create;
+      Query.Connection := Conexao.Conn;
+
+      if Buscar(Self.FCodigo) then
+        raise Exception.Create('Download '+ Self.FCodigo.ToString +' já cadastrada!');
+
+      with Query do
+      begin
+        Active := False;
+        SQL.Clear;
+        S := 'INSERT INTO MUSICAS VALUES(:wrapperType, '
+                                       +':Kind, '
+                                       +':artistId, '
+                                       +':collectionId, '
+                                       +':trackId, '
+                                       +':artistName, '
+                                       +':collectionName, '
+                                       +':trackName, '
+                                       +':artistViewUrl, '
+                                       +':collectionViewUrl, '
+                                       +':trackViewUrl, '
+                                       +':Nota)';
+        SQL.Add(S);
+
+        ParambyName('CODIGO').AsLargeInt    := Self.FCodigo;
+        ParambyName('URL').AsString         := Self.FURL;
+        ExecSQL;
+
+        if Buscar(Self.FCodigo) then
+          Result := True
+        else
+          Result := False;
+      end;
+    finally
+      Query.Free;
+    end;
+  end;
+
+  if Status = tstAlteracao then
+  begin
+      try
+      Query := TFDQuery.Create(nil);
+      Conexao := TConexao.Create;
+      Query.Connection := Conexao.Conn;
+
+      with Query do
+      begin
+        Active := False;
+        SQL.Clear;
+        S := 'UPDATE MUSICAS SET wrapperType = :wrapperType, '
+                               +'Kind = :Kind, '
+                               +'artistId = :artistId, '
+                               +'collectionId = :collectionId, '
+                               +'artistName = :artistName, '
+                               +'collectionName = :collectionName, '
+                               +'trackName = :trackName, '
+                               +'artistViewUrl = :artistViewUrl, '
+                               +'collectionViewUrl = :collectionViewUrl, '
+                               +'trackViewUrl = :trackViewUrl, '
+                               +'Nota = :Nota '
+                   +'WHERE TrackId = :ID';
+        SQL.Add(S);
+
+        ParambyName('ID').AsLargeInt        := Self.FCodigo;
+
+        ParambyName('URL').AsString         := Self.FURL;
+        ExecSQL;
+
+        Result := True
+      end;
+    finally
+      Query.Free;
+      Conexao.Free;
+    end;
+  end;
+
+  LimpaLog;
+end;
+
+function TLog.Incluir: Boolean;
+Var Query: TFDQuery;
+begin
+  Result := False;
+
+  try
+    Query := TFDQuery.Create(nil);
+    Conexao := TConexao.Create;
+    Query.Connection := Conexao.Conn;
+
+    with Query do
+    begin
+      Active := False;
+      SQL.Clear;
+      SQL.Add('SELECT MAX(TRACKID)+1 AS NOVOID FROM MUSICAS');
+      Active := True;
+
+      LimpaLog;
+      Self.FCodigo := FieldByName('NOVOID').AsLargeInt;
+      if Self.FCodigo = 0 then Self.FCodigo := 1;
+    end;
+  finally
+    Query.Free;
+    Conexao.Free;
+  end;
+
+  Status := tstInclusao;
+  Result := True;
+end;
+
+procedure TLog.LimpaMusica;
+begin
+  Self.FCodigo := 0;
+  Self.FURL := EmptyStr;
+end;
+
+end.

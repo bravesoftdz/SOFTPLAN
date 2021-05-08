@@ -1,0 +1,233 @@
+{-------------------------------------------------------------------------------
+Tela: Principal [frmPrincipal]                                   Data:17/04/2021
+Objetivo: Tela com o objetivo de ser um menu e container para as outras telas do
+sistema
+
+Dev.: Sérgio de Siqueira Silva
+
+Data Alteração: 19/04/2021
+Dev.: Sérgio de Siqueira Silva
+Alteração: Inclusão do botão SAIR
+-------------------------------------------------------------------------------}
+
+unit Guarani.View.Principal;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects,
+  FMX.Layouts, FMX.Ani, FMX.Controls.Presentation, FMX.StdCtrls,
+  Guarani.View.Inicial, Guarani.View.Produtos, Guarani.View.Vendas,
+  Guarani.View.Clientes;
+
+type
+  TfrmPrincipal = class(TForm)
+    LayoutMenu: TLayout;
+    ImageFundo: TImage;
+    LayoutMaster: TLayout;
+    ImageMenuSuperior: TImage;
+    RectangleMenuClientes: TRectangle;
+    RectangleSelecionado: TRectangle;
+    FloatAnimation1: TFloatAnimation;
+    RectangleMenuProdutos: TRectangle;
+    RectangleMenuVendas: TRectangle;
+    Image1: TImage;
+    Label2: TLabel;
+    Label1: TLabel;
+    Image2: TImage;
+    Label3: TLabel;
+    Image3: TImage;
+    RectangleMenuSair: TRectangle;
+    Image4: TImage;
+    Label4: TLabel;
+    StyleBook1: TStyleBook;
+    procedure FormShow(Sender: TObject);
+    procedure ImageMenuSuperiorClick(Sender: TObject);
+    procedure RectangleMenuClientesClick(Sender: TObject);
+    procedure RectangleMenuProdutosClick(Sender: TObject);
+    procedure RectangleMenuSairClick(Sender: TObject);
+    procedure RectangleMenuVendasClick(Sender: TObject);
+  private
+    { Private declarations }
+    FActive: TForm;
+    procedure AnimaSelecaoMenu(Inicio,Fim:TPosition);
+    procedure CarregaTela(Tela: TComponentClass);
+  public
+    { Public declarations }
+    procedure CarregaLayoutMaster(AParent:TControl {Obj Destino}; AForm:TCustomForm {Obj Alvo});
+    procedure TelaCliente;
+    procedure TelaProduto;
+    procedure TelaVendas;
+  end;
+
+var
+  frmPrincipal: TfrmPrincipal;
+  FormAtivo : TForm;
+
+implementation
+
+{$R *.fmx}
+
+procedure Abrir_Form(const FormClass: TComponentClass);
+var
+        LayoutPadrao : TComponent;
+begin
+        if Assigned(FormAtivo) then
+        begin
+                if FormAtivo.ClassType = FormClass then
+                        exit
+                else
+                begin
+                        FormAtivo.DisposeOf;
+                        FormAtivo := nil;
+                end;
+        end;
+
+        Application.CreateForm(FormClass, FormAtivo);
+
+        // Busca pelo layout no form a ser aberto...
+        LayoutPadrao := FormAtivo.FindComponent('LayoutContainer');
+
+        if Assigned(LayoutPadrao) then
+                frmPrincipal.LayoutMaster.AddObject(TLayout(LayoutPadrao));
+
+
+end;
+
+procedure TfrmPrincipal.FormShow(Sender: TObject);
+begin
+  //CarregaLayoutMaster(LayoutMaster, TfrmInicial.Create(Self));
+  Abrir_Form(TfrmInicial);
+end;
+
+//Procedure para Animação do RectangleSelecionado
+procedure TfrmPrincipal.AnimaSelecaoMenu(Inicio, Fim: TPosition);
+begin
+    FloatAnimation1.StartValue := Inicio.Y;
+    FloatAnimation1.StopValue := Fim.Y;
+    FloatAnimation1.Start;
+end;
+
+//Procedure para exibição dos formulários da aplicação no LayoutMaster
+procedure TfrmPrincipal.CarregaLayoutMaster(AParent:TControl {Obj Destino}; AForm:TCustomForm {Obj Alvo});
+var
+  i : integer;
+  Item : TControl;
+  C: string;
+  Tela: TfrmClientes;
+begin
+//  LayoutMaster.RemoveComponent(LayoutMaster.FindComponent('LayoutContainer').re);
+
+  for i := 0 to LayoutMaster.ComponentCount - 1 do
+  begin
+    if LayoutMaster.Components[i] is TLayout then
+    begin
+      if LayoutMaster.Components[i].Name = 'LayoutContainer' then
+        TLayout(LayoutMaster.Components[i]).Free;
+    end;
+
+  end;
+
+  {if LayoutMaster.ControlsCount > 0 then
+  begin
+      i := Length(AForm.Name);
+    c := Copy(AForm.Name,1,i-2);
+    if Copy(FActive.Name,1,i-2) = c then
+    begin
+      Exit
+    end else
+    begin
+      i := 0;
+      for i := (LayoutMaster.ControlsCount - 1) downto 0 do
+      begin
+        Item := LayoutMaster.Controls[i];
+        LayoutMaster.RemoveObject(0);
+
+        if Assigned(Item) then
+          FreeAndNil(Item);
+      end;
+    end;
+    end;   }
+
+
+  //Insere no LayoutMaster (FormPrincipal) o LayoutContainer (FormAlvo)
+  {while AForm.ChildrenCount > 0 do
+  begin
+    AForm.Children[0].Parent:= AParent;
+  end;
+  FActive := AForm;}
+end;
+
+procedure TfrmPrincipal.CarregaTela(Tela: TComponentClass);
+Var LayoutPrincipal: TComponent;
+begin
+  {if Assigned(FActive) then
+  begin
+    if FActive.ClassType = Tela then
+      exit
+    else
+    begin
+      FActive.DisposeOf;
+      FActive := nil;
+    end;
+  end;
+
+  Application.CreateForm(Tela, FActive);
+
+  LayoutPrincipal := FActive.FindComponent('LayoutContainer');
+
+  if Assigned(LayoutPrincipal) then
+    frmPrincipal.LayoutMaster.AddObject(TLayout(LayoutPrincipal));}
+
+end;
+
+procedure TfrmPrincipal.ImageMenuSuperiorClick(Sender: TObject);
+begin
+  CarregaLayoutMaster(LayoutMaster, TfrmInicial.Create(Self));
+  AnimaSelecaoMenu(RectangleSelecionado.Position,ImageMenuSuperior.Position);
+end;
+
+procedure TfrmPrincipal.RectangleMenuSairClick(Sender: TObject);
+begin
+    Close;
+end;
+
+procedure TfrmPrincipal.RectangleMenuProdutosClick(Sender: TObject);
+begin
+  CarregaLayoutMaster(LayoutMaster, TfrmProdutos.Create(Self));
+  AnimaSelecaoMenu(RectangleSelecionado.Position,RectangleMenuProdutos.Position);
+end;
+
+procedure TfrmPrincipal.RectangleMenuVendasClick(Sender: TObject);
+begin
+  CarregaLayoutMaster(LayoutMaster, TfrmVendas.Create(Self));
+  AnimaSelecaoMenu(RectangleSelecionado.Position,RectangleMenuVendas.Position);
+end;
+
+procedure TfrmPrincipal.TelaCliente;
+begin
+  CarregaLayoutMaster(LayoutMaster, TfrmInicial.Create(Self));
+  CarregaLayoutMaster(LayoutMaster, TfrmClientes.Create(Self));
+end;
+
+procedure TfrmPrincipal.TelaProduto;
+begin
+  CarregaLayoutMaster(LayoutMaster, TfrmInicial.Create(Self));
+  CarregaLayoutMaster(LayoutMaster, TfrmProdutos.Create(Self));
+end;
+
+procedure TfrmPrincipal.TelaVendas;
+begin
+  CarregaLayoutMaster(LayoutMaster, TfrmInicial.Create(Self));
+  CarregaLayoutMaster(LayoutMaster, TfrmVendas.Create(Self));
+end;
+
+procedure TfrmPrincipal.RectangleMenuClientesClick(Sender: TObject);
+begin
+  Abrir_Form(TfrmClientes);
+  //CarregaLayoutMaster(LayoutMaster, TfrmClientes.Create(Self));
+  AnimaSelecaoMenu(RectangleSelecionado.Position,RectangleMenuClientes.Position);
+end;
+
+end.

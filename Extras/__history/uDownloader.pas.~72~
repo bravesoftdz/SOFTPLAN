@@ -1,0 +1,95 @@
+unit uDownloader;
+
+interface
+
+uses
+  System.IOUtils, System.SysUtils, System.Types, System.UITypes, System.Classes,
+  System.Variants, FMX.Types, FMX.Dialogs, System.Net.URLClient, FMX.Edit,
+  System.Net.HttpClient, System.Net.HttpClientComponent, FMX.StdCtrls,
+  FMX.Controls.Presentation, FMX.ScrollBox, FMX.Memo, System.ImageList,
+  FMX.ImgList;
+
+type
+  TDownloadThreadDataEvent = procedure(const Sender: TObject; ThreadNo, ASpeed: Integer; AContentLength: Int64; AReadCount: Int64; var Abort: Boolean) of object;
+  TDownloadThread = class(TThread)
+  private
+    FOnThreadData: TDownloadThreadDataEvent;
+
+  protected
+    FURL, FFileName: string;
+    FStartPoint, FEndPoint: Int64;
+    FThreadNo: Integer;
+    FTimeStart: Cardinal;
+
+    procedure ReceiveDataEvent(const Sender: TObject; AContentLength: Int64; AReadCount: Int64; var Abort: Boolean);
+  public
+    constructor Create(const URL, FileName: string; ThreadNo: Integer; StartPoint, EndPoint: Int64);
+    destructor Destroy; override;
+    procedure Execute; override;
+
+    property OnThreadData: TDownloadThreadDataEvent write FOnThreadData;
+  end;
+
+implementation
+
+
+{ TDownloadThread }
+
+constructor TDownloadThread.Create(const URL, FileName: string; ThreadNo: Integer; StartPoint, EndPoint: Int64);
+begin
+  inherited Create(True);
+  FURL := URL;
+  FFileName := FileName;
+  FThreadNo := ThreadNo;
+  FStartPoint := StartPoint;
+  FEndPoint := EndPoint;
+end;
+
+destructor TDownloadThread.Destroy;
+begin
+  inherited;
+end;
+
+procedure TDownloadThread.Execute;
+var
+  LResponse: IHTTPResponse;
+  LStream: TFileStream;
+  LHttpClient: THTTPClient;
+begin
+  inherited;
+  LHttpClient := THTTPClient.Create;
+  try
+    LHttpClient.OnReceiveData := ReceiveDataEvent;
+    LStream := TFileStream.Create(FFileName, fmOpenWrite or fmShareDenyNone);
+    try
+      FTimeStart := GetTickCount;
+      LStream.Seek(FStartPoint, TSeekOrigin.soBeginning);
+      LResponse := LHttpClient.GetRange(FURL, FStartPoint, FEndPoint, LStream);
+    finally
+      LStream.Free;
+    end;
+  finally
+    LHttpClient.Free;
+  end;
+end;
+
+procedure TDownloadThread.ReceiveDataEvent(const Sender: TObject; AContentLength, AReadCount: Int64;
+  var Abort: Boolean);
+var
+  LTime: Cardinal;
+  LSpeed: Integer;
+begin
+  if Assigned(FOnThreadData) then
+  begin
+    LTime := GetTickCount - FTimeStart;
+    if AReadCount = 0 then
+      LSpeed := 0
+    else
+      LSpeed := (AReadCount * 1000) div LTime;
+
+    FOnThreadData(Sender, FThreadNo, LSpeed, AContentLength, AReadCount, Abort);
+  end;
+end;
+
+
+end.

@@ -1,0 +1,62 @@
+{-------------------------------------------------------------------------------
+Classe: TDownload                                                Data:08/05/2021
+Objetivo: Classe pronta pra downloads
+
+Dev.: Sérgio de Siqueira Silva
+
+Data Alteração:
+Dev.:
+Alteração:
+-------------------------------------------------------------------------------}
+
+unit Softplan.Controller.Download;
+
+interface
+
+uses idTCPClient, idHTTP, System.JSON, REST.Response.Adapter, System.Classes,
+     SysUtils;
+
+type
+  TDownload = class
+  private
+    MemStream: TMemoryStream;
+    HTTP: TidHTTP;
+  public
+    constructor Create();
+    destructor Destroy(); override;
+    function Download(const URL: string): boolean;
+  end;
+
+implementation
+
+{ TDownload }
+
+constructor TDownload.Create;
+begin
+  MemStream := TMemoryStream.Create;
+  HTTP := TidHTTP.Create(nil);
+  HTTP.Request.UserAgent := 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Acoo Browser; GTB5; Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1) ; Maxthon; InfoPath.1; .NET CLR 3.5.30729; .NET CLR 3.0.30618)';
+end;
+
+destructor TDownload.Destroy;
+begin
+  FreeAndNil(HTTP);
+  inherited;
+end;
+
+function TDownload.Download(const URL: string): boolean;
+begin
+  Result := False;
+
+  try
+
+
+
+
+  URL := StringReplace(URL, ' ', EmptyStr, [rfReplaceAll]);
+  result := HTTP.Get(URL);
+
+  Result := True;
+end;
+
+end.

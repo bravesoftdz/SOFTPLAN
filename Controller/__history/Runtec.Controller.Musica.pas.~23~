@@ -1,0 +1,73 @@
+unit Runtec.Controller.Musica;
+
+interface
+
+uses System.SysUtils, System.Types, System.UITypes, System.Classes,
+     System.Variants, FMX.Dialogs, Runtec.Model.Musica, uEnums;
+
+type
+  TControlMusica = class
+  private
+    objMusica: TMusica;
+    FAcao: TAcao;
+
+    {CRUD}
+    function Incluir: Boolean;
+    function Atualizar(const idMusica: Integer): Boolean;
+    function Apagar: Boolean;
+    function Inserir: Boolean;
+  public
+    constructor Create;
+    destructor Destroy;
+
+    property Musica: TMusica read FMusica write FMusica;
+    procedure Acao(const Tipo: TAcao; ID: Integer = 0);
+  end;
+
+implementation
+
+
+{ TControlMusica }
+
+procedure TControlMusica.Acao(const Tipo: TAcao; ID: Integer = 0);
+begin
+  case Tipo of
+    tacIncluir:  FMusica.Acao(tacIncluir);
+    tacCarregar: FMusica.Acao(tacCarregar, ID);
+    tacAlterar:  FMusica.Acao(tacAlterar, ID);
+    tacGravar:   FMusica.Acao(tacGravar);
+    tacExcluir:  FMusica.Acao(tacExcluir);
+  end;
+end;
+
+function TControlMusica.Apagar: Boolean;
+begin
+
+end;
+
+function TControlMusica.Atualizar(const idMusica: Integer): Boolean;
+begin
+
+end;
+
+constructor TControlMusica.Create;
+begin
+  FMusica := TMusica.Create;
+end;
+
+destructor TControlMusica.Destroy;
+begin
+  FreeAndNil(FMusica);
+end;
+
+function TControlMusica.Incluir: Boolean;
+begin
+
+end;
+
+function TControlMusica.Inserir: Boolean;
+begin
+
+end;
+
+end.

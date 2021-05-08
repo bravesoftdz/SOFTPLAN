@@ -1,0 +1,463 @@
+{-------------------------------------------------------------------------------
+Tela: frmMusicas                                                 Data:01/05/2021
+Objetivo: Tela cadastro de Músicas realizando a nota e navegação nas URLs
+
+Dev.: Sérgio de Siqueira Silva
+
+Data Alteração: DD/MM/AAAA
+Dev.:
+Alteração:
+-------------------------------------------------------------------------------}
+
+unit Runtec.View.Musicas;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, System.Rtti,
+  FMX.Grid.Style, FMX.Controls.Presentation, FMX.ScrollBox, FMX.Grid,
+  FMX.Layouts, FMX.Objects, FMX.Edit, FMX.StdCtrls, FireDAC.Stan.Intf,
+  FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
+  FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
+  Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client, Fmx.Bind.Grid,
+  System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt,
+  Fmx.Bind.DBEngExt, Data.Bind.Components, Data.Bind.Grid, Data.Bind.DBScope,
+  FMX.TabControl, Runtec.Controller.Musica, Runtec.Model.ConexaoBD, uEnums,
+  FMX.ListBox;
+
+type
+  TTipoBusca = (tPesqTrackId, tPesqArtistName, tPesqCollectionName, tPesqTodas);
+
+  TfrmMusicas = class(TForm)
+    LayoutContainer: TLayout;
+    LayoutAcoesPesquisa: TLayout;
+    Label1: TLabel;
+    RectangleEdtNomeFantasia: TRectangle;
+    edtPesquisa: TEdit;
+    btnPesquisar: TImage;
+    LayoutAcoes: TLayout;
+    imgExcluir: TImage;
+    chkID: TCheckBox;
+    chkArtist: TCheckBox;
+    chkCollection: TCheckBox;
+    TabControl: TTabControl;
+    TabListagemClientes: TTabItem;
+    TabCadastroClientes: TTabItem;
+    LayoutCadastroClientes: TLayout;
+    Label2: TLabel;
+    Label3: TLabel;
+    Layout3: TLayout;
+    btnCancelar: TImage;
+    btnGravar: TImage;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    Grid: TStringGrid;
+    StringColumn1: TStringColumn;
+    StringColumn2: TStringColumn;
+    StringColumn3: TStringColumn;
+    StringColumn4: TStringColumn;
+    Label7: TLabel;
+    datTrackId: TLabel;
+    StyleBook1: TStyleBook;
+    StringColumn5: TStringColumn;
+    Label8: TLabel;
+    Label9: TLabel;
+    Label10: TLabel;
+    Label11: TLabel;
+    Label12: TLabel;
+    Label13: TLabel;
+    datNota: TComboBox;
+    datWrapperType: TLabel;
+    datKind: TLabel;
+    datArtistId: TLabel;
+    datCollectionId: TLabel;
+    datArtistName: TLabel;
+    datCollectionName: TLabel;
+    datTrackName: TLabel;
+    datArtistViewUrl: TLabel;
+    datCollectionViewUrl: TLabel;
+    datTrackViewUrl: TLabel;
+    Image1: TImage;
+    Image2: TImage;
+    Image3: TImage;
+    btnExcluirTodas: TImage;
+    Label15: TLabel;
+    Label16: TLabel;
+    btnVotar: TRectangle;
+    imgAlterar: TImage;
+    Label14: TLabel;
+    btnExcluir: TRectangle;
+    btnExcluirAll: TRectangle;
+    procedure edtPesquisaKeyDown(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure btnPesquisarClick(Sender: TObject);
+    procedure btnGravarClick(Sender: TObject);
+    procedure btnCancelarClick(Sender: TObject);
+    procedure btnPesquisarPaint(Sender: TObject; Canvas: TCanvas;
+      const ARect: TRectF);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure datArtistViewUrlClick(Sender: TObject);
+    procedure datCollectionViewUrlClick(Sender: TObject);
+    procedure datTrackViewUrlClick(Sender: TObject);
+    procedure btnVotarClick(Sender: TObject);
+    procedure btnExcluirClick(Sender: TObject);
+    procedure btnExcluirAllClick(Sender: TObject);
+  private
+    { Private declarations }
+    Show: Boolean;
+
+    procedure AlterarMusica(const TrackId: Integer);
+    procedure IncluirMusica();
+    procedure LimpaGrideDados();
+    function IdSelecionado:Int64;
+    procedure AbrirURL(const URL: String);
+    procedure Checks(const Opcao: Integer);
+  public
+    { Public declarations }
+    procedure LocalizarMusica();
+    procedure PopularGrid;
+    procedure CarregaMusicas(TipoBusca:TTipoBusca);
+  end;
+
+var
+  Musica: TControlMusica;
+  frmMusicas: TfrmMusicas;
+  QueryMusicas: TFDQuery;
+  Conexao: TConexao;
+
+implementation
+
+{$R *.fmx}
+
+uses {$IFDEF MSWINDOWS}
+     Winapi.ShellAPI, Winapi.Windows;
+     {$ENDIF MSWINDOWS}
+
+procedure TfrmMusicas.AbrirURL(const URL: String);
+begin
+  {$IFDEF MSWINDOWS}
+  ShellExecute(0, 'OPEN', PChar(URL), '', '', SW_SHOWNORMAL);
+  {$ENDIF MSWINDOWS}
+end;
+
+procedure TfrmMusicas.AlterarMusica(const TrackId: Integer);
+begin
+  Musica := TControlMusica.Create;
+
+  Musica.Acao(tacAlterar, TrackId);
+
+  datWrapperType.Text       := Musica.Musica.wrapperType;
+  datKind.Text              := Musica.Musica.Kind;
+  datArtistId.Text          := Musica.Musica.artistId.ToString;
+  datCollectionId.Text      := Musica.Musica.collectionId.ToString;
+  datTrackId.Text           := Musica.Musica.trackId.ToString;
+  datArtistName.Text        := Musica.Musica.artistName;
+  datCollectionName.Text    := Musica.Musica.collectionName;
+  datTrackName.Text         := Musica.Musica.trackName;
+  datArtistViewUrl.Text     := Musica.Musica.artistViewUrl;
+  datCollectionViewUrl.Text := Musica.Musica.collectionViewUrl;
+  datTrackViewUrl.Text      := Musica.Musica.trackViewUrl;
+  datNota.ItemIndex         := Musica.Musica.Nota
+end;
+
+procedure TfrmMusicas.edtPesquisaKeyDown(Sender: TObject;
+  var Key: Word; var KeyChar: Char; Shift: TShiftState);
+begin
+  if Key = vkReturn then
+  begin
+    if edtPesquisa.Text <> EmptyStr then
+      LocalizarMusica
+    else
+      CarregaMusicas(tPesqTodas);
+  end;
+end;
+
+procedure TfrmMusicas.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  ShowMessage('fechar os objs');
+end;
+
+procedure TfrmMusicas.CarregaMusicas(TipoBusca:TTipoBusca);
+var sSQL: String;
+begin
+  sSQL := 'SELECT * FROM MUSICAS ';
+
+  //Verifica se a Query já esta criada
+  if not Assigned(QueryMusicas) then
+  begin
+    QueryMusicas := TFDQuery.Create(nil);
+    Conexao := TConexao.Create;
+
+    QueryMusicas.Connection := Conexao.BD;
+  end;
+
+  //Monstagem da instrução SQL
+  QueryMusicas.Active := False;
+  QueryMusicas.SQL.Clear;
+
+  //Tipo de Busca
+  case TipoBusca of
+    tPesqTrackId:         begin
+                            sSQL := sSQL + 'WHERE TRACKID = :BUSCA';
+                            QueryMusicas.SQL.Add(sSQL);
+                            try
+                              QueryMusicas.ParamByName('BUSCA').AsLargeInt := edtPesquisa.Text.ToInt64;
+                            except
+                              ShowMessage('ID inválido!');
+                              FreeAndNil(QueryMusicas);
+                              FreeAndNil(Conexao);
+                              exit;
+                            end;
+                          end;
+    tPesqArtistName:      begin
+                            sSQL := sSQL + 'WHERE UPPER(ARTISTNAME) LIKE :BUSCA';
+                            QueryMusicas.SQL.Add(sSQL);
+                            QueryMusicas.ParamByName('BUSCA').AsString := UpperCase(edtPesquisa.Text) + '%';
+                          end;
+    tPesqCollectionName:  begin
+                            sSQL := sSQL + 'WHERE UPPER(COLLECTIONNAME) LIKE :BUSCA';
+                            QueryMusicas.SQL.Add(sSQL);
+                            QueryMusicas.ParamByName('BUSCA').AsString := UpperCase(edtPesquisa.Text) + '%';
+                          end;
+    tPesqTodas:           begin
+                            QueryMusicas.SQL.Add(sSQL);
+                          end;
+
+  end;
+
+  QueryMusicas.Active := True;
+  QueryMusicas.FetchAll;
+
+  PopularGrid;
+end;
+
+procedure TfrmMusicas.Checks(const Opcao: Integer);
+begin
+  case Opcao of
+    1 : begin
+          chkID.IsChecked := False;
+          chkCollection.IsChecked := False;
+        end;
+    2 : begin
+          chkID.IsChecked := False;
+          chkArtist.IsChecked := False;
+        end;
+    3 : begin
+          chkArtist.IsChecked := False;
+          chkCollection.IsChecked := False;
+        end;
+  end;
+end;
+
+procedure TfrmMusicas.datArtistViewUrlClick(Sender: TObject);
+begin
+  AbrirURL(datArtistViewUrl.Text);
+end;
+
+procedure TfrmMusicas.datCollectionViewUrlClick(Sender: TObject);
+begin
+  AbrirURL(datCollectionViewUrl.Text);
+end;
+
+procedure TfrmMusicas.datTrackViewUrlClick(Sender: TObject);
+begin
+  AbrirURL(datTrackViewUrl.Text);
+end;
+
+function TfrmMusicas.IdSelecionado: Int64;
+begin
+  try
+    Result := Grid.Cells[0,Grid.Row].ToInt64;
+  except
+    raise Exception.Create('Selecione pelo menos uma música!');
+  end;
+end;
+
+procedure TfrmMusicas.btnExcluirAllClick(Sender: TObject);
+var Musica: TControlMusica;
+begin
+  if not chkArtist.IsChecked then
+  begin
+    ShowMessage('Para efetuar a exclusão de um artista e necessario selecionar a opção Artist Name!');
+    exit;
+  end;
+
+  if edtPesquisa.Text <> EmptyStr then
+    LocalizarMusica
+  else
+  begin
+    ShowMessage('Informe o nome do artista para exclusão!');
+    exit;
+  end;
+
+  try
+    Musica := TControlMusica.Create;
+
+    if MessageDlg('Deseja realmente apagar todas as música da listagem abaixo?', System.UITypes.TMsgDlgType.mtConfirmation,
+               [System.UITypes.TMsgDlgBtn.mbYes, System.UITypes.TMsgDlgBtn.mbNO], 0) = mrNo then exit;
+
+    Musica.Musica.ApagarTodasMusicas(edtPesquisa.Text.ToUpper);
+  finally
+    Musica.Free;
+  end;
+
+  ShowMessage('Processo finalizado!');
+  CarregaMusicas(tPesqTodas);
+  edtPesquisa.Text := EmptyStr;
+end;
+
+procedure TfrmMusicas.btnExcluirClick(Sender: TObject);
+var Musica: TControlMusica;
+begin
+  try
+    Musica := TControlMusica.Create;
+    Musica.Acao(tacCarregar, IdSelecionado);
+    if MessageDlg('Deseja realmente apagar a música '+ Musica.Musica.trackName +' ?', System.UITypes.TMsgDlgType.mtConfirmation,
+               [System.UITypes.TMsgDlgBtn.mbYes, System.UITypes.TMsgDlgBtn.mbNO], 0) = mrYes then
+      Musica.Acao(tacExcluir, IdSelecionado);
+  finally
+    Musica.Free;
+  end;
+  CarregaMusicas(tPesqTodas);
+end;
+
+procedure TfrmMusicas.btnPesquisarClick(Sender: TObject);
+begin
+  if edtPesquisa.Text <> EmptyStr then
+    LocalizarMusica
+  else
+    CarregaMusicas(tPesqTodas);
+end;
+
+procedure TfrmMusicas.btnPesquisarPaint(Sender: TObject; Canvas: TCanvas;
+  const ARect: TRectF);
+begin
+  if not Show then
+    CarregaMusicas(tPesqTodas);
+
+  Show := True;
+end;
+
+procedure TfrmMusicas.btnVotarClick(Sender: TObject);
+begin
+  AlterarMusica(IdSelecionado);
+  TabControl.Next();
+end;
+
+procedure TfrmMusicas.btnCancelarClick(Sender: TObject);
+begin
+  if Assigned(Musica) then Musica.Free;
+
+  TabControl.Previous();
+end;
+
+procedure TfrmMusicas.btnGravarClick(Sender: TObject);
+begin
+  try
+      Musica.Musica.wrapperType       := datWrapperType.Text;
+      Musica.Musica.Kind              := datKind.Text;
+      Musica.Musica.artistId          := datArtistId.Text.ToInt64;
+      Musica.Musica.collectionId      := datCollectionId.Text.ToInt64;
+      Musica.Musica.trackId           := datTrackId.Text.ToInt64;
+      Musica.Musica.artistName        := datArtistName.Text;
+      Musica.Musica.collectionName    := datCollectionName.Text;
+      Musica.Musica.trackName         := datTrackName.Text;
+      Musica.Musica.artistViewUrl     := datArtistViewUrl.Text;
+      Musica.Musica.collectionViewUrl := datCollectionViewUrl.Text;
+      Musica.Musica.trackViewUrl      := datTrackViewUrl.Text;
+      Musica.Musica.Nota              := datNota.Selected.Text.ToInteger;
+
+    Musica.Acao(tacGravar);
+  finally
+    if Assigned(Musica) then Musica.Free;
+    datNota.Index := 0;
+  end;
+
+  TabControl.Previous();
+  CarregaMusicas(tPesqTodas);
+end;
+
+procedure TfrmMusicas.IncluirMusica;
+begin
+    Musica := TControlMusica.Create;
+
+    Musica.Musica.Acao(tacIncluir);
+
+    datTrackId.Text := Musica.Musica.trackId.ToString;
+end;
+
+procedure TfrmMusicas.LimpaGrideDados;
+begin
+  Grid.RowCount := 0;
+end;
+
+procedure TfrmMusicas.LocalizarMusica;
+Var i: Integer;
+begin
+  i := 0;
+
+  if (chkID.IsChecked) then
+  begin
+    Inc(i,1);
+  end;
+
+  if (chkArtist.IsChecked) then
+  begin
+    Inc(i,1);
+  end;
+
+  if (chkCollection.IsChecked) then
+  begin
+    Inc(i,1);
+  end;
+
+  if i > 1 then
+  begin
+    ShowMessage('Escolha somente uma opção para pesquisa!');
+  end;
+
+  if (chkID.IsChecked) then
+  begin
+      CarregaMusicas(tPesqTrackId);
+  end;
+
+  if (chkArtist.IsChecked) then
+  begin
+    CarregaMusicas(tPesqArtistName);
+  end;
+
+  if (chkCollection.IsChecked) then
+  begin
+    CarregaMusicas(tPesqCollectionName);
+  end;
+end;
+
+procedure TfrmMusicas.PopularGrid;
+var iAux: Integer;
+begin
+  LimpaGrideDados;
+
+  if not Assigned(QueryMusicas) then exit;
+
+  with QueryMusicas do
+  begin
+
+    First;
+    Grid.RowCount := RecordCount;
+    for iAux := 0 to RecordCount - 1 do
+    begin
+      Grid.Cells[0,iAux] := FieldByName('TRACKID').AsString;
+      Grid.Cells[1,iAux] := FieldByName('ARTISTNAME').AsString;
+      Grid.Cells[2,iAux] := FieldByName('COLLECTIONNAME').AsString;
+      Grid.Cells[3,iAux] := FieldByName('TRACKNAME').AsString;
+      Grid.Cells[4,iAux] := FieldByName('NOTA').AsString;
+
+      Next;
+    end;
+
+  end;
+end;
+
+end.

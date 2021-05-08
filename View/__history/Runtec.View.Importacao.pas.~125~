@@ -1,0 +1,266 @@
+unit Runtec.View.Importacao;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Layouts,
+  System.Rtti, FMX.Grid.Style, FMX.ScrollBox, FMX.Grid, FMX.Objects, FMX.Edit,
+  FMX.Controls.Presentation, FMX.StdCtrls, FireDAC.Stan.Intf,
+  FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
+  FireDAC.Phys.Intf, FireDAC.DApt.Intf, Data.DB, FireDAC.Comp.DataSet,
+  FireDAC.Comp.Client, Runtec.Controller.Importacao, Runtec.Controller.Musica,
+  uEnums, Fmx.Bind.Grid, System.Bindings.Outputs, Fmx.Bind.Editors,
+  Data.Bind.EngExt, Fmx.Bind.DBEngExt, Data.Bind.Components, Data.Bind.Grid,
+  Data.Bind.DBScope, FMX.Memo, System.JSON;
+
+type
+  TfrmImportacao = class(TForm)
+    LayoutContainer: TLayout;
+    LayoutAcoesPesquisa: TLayout;
+    Label1: TLabel;
+    RectangleEdtNomeFantasia: TRectangle;
+    edtPesquisa: TEdit;
+    btnPesquisar: TImage;
+    btnImportar: TRectangle;
+    Image1: TImage;
+    Label2: TLabel;
+    mtMusicas: TFDMemTable;
+    BindSourceDB1: TBindSourceDB;
+    StringGridBindSourceDB1: TStringGrid;
+    LinkGridToDataSourceBindSourceDB1: TLinkGridToDataSource;
+    BindingsList1: TBindingsList;
+    mtMusicaswrapperType: TStringField;
+    mtMusicasKind: TStringField;
+    mtMusicasartistId: TLargeintField;
+    mtMusicascollectionId: TLargeintField;
+    mtMusicastrackId: TLargeintField;
+    mtMusicasartistName: TStringField;
+    mtMusicascollectionName: TStringField;
+    mtMusicastrackName: TStringField;
+    mtMusicasartistViewUrl: TStringField;
+    mtMusicascollectionViewUrl: TStringField;
+    mtMusicastrackViewUrl: TStringField;
+    mtMusicasNota: TIntegerField;
+    procedure edtPesquisaKeyDown(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure btnPesquisarClick(Sender: TObject);
+    procedure btnImportarClick(Sender: TObject);
+    procedure btnPesquisarPainting(Sender: TObject; Canvas: TCanvas;
+      const ARect: TRectF);
+  private
+    { Private declarations }
+    Artista: String;
+    Show: Boolean;
+    Musica: TControlMusica;
+    procedure Importar();
+    procedure ConsumirAPI();
+    procedure LimparMtMusicas();
+    procedure Finalizado();
+  public
+    { Public declarations }
+  end;
+
+var
+  frmImportacao: TfrmImportacao;
+
+implementation
+
+{$R *.fmx}
+
+uses Runtec.View.Principal, uLoading;
+
+procedure TfrmImportacao.ConsumirAPI();
+Var REST: TRestConsumer;
+    JSON: String;
+    i: Integer;
+    Msg: String;
+
+    JSONFULL:    TJSONObject;
+    JSONRESULTS: TJSONArray;
+    JSONMUSIC:   TJSONObject;
+begin
+  Msg := 'Deseja realmente baixar as músicas?';
+
+  if edtPesquisa.Text.IsEmpty then
+  begin
+    ShowMessage('Não há nenhum termo para pesquisa!');
+    exit;
+  end;
+
+  try
+
+    REST := TRestConsumer.Create;
+    Artista := edtPesquisa.Text;
+    JSON := REST.GET(Artista);
+
+    JSONFULL := TJSONObject(TJSONObject.ParseJSONValue(JSON));
+    if JSONFULL <> nil then
+    begin
+      LimparMtMusicas;
+
+      JSONRESULTS := TJSONArray(JSONFULL.Values['results']);
+      if JSONRESULTS <> nil then
+      begin
+        if MessageDlg(Msg, System.UITypes.TMsgDlgType.mtConfirmation,
+         [System.UITypes.TMsgDlgBtn.mbYes, System.UITypes.TMsgDlgBtn.mbNO], 0) = mrNo then exit;
+
+        for i := 0 to JSONRESULTS.Count - 1 do
+        begin
+          JSONMUSIC := TJSONObject(JSONRESULTS.Items[i]);
+
+          if Pos(UpperCase(Artista), UpperCase(JSONMUSIC.Values['artistName'].Value)) <> 0 then
+          begin
+            mtMusicas.Insert;
+            mtMusicaswrapperType.AsString       := UpperCase(JSONMUSIC.Values['wrapperType'].Value);
+            mtMusicasKind.AsString              := UpperCase(JSONMUSIC.Values['kind'].Value);
+            mtMusicasartistId.AsLargeInt        := JSONMUSIC.Values['artistId'].Value.ToInt64;
+            mtMusicascollectionId.AsLargeInt    := JSONMUSIC.Values['collectionId'].Value.ToInt64;
+            mtMusicastrackId.AsLargeInt         := JSONMUSIC.Values['trackId'].Value.ToInt64;
+            mtMusicasartistName.AsString        := UpperCase(JSONMUSIC.Values['artistName'].Value);
+            mtMusicascollectionName.AsString    := UpperCase(JSONMUSIC.Values['collectionName'].Value);
+            mtMusicastrackName.AsString         := UpperCase(JSONMUSIC.Values['trackName'].Value);
+            mtMusicasartistViewUrl.AsString     := JSONMUSIC.Values['artistViewUrl'].Value;
+            mtMusicascollectionViewUrl.AsString := JSONMUSIC.Values['collectionViewUrl'].Value;
+            mtMusicastrackViewUrl.AsString      := JSONMUSIC.Values['trackViewUrl'].Value;
+            mtMusicasNota.AsInteger             := 0;
+            mtMusicas.Post;
+          end;
+        end;
+
+      end;
+
+    end;
+
+  finally
+    REST.Free;
+  end;
+end;
+
+procedure TfrmImportacao.btnImportarClick(Sender: TObject);
+begin
+  Importar;
+end;
+
+procedure TfrmImportacao.btnPesquisarClick(Sender: TObject);
+begin
+  ConsumirAPI;
+end;
+
+procedure TfrmImportacao.btnPesquisarPainting(Sender: TObject; Canvas: TCanvas;
+  const ARect: TRectF);
+begin
+  if not Show then
+    mtMusicas.Active := True;
+
+  Show := True;
+end;
+
+procedure TfrmImportacao.edtPesquisaKeyDown(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  if Key = vkReturn then
+  begin
+    ConsumirAPI;
+  end;
+end;
+
+procedure TfrmImportacao.Finalizado;
+begin
+  ShowMessage('Processo finalizado!');
+  LimparMtMusicas;
+end;
+
+procedure TfrmImportacao.Importar;
+Var Msg: String;
+    Id:  Int64;
+begin
+  if not mtMusicas.Active then
+  begin
+    ShowMessage('Não há o que importar!');
+    exit;
+  end;
+
+  if mtMusicas.RecordCount = 0 then
+  begin
+    ShowMessage('Não há o que importar!');
+    exit;
+  end;
+
+  Msg := 'Deseja realmente importar as músicas do(a) artista ' + Artista + '?' +#13
+        +'Esse processo ira substituir qualquer importação anterior contendo esse artista!';
+
+  if MessageDlg(Msg, System.UITypes.TMsgDlgType.mtConfirmation,
+               [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], 0) = mrNo then exit;
+
+
+  try
+    Musica := TControlMusica.Create;
+    if not Musica.Musica.ApagarTodasMusicas(Artista) then
+      raise Exception.Create('Ocorreu algum erro ao sobrescrever o artista!');
+  finally
+    Musica.Free;
+  end;
+
+  TLoading.Show(frmPrincipal,'Importando...');
+
+  TThread.CreateAnonymousThread(procedure
+  begin
+    try
+      with mtMusicas do
+      begin
+        Musica := TControlMusica.Create;
+
+        First;
+        while not Eof do
+        begin
+          Musica.Acao(tacIncluir);
+
+          Musica.Musica.wrapperType       := mtMusicaswrapperType.AsString;
+          Musica.Musica.Kind              := mtMusicasKind.AsString;
+          Musica.Musica.artistId          := mtMusicasartistId.AsLargeInt;
+          Musica.Musica.collectionId      := mtMusicascollectionId.AsLargeInt;
+          Musica.Musica.trackId           := mtMusicastrackId.AsLargeInt;
+          Musica.Musica.artistName        := mtMusicasartistName.AsString;
+          Musica.Musica.collectionName    := mtMusicascollectionName.AsString;
+          Musica.Musica.trackName         := mtMusicastrackName.AsString;
+          Musica.Musica.artistViewUrl     := mtMusicasartistViewUrl.AsString;
+          Musica.Musica.collectionViewUrl := mtMusicascollectionViewUrl.AsString;
+          Musica.Musica.trackViewUrl      := mtMusicastrackViewUrl.AsString;
+          Musica.Musica.Nota              := 0;
+
+          Musica.Acao(tacGravar);
+
+          Next;
+        end;
+      end;
+
+    finally
+      TThread.Synchronize(nil, procedure
+      begin
+        TLoading.Hide;
+
+        Finalizado;
+      end);
+
+      if Assigned(Musica) then
+        FreeAndNil(Musica);
+    end;
+
+  end).Start;
+
+end;
+
+procedure TfrmImportacao.LimparMtMusicas;
+begin
+  with mtMusicas do
+  begin
+    first;
+    while not Eof do
+    begin
+      Delete;
+    end;
+  end;
+end;
+
+end.

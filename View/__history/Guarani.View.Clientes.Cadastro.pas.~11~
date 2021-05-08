@@ -1,0 +1,79 @@
+unit Guarani.View.Clientes.Cadastro;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants, 
+  FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.StdCtrls,
+  FMX.Objects, FMX.Controls.Presentation, FMX.Edit, FMX.Layouts, Guarani.View.Principal,
+  Guarani.Controller.ClienteJuridica, Guarani.Model.ClienteJuridica;
+
+type
+  TfrmClientesCadastro = class(TFrame)
+    LayoutCadastroClientes: TLayout;
+    RectangleEdtNomeFantasia: TRectangle;
+    edtNomeFantasia: TEdit;
+    Label1: TLabel;
+    RectangleEdtRazaoSocial: TRectangle;
+    EdtRazaoSocial: TEdit;
+    Label2: TLabel;
+    Layout2: TLayout;
+    Image1: TImage;
+    Image2: TImage;
+    RectangleEdtCNPJ: TRectangle;
+    edtCNPJ: TEdit;
+    Label3: TLabel;
+    Label5: TLabel;
+    Rectangle2: TRectangle;
+    edtTelefone: TEdit;
+    Label4: TLabel;
+    Rectangle1: TRectangle;
+    edtEndereco: TEdit;
+    procedure Image2Click(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    procedure AlterarCliente(IdCliente: Integer);
+    procedure IncluirCliente;
+  end;
+
+implementation
+
+var Cliente: TClienteJuridica;
+    ClienteControl: TControlClienteJuridica;
+
+{$R *.fmx}
+
+procedure TfrmClientesCadastro.AlterarCliente(IdCliente: Integer);
+begin
+  Cliente := TClienteJuridica.Create;
+
+  if not Cliente.Alterar(IdCliente) then exit;
+
+  edtCNPJ.Text         := Cliente.CNPJ;
+  EdtRazaoSocial.Text  := Cliente.RazaoSocial;
+  edtNomeFantasia.Text := Cliente.NomeFantisia;
+  edtEndereco.Text     := Cliente.Endereco;
+  edtTelefone.Text     := Cliente.Telefone;
+end;
+
+procedure TfrmClientesCadastro.Image2Click(Sender: TObject);
+begin
+  frmPrincipal.TelaCliente;
+end;
+
+procedure TfrmClientesCadastro.IncluirCliente;
+begin
+  try
+    Cliente := TClienteJuridica.Create;
+    ClienteControl := TControlClienteJuridica.Create;
+
+    if Cliente.Incluir then
+
+  finally
+
+  end;
+end;
+
+end.

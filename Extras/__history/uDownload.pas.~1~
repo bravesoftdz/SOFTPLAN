@@ -1,0 +1,201 @@
+unit uDownload;
+
+interface
+
+uses
+  System.Net.URLClient, System.net.HTTPClient;
+
+type
+  TAcHTTPProgress = procedure(const Sender: TObject; AStartPosition : Int64; AEndPosition: Int64; AContentLength: Int64; AReadCount: Int64; ATimeStart : Int64; ATime : Int64; var Abort: Boolean) of object;
+  TAcHTTPClient = class
+    private
+      FOnProgress:     TAcHTTPProgress;
+      FHTTPClient:     THTTPClient;
+      FTimeStart:      cardinal;
+      FCancelDownload: boolean;
+      FStartPosition:  Int64;
+      FEndPosition:    Int64;
+      FContentLength:  Int64;
+    private
+      procedure   SetProxySettings(AProxySettings: TProxySettings);
+      function    GetProxySettings : TProxySettings;
+      procedure   OnReceiveDataEvent(const Sender: TObject; AContentLength: Int64; AReadCount: Int64; var Abort: Boolean);
+    public
+      constructor Create;
+      destructor  Destroy; override;
+      property    ProxySettings : TProxySettings read FProxySettings write SetProxySettings;
+      property    OnProgress : TAcHTTPProgress read FOnProgress write FOnProgress;
+      property    CancelDownload : boolean read FCancelDownload write FCancelDownload;
+      function    Download(const ASrcUrl : string; const ADestFileName : string): Boolean;
+  end;
+
+implementation
+
+uses
+  System.Classes, System.SysUtils, Winapi.Windows;
+
+constructor TAcHTTPClient.Create;
+// -----------------------------------------------------------------------------
+// Constructor
+begin
+  inherited Create;
+
+  // create an THTTPClient
+  FHTTPClient := THTTPClient.Create;
+  FHTTPClient.OnReceiveData := OnReceiveDataEvent;
+
+  // setting the timeouts
+  FHTTPClient.ConnectionTimeout :=  5000;
+  FHTTPClient.ResponseTimeout   := 15000;
+
+  // initialize the class variables
+  FCancelDownload := false;
+  FOnProgress     := nil;
+  FEndPosition    := -1;
+  FStartPosition  := -1;
+  FContentLength  := -1;
+end;
+
+
+destructor TAcHTTPClient.Destroy;
+// -----------------------------------------------------------------------------
+// Destructor
+begin
+  FHTTPClient.free;
+
+  inherited Destroy;
+end;
+
+
+procedure TAcHTTPClient.SetProxySettings(AProxySettings: TProxySettings);
+// -----------------------------------------------------------------------------
+// Set FHTTPClient.ProxySettings with AProxySettings
+begin
+  FHTTPClient.ProxySettings := AProxySettings;
+end;
+
+
+function TAcHTTPClient.GetProxySettings : TProxySettings;
+// -----------------------------------------------------------------------------
+// Get FHTTPClient.ProxySettings
+begin
+  Result := FHTTPClient.ProxySettings;
+end;
+
+
+procedure TAcHTTPClient.OnReceiveDataEvent(const Sender: TObject; AContentLength: Int64; AReadCount: Int64; var Abort: Boolean);
+// -----------------------------------------------------------------------------
+// HTTPClient.OnReceiveDataEvent become OnProgress
+begin
+  Abort := CancelDownload;
+
+  if Assigned(OnProgress) then
+    OnProgress(Sender, FStartPosition, FEndPosition, AContentLength, AReadCount, FTimeStart, GetTickCount,  Abort);
+end;
+
+
+function TAcHTTPClient.Download(const ASrcUrl : string; const ADestFileName : string): Boolean;
+// -----------------------------------------------------------------------------
+// Download a file from ASrcUrl and store to ADestFileName
+var
+  aResponse:           IHTTPResponse;
+  aFileStream:         TFileStream;
+  aTempFilename:       string;
+  aAcceptRanges:       boolean;
+  aTempFilenameExists: boolean;
+begin
+  Result         := false;
+  FEndPosition   := -1;
+  FStartPosition := -1;
+  FContentLength := -1;
+
+  aResponse   := nil;
+  aFileStream := nil;
+  try
+    // raise an exception if the file already exists on ADestFileName
+    if FileExists(ADestFileName) then
+      raise Exception.Create(Format('the file %s alredy exists', [ADestFileName]));
+
+    // reset the CancelDownload property
+    CancelDownload := false;
+
+    // set the time start of the download
+    FTimeStart := GetTickCount;
+
+    // until the download is incomplete the ADestFileName has *.parts extension
+    aTempFilename := ADestFileName + '.parts';
+
+    // get the header from the server for aSrcUrl
+    aResponse := FHTTPClient.Head(aSrcUrl);
+
+    // checks if the response StatusCode is 2XX (aka OK)
+    if (aResponse.StatusCode < 200) or (aResponse.StatusCode > 299) then
+      raise Exception.Create(Format('Server error %d: %s', [aResponse.StatusCode, aResponse.StatusText]));
+
+    // checks if the server accept bytes ranges
+    aAcceptRanges := SameText(aResponse.HeaderValue['Accept-Ranges'], 'bytes');
+
+    // get the content length (aka FileSize)
+    FContentLength := aResponse.ContentLength;
+
+    // checks if a "partial" download already exists
+    aTempFilenameExists := FileExists(aTempFilename);
+
+    // if a "partial" download already exists
+    if aTempFilenameExists then
+    begin
+      // re-utilize the same file stream, with position on the end of the stream
+      aFileStream := TFileStream.Create(aTempFilename, fmOpenWrite or fmShareDenyNone);
+      aFileStream.Seek(0, TSeekOrigin.soEnd);
+    end else begin
+      // create a new file stream, with the position on the beginning of the stream
+      aFileStream := TFileStream.Create(aTempFilename, fmCreate);
+      aFileStream.Seek(0, TSeekOrigin.soBeginning);
+    end;
+
+    // if the server doesn't accept bytes ranges, always start to write at beginning of the stream
+    if not(aAcceptRanges) then
+      aFileStream.Seek(0, TSeekOrigin.soBeginning);
+
+    // set the range of the request (from the stream position to server content length)
+    FStartPosition := aFileStream.Position;
+    FEndPosition   := FContentLength;
+
+    // if the range is incomplete (the FStartPosition is less than FEndPosition)
+    if (FEndPosition > 0) and (FStartPosition < FEndPosition) then
+    begin
+      // ... and if a starting point is present
+      if FStartPosition > 0 then
+      begin
+        // makes a bytes range request from FStartPosition to FEndPosition
+        aResponse := FHTTPClient.GetRange(aSrcUrl, FStartPosition, FEndPosition, aFileStream);
+      end else begin
+        // makes a canonical GET request
+        aResponse := FHTTPClient.Get(aSrcUrl, aFileStream);
+      end;
+
+      // check if the response StatusCode is 2XX (aka OK)
+      if (aResponse.StatusCode < 200) or (aResponse.StatusCode > 299) then
+        raise Exception.Create(Format('Server error %d: %s', [aResponse.StatusCode, aResponse.StatusText]));
+    end;
+
+    // if the FileStream.Size is equal to server ContentLength, the download is completed!
+    if (aFileStream.Size > 0) and (aFileStream.Size = FContentLength) then begin
+
+      // free the FileStream otherwise doesn't renames the "partial file" into the DestFileName
+      FreeAndNil(aFileStream);
+
+      // renames the aTempFilename file into the ADestFileName
+      Result := RenameFile(aTempFilename, ADestFileName);
+
+      // What?
+      if not(Result) then
+        raise Exception.Create(Format('RenameFile from %s to %s: %s', [aTempFilename, ADestFileName, SysErrorMessage(GetLastError)]));
+    end;
+  finally
+    if aFileStream <> nil then aFileStream.Free;
+    aResponse := nil;
+  end;
+end;
+
+end.

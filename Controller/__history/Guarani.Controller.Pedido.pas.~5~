@@ -1,0 +1,34 @@
+unit Guarani.Controller.Pedido;
+
+interface
+
+uses Guarani.Model.Pedido, System.SysUtils, System.Types, System.UITypes, System.Classes,
+     System.Variants, FMX.Dialogs;
+
+type
+  TControlPedido = class
+  private
+
+  public
+    procedure Gravar(Pedido: TPedido);
+  end;
+
+implementation
+
+{ TControlProduto }
+
+procedure TControlPedido.Gravar(Pedido: TPedido);
+begin
+  if Pedido.ID = 0 then
+    raise Exception.Create('Id do pedido em branco');
+
+  if Pedido.IdCliente = 0 then
+    raise Exception.Create('Id do cliente em branco');
+
+  if Pedido.DataPedido = StrtoDate('01/01/1900') then
+    raise Exception.Create('Data do pedido em branco');
+
+  Pedido.Gravar(Pedido);
+end;
+
+end.

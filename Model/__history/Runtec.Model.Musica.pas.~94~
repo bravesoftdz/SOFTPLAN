@@ -1,0 +1,402 @@
+unit Runtec.Model.Musica;
+
+interface
+
+uses
+  SysUtils, UITypes, StrUtils, Runtec.Model.ConexaoBD,
+  FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
+  FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
+  FireDAC.Phys.FB, FireDAC.Phys.FBDef, FireDAC.FMXUI.Wait, Data.DB,
+  FireDAC.Comp.Client, FireDAC.Stan.Intf, FireDAC.Dapt, uEnums;
+
+type
+  TMusica = class
+  private
+    Status: TStatus;
+    FcollectionId: Int64;
+    FartistId: Int64;
+    FtrackViewUrl: String;
+    FtrackName: String;
+    FwrapperType: String;
+    FNota: Integer;
+    FKind: String;
+    FcollectionViewUrl: String;
+    FcollectionName: String;
+    FtrackId: Int64;
+    FartistViewUrl: String;
+    FartistName: String;
+
+    procedure LimpaMusica();
+
+    {CRUD}
+    function Incluir:Boolean;
+    function Alterar(ID: Int64): Boolean;
+    function Buscar(ID: Int64): Boolean;
+    function Gravar: Boolean;
+    function Apagar: Boolean;
+  public
+    constructor Create;
+    destructor Destroy;
+
+    property wrapperType: String read FwrapperType write FwrapperType;
+    property Kind: String read FKind write FKind;
+    property artistId: Int64 read FartistId write FartistId;
+    property collectionId: Int64 read FcollectionId write FcollectionId;
+    property trackId: Int64 read FtrackId write FtrackId;
+    property artistName: String read FartistName write FartistName;
+    property collectionName: String read FcollectionName write FcollectionName;
+    property trackName: String read FtrackName write FtrackName;
+    property artistViewUrl: String read FartistViewUrl write FartistViewUrl;
+    property collectionViewUrl: String read FcollectionViewUrl write FcollectionViewUrl;
+    property trackViewUrl: String read FtrackViewUrl write FtrackViewUrl;
+    property Nota: Integer read FNota write FNota;
+
+    function Acao(const Tipo: TAcao; Id: Int64 = 0): Boolean;
+    function ApagarTodasMusicas(const Cantor: String): Boolean;
+  end;
+
+implementation
+
+var Conexao: TConexao;
+
+{ TProduto }
+
+function TMusica.Acao(const Tipo: TAcao; Id: Int64 = 0): Boolean;
+begin
+  Result := False;
+
+  if Tipo = tacIncluir then
+  begin
+    if Incluir then
+      Result := True;
+
+    exit;
+  end;
+
+  if Tipo = tacAlterar then
+  begin
+    if id = 0 then
+      raise Exception.Create('Selecione pelo menos uma música para alterar!');
+
+    if Alterar(id) then
+      Result := True;
+
+    exit;
+  end;
+
+  if Tipo = tacCarregar then
+  begin
+    if id = 0 then
+      raise Exception.Create('Nenhum ID informado!');
+
+    if Buscar(id) then
+      Result := True;
+
+    exit;
+  end;
+
+  if Tipo = tacGravar then
+  begin
+    if Gravar then
+      Result := True;
+
+    exit;
+  end;
+
+
+  if Tipo = tacExcluir then
+  begin
+    if Apagar then
+      Result := True;
+
+    exit;
+  end;
+
+end;
+
+function TMusica.Alterar(ID: Int64): Boolean;
+begin
+  Result := False;
+
+  if not Buscar(ID) then exit;
+
+  Status := tstAlteracao;
+  Result := True;
+end;
+
+function TMusica.Apagar: Boolean;
+Var Query: TFDQuery;
+begin
+  Result := False;
+
+  if not Buscar(Self.trackId) then exit;
+  
+  try
+    Query := TFDQuery.Create(nil);
+    Conexao := TConexao.Create;
+    Query.Connection := Conexao.BD;
+
+    with Query do
+    begin
+      Active := False;
+      SQL.Clear;
+      SQL.Add('DELETE FROM MUSICAS WHERE TRACKID = :ID');
+      ParamByName('ID').AsLargeInt:= Self.trackId;
+      ExecSQL;
+
+      if not Buscar(Self.trackId) then
+        Result := True;
+    end;
+  finally
+    Query.Free;
+    Conexao.Free;
+  end;
+end;
+
+function TMusica.ApagarTodasMusicas(const Cantor: String): Boolean;
+Var Query: TFDQuery;
+begin
+  Result := False;
+
+  try
+    Query := TFDQuery.Create(nil);
+    Conexao := TConexao.Create;
+    Query.Connection := Conexao.BD;
+
+    with Query do
+    begin
+      Active := False;
+      SQL.Clear;
+      SQL.Add('DELETE FROM MUSICAS WHERE UPPER(artistName) LIKE :artistName');
+      ParamByName('artistName').AsString := '%' + UpperCase(Cantor) +'%';
+      ExecSQL;
+
+      Active := False;
+      SQL.Clear;
+      SQL.Add('SELECT * FROM MUSICAS WHERE UPPER(artistName) LIKE :artistName');
+      ParamByName('artistName').AsString := '%' + UpperCase(Cantor) +'%';
+      Active := True;
+
+      if RecordCount = 0 then
+        Result := True;
+    end;
+  finally
+    Query.Free;
+    Conexao.Free;
+  end;
+
+  LimpaMusica;
+  Status := tstNavegando;
+end;
+
+function TMusica.Buscar(ID: Int64): Boolean;
+Var Query: TFDQuery;
+begin
+  Result := False;
+
+  try
+    Query := TFDQuery.Create(nil);
+    Conexao := TConexao.Create;
+    Query.Connection := Conexao.BD;
+
+    with Query do
+    begin
+      Active := False;
+      SQL.Clear;
+      SQL.Add('SELECT * FROM MUSICAS WHERE TRACKID = :ID');
+      ParamByName('ID').AsLargeInt := ID;
+      Active := True;
+
+      if RecordCount = 0 then
+      begin
+        LimpaMusica;
+        exit;
+      end else
+        Result := True;
+
+      Self.wrapperType       := FieldByName('wrapperType').AsString;
+      Self.Kind              := FieldByName('Kind').AsString;
+      Self.artistId          := FieldByName('artistId').AsLargeInt;
+      Self.collectionId      := FieldByName('collectionId').AsLargeInt;
+      Self.trackId           := FieldByName('trackId').AsLargeInt;
+      Self.artistName        := FieldByName('artistName').AsString;
+      Self.collectionName    := FieldByName('collectionName').AsString;
+      Self.trackName         := FieldByName('trackName').AsString;
+      Self.artistViewUrl     := FieldByName('artistViewUrl').AsString;
+      Self.collectionViewUrl := FieldByName('collectionViewUrl').AsString;
+      Self.trackViewUrl      := FieldByName('trackViewUrl').AsString;
+      Self.Nota              := FieldByName('Nota').AsInteger;
+    end;
+  finally
+    Query.Free;
+    Conexao.Free;
+  end;
+end;
+
+constructor TMusica.Create;
+begin
+  LimpaMusica;
+end;
+
+destructor TMusica.Destroy;
+begin
+  if Assigned (Conexao) then
+    FreeAndNil(Conexao);
+end;
+
+function TMusica.Gravar: Boolean;
+Var Query: TFDQuery;
+    S:     String;
+begin
+  Result := False;
+
+  if Status = tstInclusao then
+  begin
+    try
+      Query := TFDQuery.Create(nil);
+      Conexao := TConexao.Create;
+      Query.Connection := Conexao.BD;
+
+      if Buscar(Self.trackId) then
+        raise Exception.Create('Música '+ Self.trackName +' já cadastrada!');
+
+      with Query do
+      begin
+        Active := False;
+        SQL.Clear;
+        S := 'INSERT INTO MUSICAS VALUES(:wrapperType, '
+                                       +':Kind, '
+                                       +':artistId, '
+                                       +':collectionId, '
+                                       +':trackId, '
+                                       +':artistName, '
+                                       +':collectionName, '
+                                       +':trackName, '
+                                       +':artistViewUrl, '
+                                       +':collectionViewUrl, '
+                                       +':trackViewUrl, '
+                                       +':Nota)';
+        SQL.Add(S);
+
+        ParambyName('wrapperType').AsString       := Self.wrapperType;
+        ParambyName('Kind').AsString              := Self.Kind;
+        ParambyName('artistId').AsLargeInt        := Self.artistId;
+        ParambyName('collectionId').AsLargeInt    := Self.collectionId;
+        ParambyName('trackId').AsLargeInt         := Self.trackId;
+        ParambyName('artistName').AsString        := Self.artistName;
+        ParambyName('collectionName').AsString    := Self.collectionName;
+        ParambyName('trackName').AsString         := Self.trackName;
+        ParambyName('artistViewUrl').AsString     := Self.artistViewUrl;
+        ParambyName('collectionViewUrl').AsString := Self.collectionViewUrl;
+        ParambyName('trackViewUrl').AsString      := Self.trackViewUrl;
+        ParambyName('Nota').AsInteger             := Self.Nota;
+        ExecSQL;
+
+        if Buscar(Self.trackId) then
+          Result := True
+        else
+          Result := False;
+      end;
+    finally
+      Query.Free;
+    end;
+  end;
+
+  if Status = tstAlteracao then
+  begin
+      try
+      Query := TFDQuery.Create(nil);
+      Conexao := TConexao.Create;
+      Query.Connection := Conexao.BD;
+
+      with Query do
+      begin
+        Active := False;
+        SQL.Clear;
+        S := 'UPDATE MUSICAS SET wrapperType = :wrapperType, '
+                               +'Kind = :Kind, '
+                               +'artistId = :artistId, '
+                               +'collectionId = :collectionId, '
+                               +'artistName = :artistName, '
+                               +'collectionName = :collectionName, '
+                               +'trackName = :trackName, '
+                               +'artistViewUrl = :artistViewUrl, '
+                               +'collectionViewUrl = :collectionViewUrl, '
+                               +'trackViewUrl = :trackViewUrl, '
+                               +'Nota = :Nota '
+                   +'WHERE TrackId = :ID';
+        SQL.Add(S);
+
+        ParambyName('ID').AsLargeInt              := Self.trackId;
+
+        ParambyName('wrapperType').AsString       := Self.wrapperType;
+        ParambyName('Kind').AsString              := Self.Kind;
+        ParambyName('artistId').AsLargeInt        := Self.artistId;
+        ParambyName('collectionId').AsLargeInt    := Self.collectionId;
+        ParambyName('artistName').AsString        := Self.artistName;
+        ParambyName('collectionName').AsString    := Self.collectionName;
+        ParambyName('trackName').AsString         := Self.trackName;
+        ParambyName('artistViewUrl').AsString     := Self.artistViewUrl;
+        ParambyName('collectionViewUrl').AsString := Self.collectionViewUrl;
+        ParambyName('trackViewUrl').AsString      := Self.trackViewUrl;
+        ParambyName('Nota').AsInteger             := Self.Nota;
+        ExecSQL;
+
+        Result := True
+      end;
+    finally
+      Query.Free;
+      Conexao.Free;
+    end;
+  end;
+
+  LimpaMusica;
+end;
+
+function TMusica.Incluir: Boolean;
+Var Query: TFDQuery;
+begin
+  Result := False;
+
+  try
+    Query := TFDQuery.Create(nil);
+    Conexao := TConexao.Create;
+    Query.Connection := Conexao.BD;
+
+    with Query do
+    begin
+      Active := False;
+      SQL.Clear;
+      SQL.Add('SELECT MAX(TRACKID)+1 AS NOVOID FROM MUSICAS');
+      Active := True;
+
+      LimpaMusica;
+      Self.trackId := FieldByName('NOVOID').AsInteger;
+      if Self.trackId = 0 then Self.trackId := 1;
+    end;
+  finally
+    Query.Free;
+    Conexao.Free;
+  end;
+
+  Status := tstInclusao;
+  Result := True;
+end;
+
+procedure TMusica.LimpaMusica;
+begin
+  Self.wrapperType       := EmptyStr;
+  Self.Kind              := EmptyStr;
+  Self.artistId          := 0;
+  Self.collectionId      := 0;
+  Self.trackId           := 0;
+  Self.artistName        := EmptyStr;
+  Self.collectionName    := EmptyStr;
+  Self.trackName         := EmptyStr;
+  Self.artistViewUrl     := EmptyStr;
+  Self.collectionViewUrl := EmptyStr;
+  Self.trackViewUrl      := EmptyStr;
+  Self.Nota              := 0;
+end;
+
+end.

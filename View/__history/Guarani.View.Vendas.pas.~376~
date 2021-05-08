@@ -1,0 +1,811 @@
+{-------------------------------------------------------------------------------
+Tela: Produtos [frmProdutos]                                     Data:17/04/2021
+Objetivo: Tela cadastro de produtos realizando operações de CRUD
+
+Dev.: Sérgio de Siqueira Silva
+
+Data Alteração: 19/04/2021
+Dev.: Sérgio de Siqueira Silva
+Alteração: Alteração de GRID para StringGrid
+-------------------------------------------------------------------------------}
+
+unit Guarani.View.Vendas;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.StdCtrls,
+  FMX.Controls.Presentation, FMX.Edit, FMX.Objects, FMX.Layouts, System.Rtti,
+  FMX.Grid.Style, FMX.Grid, FMX.ScrollBox,
+  FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
+  FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
+  FireDAC.Phys.FB, FireDAC.Phys.FBDef, FireDAC.FMXUI.Wait, Data.DB,
+  FireDAC.Comp.Client, FireDAC.Stan.Intf, FireDAC.Dapt, FMX.DateTimeCtrls,
+  FireDAC.Stan.Param, FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.Comp.DataSet,
+  Fmx.Bind.Grid, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt,
+  Fmx.Bind.DBEngExt, Data.Bind.Components, Data.Bind.Grid, Data.Bind.DBScope,
+  Guarani.Model.ConexaoBD, Guarani.View.Clientes,
+  Guarani.Model.ClienteJuridica, Guarani.Model.Produto, Guarani.Model.Pedido,
+  Guarani.Model.Venda, FMX.TabControl;
+
+
+type
+  TfrmVendas = class(TForm)
+    LayoutContainer: TLayout;
+    TabControl1: TTabControl;
+    TabListagemClientes: TTabItem;
+    TabCadastroClientes: TTabItem;
+    LayoutCliente: TLayout;
+    Image5: TImage;
+    lblPesqCliID: TLabel;
+    lblPesqCliRazao: TLabel;
+    dCliID: TLabel;
+    dCliRazaoSocial: TLabel;
+    dCliNomeFantasia: TLabel;
+    Image9: TImage;
+    Image10: TImage;
+    lblPesqCliFantasia: TLabel;
+    dCliCNPJ: TLabel;
+    Image3: TImage;
+    lblPesqCliCNPJ: TLabel;
+    Line2: TLine;
+    LayoutConfirmacao: TLayout;
+    btnGravar: TRectangle;
+    Image7: TImage;
+    Label14: TLabel;
+    btnCancelar: TRectangle;
+    Image8: TImage;
+    Label15: TLabel;
+    LayoutItems: TLayout;
+    Label2: TLabel;
+    Label9: TLabel;
+    dPedQtdTotal: TLabel;
+    dPedValorTotal: TLabel;
+    Label13: TLabel;
+    GridItems: TStringGrid;
+    LayoutPedido: TLayout;
+    Label8: TLabel;
+    Line1: TLine;
+    dPedData: TDateEdit;
+    Label3: TLabel;
+    dPedID: TLabel;
+    LayoutProduto: TLayout;
+    lblDescCódigo: TLabel;
+    Label10: TLabel;
+    Label11: TLabel;
+    Label12: TLabel;
+    RectangleEdtCNPJ: TRectangle;
+    dProId: TEdit;
+    Rectangle1: TRectangle;
+    edtProQtd: TEdit;
+    Rectangle2: TRectangle;
+    dProPreco: TEdit;
+    dProdDesc: TLabel;
+    Image6: TImage;
+    Image11: TImage;
+    Line3: TLine;
+    GridPedidos: TStringGrid;
+    StringColumn1: TStringColumn;
+    StringColumn2: TStringColumn;
+    StringColumn3: TStringColumn;
+    StringColumn4: TStringColumn;
+    LayoutAcoesPesquisa: TLayout;
+    Label1: TLabel;
+    RectangleEdtNomeFantasia: TRectangle;
+    edtPesquisa: TEdit;
+    btnLocalizarPedido: TImage;
+    LayoutAcoes: TLayout;
+    btnIncluirPedido: TImage;
+    btnExcluirPedido: TImage;
+    chkPesCliente: TCheckBox;
+    chkPesData: TCheckBox;
+    chkPesNumero: TCheckBox;
+    procedure edtPesquisaKeyDown(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure btnLocalizarPedidoClick(Sender: TObject);
+    procedure btnIncluirPedidoClick(Sender: TObject);
+    procedure GridPedidosCellDblClick(const Column: TColumn;
+      const Row: Integer);
+    procedure btnCancelarClick(Sender: TObject);
+    procedure btnGravarClick(Sender: TObject);
+    procedure btnExcluirPedidoClick(Sender: TObject);
+    procedure Label1Paint(Sender: TObject; Canvas: TCanvas;
+      const ARect: TRectF);
+    procedure lblPesqCliIDClick(Sender: TObject);
+    procedure lblPesqCliRazaoClick(Sender: TObject);
+    procedure lblPesqCliFantasiaClick(Sender: TObject);
+    procedure dProIdKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char;
+      Shift: TShiftState);
+    procedure edtProQtdKeyDown(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure dProPrecoKeyDown(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure Image6Click(Sender: TObject);
+    procedure lblPesqCliCNPJClick(Sender: TObject);
+    procedure GridItemsCellDblClick(const Column: TColumn; const Row: Integer);
+  private
+    { Private declarations }
+    procedure LimpaProduto();
+    procedure LimpaCliente();
+    procedure LimpaItems();
+    procedure LimpaPedido();
+
+    procedure InserirItem();
+    function NovoIDPedido:Integer;
+    function NovoIDItem:Integer;
+    procedure CalculaTotais();
+    function GravarVenda: Boolean;
+  public
+    { Public declarations }
+    procedure PopularGridVendas(sSQL: String; Tipo: Integer);
+    procedure LocalizarPedido();
+    procedure TelaCadastro();
+    procedure PesquisaCliente();
+    function PesquisaProduto(Tipo:Integer; BuscaID: Boolean): Boolean;
+  end;
+
+var
+  frmVendas: TfrmVendas;
+  SecondView: Boolean;
+  Venda: TVenda;
+
+implementation
+
+{$R *.fmx}
+
+{ TfrmVendas }
+
+procedure TfrmVendas.btnGravarClick(Sender: TObject);
+begin
+  if not GravarVenda then exit;
+
+  if MessageDlg('Deseja imprimir o pedido?', System.UITypes.TMsgDlgType.mtConfirmation,
+           [System.UITypes.TMsgDlgBtn.mbYes, System.UITypes.TMsgDlgBtn.mbNO], 0) = mrYes then
+  begin
+    ShowMessage('Aqui sairia a relatório, mas não tinha componente Fast na minha maquina!');
+  end;
+
+  TelaCadastro;
+end;
+
+procedure TfrmVendas.CalculaTotais;
+Var TotalItems: Integer;
+    TotalValor: Currency;
+begin
+  TotalItems := 0;
+  TotalValor := 0;
+
+  {if memPedidoItems.RecordCount = 0 then
+  begin
+    TotalItems := 0;
+    TotalValor := 0;
+  end else
+  begin
+    with memPedidoItems do
+    begin
+      first;
+      while not Eof do
+      begin
+        TotalItems := TotalItems + memPedidoItemsQTD.AsInteger;
+        TotalValor := TotalValor + memPedidoItemsVALORTOT.AsCurrency;
+        next;
+      end;
+    end;
+  end;}
+
+  dPedQtdTotal.Text := InttoStr(TotalItems);
+  dPedValorTotal.Text := FormatFloat(',0.00', TotalValor);
+end;
+
+procedure TfrmVendas.dProIdKeyDown(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  if Key = vkReturn then
+  begin
+    if not PesquisaProduto(1,True) then
+    begin
+      LimpaProduto;
+      ShowMessage('Produto não encontrado!');
+      exit;
+    end;
+    edtProQtd.SetFocus;
+  end;
+end;
+
+procedure TfrmVendas.dProPrecoKeyDown(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  if Key = vkReturn then
+  begin
+    InserirItem;
+  end;
+end;
+
+procedure TfrmVendas.edtPesquisaKeyDown(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  if Key = vkReturn then
+    LocalizarPedido();
+end;
+
+procedure TfrmVendas.edtProQtdKeyDown(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  if Key = vkReturn then
+    dProPreco.SetFocus;
+end;
+
+function TfrmVendas.GravarVenda: Boolean;
+Var Query:   TFDQuery;
+    Conexao: TConexao;
+    sSQL:    String;
+begin
+  Result := False;
+
+  //Verifica se tem items a gravar
+
+  //Verificação do ID do pedido master
+  try
+    if dPedID.Text.ToInteger = 0 then
+    begin
+      ShowMessage('Erro ao processar o ID do pedido, finalize a abre um novo pedido!');
+      exit;
+    end;
+  except
+    ShowMessage('Erro ao processar o ID do pedido, finalize a abre um novo pedido!');
+    exit;
+  end;
+
+  //Verificação do cliente
+  try
+    if dCliID.Text.ToInteger <= 0 then
+    begin
+      ShowMessage('Cliente não definido!');
+      exit;
+    end;
+  except
+    ShowMessage('Erro ao processar o cliente, tente selecionar um novamente!');
+    exit;
+  end;
+
+  try
+    Query := TFDQuery.Create(nil);
+    Conexao := TConexao.Create;
+    Query.Connection := Conexao.BD;
+
+    with Query do
+    begin
+      //Gravar Pedido (Master)
+      sSQL := 'INSERT INTO PEDIDOS VALUES(:ID, :DATAPEDIDO, :IDCLIENTE)';
+      Active := False;
+      SQL.Clear;
+      SQL.Add(sSQL);
+      ParamByName('ID').AsInteger          := dPedID.Text.ToInteger;
+      ParamByName('DATAPEDIDO').AsString   := DatetoStr(dPedData.Date);
+      ParamByName('IDCLIENTE').AsInteger   := dCliID.Text.ToInteger;
+      ExecSQL;
+
+      //Gravar Pedido (Detail)
+      {memPedidoItems.First;
+      while not memPedidoItems.Eof do
+      begin
+        sSQL := 'INSERT INTO PEDIDOITEMS VALUES(:ID, :IDPEDIDO, :IDPRODUTO, :PRECOUNITARIO, :QUANTIDADE)';
+        Active := False;
+        SQL.Clear;
+        SQL.Add(sSQL);
+        ParamByName('ID').AsInteger             := NovoIDItem;
+        ParamByName('IDPEDIDO').AsInteger       := memPedidoItemsIDPEDIDO.AsInteger;
+        ParamByName('IDPRODUTO').AsInteger      := memPedidoItemsIDPRODUTO.AsInteger;
+        ParamByName('PRECOUNITARIO').AsCurrency := memPedidoItemsVALORUN.AsCurrency;
+        ParamByName('QUANTIDADE').AsInteger     := memPedidoItemsQTD.AsInteger;
+        ExecSQL;
+
+        memPedidoItems.Next;
+      end;}
+    end;
+
+  finally
+    Query.Free;
+    Conexao.Free;
+  end;
+
+  Result := True;
+end;
+
+procedure TfrmVendas.GridItemsCellDblClick(const Column: TColumn;
+  const Row: Integer);
+begin
+  if MessageDlg('Deseja realmente apagar o item?', System.UITypes.TMsgDlgType.mtConfirmation,
+             [System.UITypes.TMsgDlgBtn.mbYes, System.UITypes.TMsgDlgBtn.mbNO], 0) = mrYes then
+  //memPedidoItems.Delete;
+  CalculaTotais;
+end;
+
+procedure TfrmVendas.GridPedidosCellDblClick(const Column: TColumn;
+  const Row: Integer);
+begin
+  PopularGridVendas('',0);
+end;
+
+procedure TfrmVendas.btnIncluirPedidoClick(Sender: TObject);
+begin
+  Venda := TVenda.Create;
+  Venda.Incluir;
+
+  dPedID.Text := Venda.Pedido.Id.ToString;
+  dPedData.Date := Now;
+
+  LimpaProduto;
+  LimpaCliente;
+  LimpaItems;
+  CalculaTotais;
+
+  TabControl1.Next();
+end;
+
+procedure TfrmVendas.btnExcluirPedidoClick(Sender: TObject);
+Var Query: TFDQuery;
+    Conexao: TConexao;
+    sSQL: String;
+    IdPedido: Integer;
+    Liberado: Boolean;
+begin
+  //Verifica se realmente tem registros para apagar
+  try
+    IdPedido := StrtoInt(GridPedidos.Cells[0,GridPedidos.Row]);
+  except
+    ShowMessage('Não há o que excluir!');
+    exit;
+  end;
+
+  //Login de liberação
+  InputQuery( 'LOGIN DE LIBERAÇÃO', ['USUÁRIO: [SERGIO]', #1'SENHA [123]:'], ['', ''],
+   procedure(const AResult: TModalResult; const AValues: array of string)
+    begin
+     if (AValues[0] <> 'SERGIO') or (AValues[1] <> '123') then
+     begin
+       Liberado := False;
+     end else
+       Liberado := True;
+    end);
+  if Liberado = false then
+  begin
+    ShowMessage('Você não tem permissão para apagar o pedido!');
+    exit;
+  end;
+
+  //Rotina SQL para apagar o pedido e os items
+  try
+    Query := TFDQuery.Create(nil);
+    Conexao := TConexao.Create;
+    Query.Connection := Conexao.BD;
+
+    if MessageDlg('Deseja realmente apagar o pedido N.• '+ idPedido.ToString +' ?', System.UITypes.TMsgDlgType.mtConfirmation,
+               [System.UITypes.TMsgDlgBtn.mbYes, System.UITypes.TMsgDlgBtn.mbNO], 0) = mrYes then
+
+
+    with Query do
+    begin
+      sSQL := 'DELETE FROM PEDIDOS WHERE ID = '+idPedido.ToString;
+      Active := False;
+      SQL.Clear;
+      SQL.Add(sSQL);
+      ExecSQL;
+
+      sSQL := 'DELETE FROM PEDIDOITEMS WHERE IDPEDIDO = '+idPedido.ToString;
+      Active := False;
+      SQL.Clear;
+      SQL.Add(sSQL);
+      ExecSQL;
+    end;
+  finally
+    Query.Free;
+    Conexao.Free;
+  end;
+
+  PopularGridVendas('',0);
+end;
+
+procedure TfrmVendas.Label1Paint(Sender: TObject; Canvas: TCanvas;
+  const ARect: TRectF);
+begin
+  if SecondView = False then
+  begin
+    PopularGridVendas('',0);
+  end;
+end;
+
+procedure TfrmVendas.lblPesqCliIDClick(Sender: TObject);
+begin
+  PesquisaCliente()
+end;
+
+procedure TfrmVendas.lblPesqCliCNPJClick(Sender: TObject);
+begin
+  PesquisaCliente;
+end;
+
+procedure TfrmVendas.lblPesqCliRazaoClick(Sender: TObject);
+begin
+  PesquisaCliente;
+end;
+
+procedure TfrmVendas.lblPesqCliFantasiaClick(Sender: TObject);
+begin
+  PesquisaCliente;
+end;
+
+procedure TfrmVendas.LimpaCliente;
+begin
+  dCliID.Text           := '';
+  dCliCNPJ.Text         := '';
+  dCliRazaoSocial.Text  := '';
+  dCliNomeFantasia.Text := '';
+end;
+
+procedure TfrmVendas.LimpaItems;
+begin
+//LImpar Lista
+end;
+
+procedure TfrmVendas.LimpaPedido;
+begin
+  dPedQtdTotal.Text := '';
+  dPedValorTotal.Text := '';
+  dPedID.Text := '';
+end;
+
+procedure TfrmVendas.LimpaProduto;
+begin
+  dProId.Text := '';
+  dProdDesc.Text := '';
+  dProPreco.Text := '';
+  edtProQtd.Text := '';
+end;
+
+procedure TfrmVendas.LocalizarPedido();
+Var sSQL: String;
+    Teste: Integer;
+begin
+  if edtPesquisa.Text = '' then exit;  
+
+  Teste := 0;
+  if chkPesCliente.IsChecked then
+    Inc(Teste,1);
+
+  if chkPesData.IsChecked then
+    Inc(Teste,1);
+
+  if chkPesNumero.IsChecked then
+    Inc(Teste,1);
+
+  if Teste > 1 then
+  begin
+    ShowMessage('Escolha somente um tipo de busca!');
+    exit;
+  end;
+
+
+  //Pesquisa Numero do Pedido
+  if chkPesNumero.IsChecked then
+  begin
+    sSQL := 'SELECT  PM.ID IDPEDIDO, '
+                    +'PM.DATAPEDIDO DATAPEDIDO, '
+                    +'C.CNPJ CNPJ, '
+                    +'C.RAZAOSOCIAL RAZAOSOCIAL '
+            +'FROM PEDIDOS PM, PEDIDOITEMS PD, CLIENTES C '
+            +'WHERE   PM.ID = PD.IDPEDIDO AND '
+                    +'PM.IDCLIENTE = C.ID AND '
+                    +'PM.ID = :ID '
+            +'GROUP BY PM.ID, PM.DATAPEDIDO, C.CNPJ, C.RAZAOSOCIAL';
+    PopularGridVendas(sSQL,1);
+  end;
+
+  //Pesquisa Razão Social
+  if chkPesCliente.IsChecked then
+  begin
+    sSQL := 'SELECT  PM.ID IDPEDIDO, '
+                    +'PM.DATAPEDIDO DATAPEDIDO, '
+                    +'C.CNPJ CNPJ, '
+                    +'C.RAZAOSOCIAL RAZAOSOCIAL '
+            +'FROM PEDIDOS PM, PEDIDOITEMS PD, CLIENTES C '
+            +'WHERE   PM.ID = PD.IDPEDIDO AND '
+                    +'PM.IDCLIENTE = C.ID AND '
+                    +'C.RAZAOSOCIAL LIKE :RAZAO '
+            +'GROUP BY PM.ID, PM.DATAPEDIDO, C.CNPJ, C.RAZAOSOCIAL';
+    PopularGridVendas(sSQL,2);
+  end;
+
+  //Pesquisa Data do Pedido
+  if chkPesData.IsChecked then
+  begin
+    sSQL := 'SELECT  PM.ID IDPEDIDO, '
+                    +'PM.DATAPEDIDO DATAPEDIDO, '
+                    +'C.CNPJ CNPJ, '
+                    +'C.RAZAOSOCIAL RAZAOSOCIAL '
+            +'FROM PEDIDOS PM, PEDIDOITEMS PD, CLIENTES C '
+            +'WHERE   PM.ID = PD.IDPEDIDO AND '
+                    +'PM.IDCLIENTE = C.ID AND '
+                    +'PM.DATAPEDIDO = :DATA '
+            +'GROUP BY PM.ID, PM.DATAPEDIDO, C.CNPJ, C.RAZAOSOCIAL';
+    PopularGridVendas(sSQL,3);
+  end;
+end;
+
+function TfrmVendas.NovoIDItem: Integer;
+Var sSQL: String;
+    Query: TFDQuery;
+    Conexao: TConexao;
+begin
+   sSQL := 'SELECT MAX(ID) NOVOID FROM PEDIDOITEMS';
+
+   try
+    Query := TFDQuery.Create(nil);
+    Conexao := TConexao.Create;
+    Query.Connection := Conexao.BD;
+
+    with Query do
+    begin
+      SQL.Clear;
+      SQL.Add(sSQL);
+      Active := True;
+
+      Result := FieldByName('NOVOID').AsInteger + 1;
+
+      if Result = 0 then
+        Inc(Result,1);
+    end;
+
+  finally
+    Query.Free;
+    Conexao.Free;
+  end;
+end;
+
+function TfrmVendas.NovoIDPedido: Integer;
+Var sSQL: String;
+    Query: TFDQuery;
+    Conexao: TConexao;
+begin
+   sSQL := 'SELECT MAX(ID) NOVOID FROM PEDIDOS';
+
+   try
+    Query := TFDQuery.Create(nil);
+    Conexao := TConexao.Create;
+    Query.Connection := Conexao.BD;
+
+    with Query do
+    begin
+      SQL.Clear;
+      SQL.Add(sSQL);
+      Active := True;
+
+      Result := FieldByName('NOVOID').AsInteger + 1;
+
+      if Result = 0 then
+        Inc(Result,1);
+    end;
+
+  finally
+    Query.Free;
+    Conexao.Free;
+  end;
+end;
+
+procedure TfrmVendas.PesquisaCliente();
+Var idCliente: Integer;
+begin
+  if not Assigned(frmClientes) then
+    Application.CreateForm(TfrmClientes, frmClientes);
+
+  frmClientes.ShowModal(procedure (ModalResult: TModalResult)
+  begin
+    with frmClientes do
+    begin
+      idCliente := Grid.Cells[0,Grid.Row].ToInteger;
+    end;
+  end);
+
+  LimpaCliente;
+
+  if not Venda.Cliente.Buscar(idCliente) then
+    raise Exception.Create('Cliente não encontrado!');
+
+  dCliID.Text           := Venda.Cliente.Id.ToString;
+  dCliCNPJ.Text         := Venda.Cliente.CNPJ;
+  dCliRazaoSocial.Text  := Venda.Cliente.RazaoSocial;
+  dCliNomeFantasia.Text := Venda.Cliente.NomeFantisia;
+end;
+
+function TfrmVendas.PesquisaProduto(Tipo: Integer; BuscaID:Boolean): Boolean;
+Var sSQL: String;
+    Query: TFDQuery;
+    Conexao: TConexao;
+    Busca: String;
+begin
+  Result := False;
+
+  sSQL := 'SELECT  * FROM PRODUTOS WHERE ';
+
+  case Tipo of
+    1 : sSQL := sSQL + 'ID = :BUSCA';
+    2 : sSQL := sSQL + 'DESCRICAO LIKE :BUSCA';
+  end;
+
+  if not BuscaID then
+  begin
+    Busca := InputBox('Busca Produto', 'Digite a busca:', '');
+    if Tipo = 2 then Busca := Busca + '%';
+  end else
+  begin
+    Busca := dProId.Text;
+  end;
+
+  try
+    Query := TFDQuery.Create(nil);
+    Conexao := TConexao.Create;
+    Query.Connection := Conexao.BD;
+
+    with Query do
+    begin
+      SQL.Clear;
+      SQL.Add(sSQL);
+      ParamByName('BUSCA').AsString := Busca;
+      Active := True;
+
+      dProId.Text    := FieldByName('ID').AsString;
+      dProdDesc.Text := FieldByName('DESCRICAO').AsString;
+      {if memPedidoItems.State <> dsInsert then
+      begin
+        dProPreco.Text := CurrToStr(FieldByName('PRECO').AsCurrency);
+        edtProQtd.Text := '0';
+      end;}
+
+      if RecordCount > 0 then
+        Result := True;
+    end;
+  finally
+    Query.Free;
+    Conexao.Free;
+  end;
+end;
+
+procedure TfrmVendas.PopularGridVendas(sSQL: String; Tipo: Integer);
+var Conexao: TConexao;
+    Query:   TFDQuery;
+    Linha:   Integer;
+begin
+  if sSQL = '' then
+  begin
+    sSQL := 'SELECT  PM.ID IDPEDIDO, '
+                +'PM.DATAPEDIDO DATAPEDIDO, '
+                +'C.CNPJ CNPJ, '
+                +'C.RAZAOSOCIAL RAZAOSOCIAL '
+        +'FROM PEDIDOS PM, PEDIDOITEMS PD, CLIENTES C '
+        +'WHERE   PM.ID = PD.IDPEDIDO AND '
+                +'PM.IDCLIENTE = C.ID '
+        +'GROUP BY PM.ID, PM.DATAPEDIDO, C.CNPJ, C.RAZAOSOCIAL';
+  end;
+
+  try
+    Conexao := TConexao.Create;
+    Query := TFDQuery.Create(nil);
+    Query.Connection := Conexao.BD;
+
+    with Query do
+    begin
+      SQL.Clear;
+      SQL.Add(sSQL);
+      case Tipo of
+        1 : ParamByName('ID').AsInteger := edtPesquisa.Text.ToInteger;
+        2 : ParamByName('RAZAO').AsString := edtPesquisa.Text + '%';
+        3 : ParamByName('DATA').AsString := edtPesquisa.Text;
+      end;
+      Active := True;
+
+      First;
+      Linha := 0;
+      GridPedidos.RowCount := RecordCount;
+      while not eof do
+      begin
+        GridPedidos.Cells[0,Linha] := FieldByName('IDPEDIDO').AsInteger.ToString;
+        GridPedidos.Cells[1,Linha] := FieldByName('DATAPEDIDO').AsString;
+        GridPedidos.Cells[2,Linha] := FieldByName('CNPJ').AsString;
+        GridPedidos.Cells[3,Linha] := FieldByName('RAZAOSOCIAL').AsString;
+
+        Linha := Linha + 1;
+        Next;
+      end;
+
+    end;
+  finally
+    Query.Free;
+    Conexao.Free;
+  end;
+end;
+
+procedure TfrmVendas.btnCancelarClick(Sender: TObject);
+begin
+  LimpaProduto;
+  LimpaCliente;
+  LimpaItems;
+
+  if Assigned(Venda) then
+    Venda.Free;
+
+  TabControl1.Previous();
+end;
+
+procedure TfrmVendas.TelaCadastro;
+begin
+
+end;
+
+procedure TfrmVendas.btnLocalizarPedidoClick(Sender: TObject);
+begin
+    LocalizarPedido();
+end;
+
+procedure TfrmVendas.Image6Click(Sender: TObject);
+begin
+  InserirItem;
+end;
+
+procedure TfrmVendas.InserirItem;
+begin
+  memPedidoItems.Insert;
+
+  //Verificar o ID do produto
+  if not PesquisaProduto(1,True) then
+  begin
+    ShowMessage('Verifique o ID do produto!');
+    memPedidoItems.Cancel;
+    exit;
+  end;
+
+  //Verificar quantidade
+  try
+  if edtProQtd.Text.ToInteger <= 0 then
+  begin
+    ShowMessage('Verifique a quantidade!');
+    memPedidoItems.Cancel;
+    exit;
+  end;
+  except
+    ShowMessage('Verifique a quantidade!');
+    memPedidoItems.Cancel;
+    exit;
+  end;
+
+  //Verificar Preço
+  try
+  if StrToCurr(dProPreco.Text) <= 0 then
+  begin
+    ShowMessage('Verifique o preço!');
+    memPedidoItems.Cancel;
+    exit;
+  end;
+  except
+    ShowMessage('Verifique a preço!');
+    memPedidoItems.Cancel;
+    exit;
+  end;
+
+  memPedidoItemsID.AsInteger        := 0;
+  memPedidoItemsIDPEDIDO.AsInteger  := dPedID.Text.ToInteger;
+  memPedidoItemsIDPRODUTO.AsInteger := dProId.Text.ToInteger;
+  memPedidoItemsVALORUN.AsCurrency  := StrtoCurr(dProPreco.Text);
+  memPedidoItemsQTD.AsInteger       := edtProQtd.Text.ToInteger;
+
+  memPedidoItemsDESCRICAO.AsString  := dProdDesc.Text;
+  memPedidoItemsVALORTOT.AsCurrency := memPedidoItemsQTD.AsInteger
+                                       * memPedidoItemsVALORUN.AsCurrency;
+  memPedidoItems.Post;
+
+  CalculaTotais;
+  LimpaProduto;
+  dProId.SetFocus;
+end;
+
+end.

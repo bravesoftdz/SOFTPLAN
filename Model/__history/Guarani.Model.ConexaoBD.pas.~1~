@@ -1,0 +1,47 @@
+unit Guarani.Model.ConexaoBD;
+
+interface
+
+uses FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
+     FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
+     FireDAC.Phys.FB, FireDAC.Phys.FBDef, FireDAC.FMXUI.Wait, Data.DB,
+     FireDAC.Comp.Client, FireDAC.Stan.Intf, FireDAC.Dapt, SysUtils, UITypes,
+     StrUtils;
+
+type
+  TConexao = class(TFDConnection)
+  private
+    FConexao: TFDConnection;
+    procedure Conectar();
+  public
+    destructor Destroy;
+    constructor Create;
+    property BD: TFDConnection read FConexao;
+  end;
+
+implementation
+
+{ TConexao }
+
+procedure TConexao.Conectar;
+begin
+  FConexao := TFDConnection.Create(nil);
+  FConexao.DriverName := 'FB';
+  FConexao.Params.Database := 'C:\Users\SERGIO\Documents\GUARANI\DataBase\GUARANI.FDB';
+  FConexao.Params.UserName := 'SYSDBA';
+  FConexao.Params.Password := 'masterkey';
+  FConexao.LoginPrompt := False;
+  FConexao.Connected;
+end;
+
+constructor TConexao.Create;
+begin
+  Conectar;
+end;
+
+destructor TConexao.Destroy;
+begin
+  FConexao.Free;
+end;
+
+end.

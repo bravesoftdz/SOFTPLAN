@@ -1,0 +1,614 @@
+object frmClientesListagem: TfrmClientesListagem
+  Left = 0
+  Top = 0
+  ClientHeight = 598
+  ClientWidth = 600
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object LayoutContainer: TLayout
+    Align = Client
+    Size.Width = 600.000000000000000000
+    Size.Height = 598.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object Layout1: TLayout
+      Align = Top
+      Margins.Left = 20.000000000000000000
+      Margins.Top = 30.000000000000000000
+      Margins.Right = 20.000000000000000000
+      Position.X = 20.000000000000000000
+      Position.Y = 30.000000000000000000
+      Size.Width = 560.000000000000000000
+      Size.Height = 95.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      object Label1: TLabel
+        AutoSize = True
+        StyledSettings = []
+        Position.X = 8.000000000000000000
+        Position.Y = 16.000000000000000000
+        Size.Width = 97.000000000000000000
+        Size.Height = 16.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Text = 'NOME FANTASIA'
+        TabOrder = 2
+      end
+      object RectangleEdtNomeFantasia: TRectangle
+        Fill.Kind = None
+        Margins.Left = 3.000000000000000000
+        Margins.Top = 3.000000000000000000
+        Margins.Right = 10.000000000000000000
+        Margins.Bottom = 3.000000000000000000
+        Position.X = 112.000000000000000000
+        Position.Y = 8.000000000000000000
+        Size.Width = 433.000000000000000000
+        Size.Height = 34.000000000000000000
+        Size.PlatformDefault = False
+        XRadius = 10.000000000000000000
+        YRadius = 10.000000000000000000
+        object edtNomeFantasia: TEdit
+          Touch.InteractiveGestures = [LongTap, DoubleTap]
+          Align = Client
+          StyleLookup = 'transparentedit'
+          TabOrder = 0
+          Margins.Left = 2.000000000000000000
+          Margins.Right = 5.000000000000000000
+          Size.Width = 383.000000000000000000
+          Size.Height = 34.000000000000000000
+          Size.PlatformDefault = False
+          TextPrompt = 'DIGITE AQUI O NOME FANTASIA'
+          StyledSettings = []
+          CharCase = ecUpperCase
+          OnKeyDown = edtNomeFantasiaKeyDown
+        end
+        object Image4: TImage
+          MultiResBitmap.Height = 48
+          MultiResBitmap.Width = 48
+          MultiResBitmap = <
+            item
+              Width = 48
+              Height = 48
+              PNG = {
+                89504E470D0A1A0A0000000D49484452000000300000003008060000005702F9
+                87000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+                01DE494441546843ED98BB4AC440148657B154D0D24B258885A59DA060E10B58
+                F802BE838ABADA586AE55B58588BF7C7F0025A088AAD6261E1E5FFE5040EC324
+                2699CC6413E6838FB39B9D3973C924996C271289446AA54F6219A6E0325C8493
+                70149217F800AFE031BC873DC52CBC803F396559D6A99D017808BFA1ADA359B2
+                0EEB32472D8CC04B68EB5C119983B982C2594BEBFC195C85BC1E06457EE631FE
+                66ABC35C41CF044FBDD9895BB800FF836558D6ACCF9C41E0C567AEF96B380CF3
+                C2B2ACA3733067900BFB1CEA86399B453A9FC03AE699606EAF4C43DD20CDB36C
+                D2605D331FDBF0C61AD48D9D42579843E7641B4EF44BB4B12431E148A20B660E
+                B38D4AB9817AB6AA38DDE6B2641BDE7883BAB121E80A73E89C6CC389AC251402
+                97CDE41F59037896983026D10533C7ABC4D2640DE04962C2BC4417CC1C8F124B
+                933500EE65342B125D3073787D98857890CD40AFF8DC4A9C40EFF8DACC7DC139
+                18041FDBE97D188CAA5F683EE1040C4A55AF94ECBCFEBE0B83E1FA527F00C7D5
+                B1C41D1894A27FABF06EA32F585B99E083205CEBEB901DBC83EFF003F2E9CA63
+                1BD0769FE7B2B10DA20B1B0367BCB583D8868D8133DEDA416CC1C6C0196FED20
+                36612A75BF526AF660A3D67E1A5C36B966BF9761C71BDBF9482412690C9DCE2F
+                042F2C59CBE11DDF0000000049454E44AE426082}
+              FileName = 
+                'C:\Users\SERGIO\Documents\GUARANI\Library\baseline_search_black_' +
+                '24dp.png'
+            end>
+          Align = Right
+          Cursor = crHandPoint
+          Margins.Right = 10.000000000000000000
+          Position.X = 390.000000000000000000
+          Size.Width = 33.000000000000000000
+          Size.Height = 34.000000000000000000
+          Size.PlatformDefault = False
+          OnClick = Image4Click
+        end
+      end
+      object Layout2: TLayout
+        Align = Bottom
+        Position.Y = 45.000000000000000000
+        Size.Width = 560.000000000000000000
+        Size.Height = 50.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 4
+        object Image1: TImage
+          MultiResBitmap.Height = 48
+          MultiResBitmap.Width = 48
+          MultiResBitmap = <
+            item
+              Width = 48
+              Height = 48
+              PNG = {
+                89504E470D0A1A0A0000000D49484452000000300000003008060000005702F9
+                87000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+                0255494441546843ED99BF4A5C411487376213500493422376120BDB60C04A1F
+                C056DF213E849D3E81BE48AC6CEC255D4811CB0454D0466CB4D2DF873370F670
+                5677DCEBDE1DDC0F3E66D13BE79CB97FE7CEED8C19F3CEF990DA4121CEAADC90
+                DFE457F959CE4BB890D7F24CFE9227F2543EC8565990FBF2BFA49812E9435F62
+                0C9D597920EF64545C89C420163187C296E474888A19446212FBCD989487324A
+                8EF7F258EEC875B924A792FCE66FFC8F6DD8368A81E42057A37C943F6594F052
+                52D8B4EC17B6A50F7DA398E4226723B0378EA44FC2B9BB2BD9C3AF85BEC488AE
+                2572367224A2D3863DB7269B8258D1D120F7406C4B1FF4B75C944D434C62FB7C
+                D4F02A3EC92B6983B197DEA2F80CB1FD91A0066A29867BB30DC4795A72DAD8BE
+                D82FE4F0D704B514C1D3D107E1622BC1F6C512C865FB524BD1137B4FDA00CC65
+                4AEF36B63F96402E72DAFED4D41713F29FB49D7FC8526C7F2C859CB63F3551DB
+                8B7C97B6234FCD19598A8D81A590D33FB1A9AD8B68444C892D4C7D6F9E7E0E15
+                7292DBE26B0B07C07CDEC263BD2D7C6E5F5B3880E5D466FEA4B60D7C6E5F5B38
+                80B9D466CE53EBB1E766A427DAC61AE173FBDA42FCFDBFD72CD36ED38411E4B6
+                DB505B177DDD9646996800B7A9CDE417F336F0B97D6DE100984C59BEA4D6C34A
+                C4737AA26DAC113EB7AF2D1CC0DFD4665652DB063EB7AF2D1C00EB3696CDD4B6
+                81CFED6B0BA96A2A11C151A97A3207554FA7A1FA171AA8FA9512AA7FA987AA97
+                5532552F6C41F54B8B50F5E26E86BD119D4E599E9A23BBBC6EA9F60387A5EA4F
+                4C169E8EAD7EE4EBF522510A71AAFCCC3A664CDD743A8FAE7BD7FA82FB7DC500
+                00000049454E44AE426082}
+              FileName = 
+                'C:\Users\SERGIO\Documents\GUARANI\Library\baseline_add_circle_ou' +
+                'tline_black_24dp.png'
+            end>
+          Align = Left
+          Cursor = crHandPoint
+          Margins.Left = 10.000000000000000000
+          Position.X = 10.000000000000000000
+          Size.Width = 33.000000000000000000
+          Size.Height = 50.000000000000000000
+          Size.PlatformDefault = False
+          OnClick = Image1Click
+        end
+        object Image2: TImage
+          MultiResBitmap.Height = 48
+          MultiResBitmap.Width = 48
+          MultiResBitmap = <
+            item
+              Width = 48
+              Height = 48
+              PNG = {
+                89504E470D0A1A0A0000000D49484452000000300000003008060000005702F9
+                87000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+                0242494441546843ED99B14A1D411486AF6223440463612276A2856D8860A50F
+                60ABEF101FC2CE3C41F222B1B2491FEC428A582AA8A08DD868A5FF873370EEE1
+                5CBCEB1D771DBC1F7CCC4577CF39B33BBB33BBDB1B33E69D3391DA5121CE57B9
+                25BFC815392F3F49B890D7F2441ECBDFF28F7C909DB228BFCB3349314D641FF6
+                2546EBCCC91FF24E46C5359118C422662BEC48864354CC281293D8AFC694FC29
+                A3E4782F8FE49EDC94CBF24392DFFC8DFFB10DDB4631901CE42ACAB4FC25A384
+                9792C266E4B0B02DFBB06F14935CE42C0247E350FA248CDD7DC9117E29EC4B8C
+                E85A22679133110D1B8EDC862C05B1A2B341EE91D8953EE85FB9244B434C62FB
+                7CD4F0223ECA2B698371945EA3F80CB1FD99A0066A690CF7661B88715A72D80C
+                821CFE9AA09646303BFA205C6C6D412E9B9B5A1ACDD807D206602D33CADDA629
+                E422A7AD819A8662529E4ABBF337D936E4B4355013B53DCBBAB43B326BCECAB6
+                21A79FB1A9AD8FA8472C892D2C7D6F9E7EB60A39C96DF1B5851D603D6F615AEF
+                0A9FDBD716766035B5997FA9ED029FDBD716766021B599F3D47AECD82C6184CF
+                ED6B0BF1F7FF41AB4CBB4D0923C86DB7A1B63E86BA2DBD65A20EDCA636931FCC
+                BBC0E7F6B5851D603165F99C5A0F6F224A1AE173FBDAC20EFC4F6D662DB55DE0
+                73FBDAC20EF0DEC6B29DDA2EF0B97D6D21552D2522382B552FE6A0EAE53454FF
+                4003553F5242F50FF550F56B954CD52FB6A0FA578B50F5CBDD0C47231A4E5966
+                CD37FB7ADD52ED070E4BD59F982CCC8E9D7EE41BF420D114E254F99975CC98BA
+                E9F51E01AC33B422531A37A20000000049454E44AE426082}
+              FileName = 
+                'C:\Users\SERGIO\Documents\GUARANI\Library\baseline_remove_circle' +
+                '_outline_black_24dp.png'
+            end>
+          Align = Right
+          Cursor = crHandPoint
+          Margins.Right = 10.000000000000000000
+          Position.X = 517.000000000000000000
+          Size.Width = 33.000000000000000000
+          Size.Height = 50.000000000000000000
+          Size.PlatformDefault = False
+          OnClick = Image2Click
+        end
+        object Image3: TImage
+          MultiResBitmap.Height = 48
+          MultiResBitmap.Width = 48
+          MultiResBitmap = <
+            item
+              Width = 48
+              Height = 48
+              PNG = {
+                89504E470D0A1A0A0000000D49484452000000300000003008060000005702F9
+                87000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+                0298494441546843ED993D4F14511486174D0885C498D880B12334B64241656C
+                8915FE0A8DD47456FE022B7F80950D7484C2561235014D4CA0C346A3565AF8D1
+                C0FBC43BC9F1E43A73E683851BF6499ECC66F79E8FB973773E764713265C70A6
+                D2B62FE4599277E56DB928AFCB39099FE4377928DFC897F2B53C96670A0D3E91
+                1F25CDB4911862AB9D1C2BD7E453F94BE69A6B2339C845CEB1B026BFC85C337D
+                2427B94F8DCB9299CA15C7DF72473E9477E482BC92E435EFF11963189BCB81D4
+                A0D6A0CCC84D992BF859D2D8AC8CC2586288CDE5A416350781D9D892BE086BF7
+                B16486BB422C3972DF256A0E722472CB86995B914341AEDCD1A0762FEE4B9FF4
+                BDBC2987869CE4F6F5E8A1139CD6FCD986593A8DE62BC8ED8F043D743AC5FAA5
+                C33A1D72D9FC0F6AF8EF44EBA5342F7F4A9B842FDBB8A096AD4D2FF414864BBC
+                4DC0BD4C9FB34D5BA8454DDB033D85B8248FA40D7E20C70D356D0FF4446F8D2C
+                4B1BC855F3AA8C322DD7E52BF923C96BDEE3B328D4F4576C7A6B6443DAA06D19
+                E586DC9336DECA678C89426D1B4F6F8DBC9036884B7E0466B7AEF94AC6448F04
+                B56D2CBD35F24EDA206EC2223C9236AE4EC646A0B68DA3B746BE4A1BC4D35584
+                5D69E3EA646C046ADB387A6BC45F44A27799DFA58DAB93B111A86DE3E8ED1F42
+                A7A5F34C6E0738ED59A2CFAC1FD2364274ACAFED7BCBEE0057404BF412FE3C6D
+                2344C7FADABEB7EC0E1CA46DC5ADB46DE299DCFFFBB216C6303682AFED7BCBEE
+                C0DBB4ADB897B64DFC91ABB26E27F88C318C8DE06BFBDEB2147F2BC15129FA66
+                0E8ABE9D86E21F68A0E8474A28FEA11E8AFE59A5C22F256496865C4EE4F2338F
+                9D968EA7F89F16A1E81F772B988DDC72AAE4AA796E7F5EB714FB078785D31A33
+                955BBB6D2507B93A9F2AFB70E67FF25DF8BF59274C289BD1E8047DA5E8F2E0CF
+                E93E0000000049454E44AE426082}
+              FileName = 
+                'C:\Users\SERGIO\Documents\GUARANI\Library\baseline_adjust_black_' +
+                '24dp.png'
+            end>
+          Align = Center
+          Cursor = crHandPoint
+          Size.Width = 33.000000000000000000
+          Size.Height = 50.000000000000000000
+          Size.PlatformDefault = False
+          OnClick = Image3Click
+        end
+      end
+    end
+    object GridBindSourceDB1: TGrid
+      Align = Top
+      CanFocus = True
+      ClipChildren = True
+      Margins.Left = 20.000000000000000000
+      Margins.Top = 20.000000000000000000
+      Margins.Right = 20.000000000000000000
+      Position.X = 20.000000000000000000
+      Position.Y = 145.000000000000000000
+      Size.Width = 560.000000000000000000
+      Size.Height = 424.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      RowCount = 0
+      Viewport.Width = 556.000000000000000000
+      Viewport.Height = 399.000000000000000000
+    end
+    object PanelCadastro: TPanel
+      Position.X = 8.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 585.000000000000000000
+      Size.Height = 577.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+      object LayoutCadastroClientes: TLayout
+        Align = Client
+        Size.Width = 585.000000000000000000
+        Size.Height = 577.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        object Rectangle1: TRectangle
+          Fill.Kind = None
+          Margins.Left = 3.000000000000000000
+          Margins.Top = 3.000000000000000000
+          Margins.Right = 10.000000000000000000
+          Margins.Bottom = 3.000000000000000000
+          Position.X = 96.000000000000000000
+          Position.Y = 152.000000000000000000
+          Size.Width = 393.000000000000000000
+          Size.Height = 34.000000000000000000
+          Size.PlatformDefault = False
+          XRadius = 10.000000000000000000
+          YRadius = 10.000000000000000000
+          object Edit1: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            Align = Client
+            StyleLookup = 'transparentedit'
+            TabOrder = 0
+            Margins.Left = 2.000000000000000000
+            Margins.Right = 10.000000000000000000
+            Size.Width = 381.000000000000000000
+            Size.Height = 34.000000000000000000
+            Size.PlatformDefault = False
+            TextPrompt = 'DIGITE AQUI O NOME FANTASIA DO CLIENTE'
+            StyledSettings = []
+            CharCase = ecUpperCase
+          end
+        end
+        object Label2: TLabel
+          AutoSize = True
+          StyledSettings = []
+          Position.X = 16.000000000000000000
+          Position.Y = 104.000000000000000000
+          Size.Width = 89.000000000000000000
+          Size.Height = 16.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.Font.StyleExt = {00070000000000000004000000}
+          Text = 'Raz'#227'o Social'
+          TabOrder = 5
+        end
+        object RectangleEdtRazaoSocial: TRectangle
+          Fill.Kind = None
+          Margins.Left = 3.000000000000000000
+          Margins.Top = 3.000000000000000000
+          Margins.Right = 10.000000000000000000
+          Margins.Bottom = 3.000000000000000000
+          Position.X = 96.000000000000000000
+          Position.Y = 96.000000000000000000
+          Size.Width = 393.000000000000000000
+          Size.Height = 34.000000000000000000
+          Size.PlatformDefault = False
+          XRadius = 10.000000000000000000
+          YRadius = 10.000000000000000000
+          object EdtRazaoSocial: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            Align = Client
+            StyleLookup = 'transparentedit'
+            TabOrder = 0
+            Margins.Left = 2.000000000000000000
+            Margins.Right = 10.000000000000000000
+            Size.Width = 381.000000000000000000
+            Size.Height = 34.000000000000000000
+            Size.PlatformDefault = False
+            TextPrompt = 'DIGITE AQUI A RAZ'#195'O SOCIAL DO CLIENTE'
+            StyledSettings = []
+            CharCase = ecUpperCase
+          end
+        end
+        object Label3: TLabel
+          AutoSize = True
+          StyledSettings = []
+          Position.X = 8.000000000000000000
+          Position.Y = 160.000000000000000000
+          Size.Width = 89.000000000000000000
+          Size.Height = 16.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.Font.StyleExt = {00070000000000000004000000}
+          Text = 'Nome Fantasia'
+          TabOrder = 4
+        end
+        object Layout3: TLayout
+          Align = Bottom
+          Position.Y = 527.000000000000000000
+          Size.Width = 585.000000000000000000
+          Size.Height = 50.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 7
+          object Image6: TImage
+            MultiResBitmap.Height = 48
+            MultiResBitmap.Width = 48
+            MultiResBitmap = <
+              item
+                Width = 48
+                Height = 48
+                PNG = {
+                  89504E470D0A1A0A0000000D49484452000000300000003008060000005702F9
+                  87000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+                  00E0494441546843ED98C10A8330104443FB8DFDC542BFB1079B290E7848829A
+                  DD6403F360111566DFA827931042082116E299E79DE7F53FB30599C8C60E1710
+                  FCC9B3E5F9E6B12C812C64221B3B5C4AE0E96001C7AAC4519E835DE69416F596
+                  F0C86C62B970B83CB1583C4D9EF4084C97277744C2C8932B42E1E4C919B1B0F2
+                  A425185E9ED444979027A512C7092D4F6A255CE41FFB51EC2CFD0995E4715EBA
+                  16AE444D1ED75BF7427046306C892B62E14ADC110A53A247647A090B8169252C
+                  170F2FE1B1706889E57FAB2CFF630B20184FC7E3152313D96EF242082184B025
+                  A51F39D704527B70A1FD0000000049454E44AE426082}
+                FileName = 
+                  'C:\Users\SERGIO\Documents\GUARANI\Library\baseline_close_black_2' +
+                  '4dp.png'
+              end>
+            Align = Right
+            Cursor = crHandPoint
+            Margins.Right = 50.000000000000000000
+            Position.X = 485.000000000000000000
+            Size.Width = 50.000000000000000000
+            Size.Height = 50.000000000000000000
+            Size.PlatformDefault = False
+            OnClick = Image2Click
+          end
+          object Image7: TImage
+            MultiResBitmap.Height = 48
+            MultiResBitmap.Width = 48
+            MultiResBitmap = <
+              item
+                Width = 48
+                Height = 48
+                PNG = {
+                  89504E470D0A1A0A0000000D49484452000000300000003008060000005702F9
+                  87000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+                  00D1494441546843ED92410AC2401004176F9ED4BF68FC9957DF25BE401FA3F9
+                  81F6440796902CD93D3833D20585468C5B1D4C8410420821FFC91E9E3E6FE321
+                  F10FF88267F9201279BC3A3B62F57DF5C2015EE16EB80A86C43F61FEE48B4FDF
+                  138CB782F15630DE8A0E32BE960DBCC0E370D58659FC16DEA01CD6C3961166F1
+                  6B7887F9A1B523E4BB724FFE1BE2CFFEF372D0F8F0A523CCE39596116EE2959A
+                  11EEE2952523DCC62BA511EEE395B91121E295A91163DDC62BA511EEE395A911
+                  61E2957C44B87845C2C3C613420821A48D94DE1BD3B1680FBCF15D0000000049
+                  454E44AE426082}
+                FileName = 
+                  'C:\Users\SERGIO\Documents\GUARANI\Library\baseline_check_black_2' +
+                  '4dp.png'
+              end>
+            Align = Left
+            Margins.Left = 50.000000000000000000
+            Position.X = 50.000000000000000000
+            OnClick = Image3Click
+          end
+        end
+        object RectangleEdtCNPJ: TRectangle
+          Fill.Kind = None
+          Margins.Left = 3.000000000000000000
+          Margins.Top = 3.000000000000000000
+          Margins.Right = 10.000000000000000000
+          Margins.Bottom = 3.000000000000000000
+          Position.X = 96.000000000000000000
+          Position.Y = 40.000000000000000000
+          Size.Width = 249.000000000000000000
+          Size.Height = 34.000000000000000000
+          Size.PlatformDefault = False
+          XRadius = 10.000000000000000000
+          YRadius = 10.000000000000000000
+          object edtCNPJ: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            Align = Client
+            StyleLookup = 'transparentedit'
+            TabOrder = 0
+            Margins.Left = 2.000000000000000000
+            Margins.Right = 10.000000000000000000
+            Size.Width = 237.000000000000000000
+            Size.Height = 34.000000000000000000
+            Size.PlatformDefault = False
+            TextPrompt = 'DIGITE AQUI O CNPJ DO CLIENTE'
+            StyledSettings = []
+            CharCase = ecUpperCase
+          end
+        end
+        object Label4: TLabel
+          AutoSize = True
+          StyledSettings = []
+          Position.X = 56.000000000000000000
+          Position.Y = 48.000000000000000000
+          Size.Width = 33.000000000000000000
+          Size.Height = 16.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.Font.StyleExt = {00070000000000000004000000}
+          Text = 'CNPJ'
+          TabOrder = 2
+        end
+        object Label5: TLabel
+          AutoSize = True
+          StyledSettings = []
+          Position.X = 40.000000000000000000
+          Position.Y = 272.000000000000000000
+          Size.Width = 49.000000000000000000
+          Size.Height = 16.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.Font.StyleExt = {00070000000000000004000000}
+          Text = 'Telefone'
+          TabOrder = 1
+        end
+        object Rectangle2: TRectangle
+          Fill.Kind = None
+          Margins.Left = 3.000000000000000000
+          Margins.Top = 3.000000000000000000
+          Margins.Right = 10.000000000000000000
+          Margins.Bottom = 3.000000000000000000
+          Position.X = 96.000000000000000000
+          Position.Y = 264.000000000000000000
+          Size.Width = 249.000000000000000000
+          Size.Height = 34.000000000000000000
+          Size.PlatformDefault = False
+          XRadius = 10.000000000000000000
+          YRadius = 10.000000000000000000
+          object edtTelefone: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            Align = Client
+            StyleLookup = 'transparentedit'
+            TabOrder = 0
+            Margins.Left = 2.000000000000000000
+            Margins.Right = 10.000000000000000000
+            Size.Width = 237.000000000000000000
+            Size.Height = 34.000000000000000000
+            Size.PlatformDefault = False
+            TextPrompt = 'DIGITE AQUI OTELEFONE DO CLIENTE'
+            StyledSettings = []
+            CharCase = ecUpperCase
+          end
+        end
+        object Label6: TLabel
+          AutoSize = True
+          StyledSettings = []
+          Position.X = 32.000000000000000000
+          Position.Y = 216.000000000000000000
+          Size.Width = 57.000000000000000000
+          Size.Height = 16.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.Font.StyleExt = {00070000000000000004000000}
+          Text = 'Endere'#231'o'
+          TabOrder = 3
+        end
+        object Rectangle3: TRectangle
+          Fill.Kind = None
+          Margins.Left = 3.000000000000000000
+          Margins.Top = 3.000000000000000000
+          Margins.Right = 10.000000000000000000
+          Margins.Bottom = 3.000000000000000000
+          Position.X = 96.000000000000000000
+          Position.Y = 208.000000000000000000
+          Size.Width = 489.000000000000000000
+          Size.Height = 34.000000000000000000
+          Size.PlatformDefault = False
+          XRadius = 10.000000000000000000
+          YRadius = 10.000000000000000000
+          object edtEndereco: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            Align = Client
+            StyleLookup = 'transparentedit'
+            TabOrder = 0
+            Margins.Left = 2.000000000000000000
+            Margins.Right = 10.000000000000000000
+            Size.Width = 477.000000000000000000
+            Size.Height = 34.000000000000000000
+            Size.PlatformDefault = False
+            TextPrompt = 'DIGITE AQUI O ENDERE'#199'O COMPLETO  DO CLIENTE'
+            StyledSettings = []
+            CharCase = ecUpperCase
+          end
+        end
+      end
+    end
+  end
+  object qryClientes: TFDQuery
+    Connection = DM.ConnFBD
+    SQL.Strings = (
+      'SELECT * FROM CLIENTES')
+    Left = 32
+    Top = 464
+    object qryClientesID: TIntegerField
+      FieldName = 'ID'
+      Origin = 'ID'
+      Required = True
+    end
+    object qryClientesNOMEFANTASIA: TStringField
+      FieldName = 'NOMEFANTASIA'
+      Origin = 'NOMEFANTASIA'
+      Required = True
+      Size = 100
+    end
+    object qryClientesRAZAOSOCIAL: TStringField
+      FieldName = 'RAZAOSOCIAL'
+      Origin = 'RAZAOSOCIAL'
+      Required = True
+      Size = 100
+    end
+    object qryClientesCNPJ: TStringField
+      FieldName = 'CNPJ'
+      Origin = 'CNPJ'
+      Required = True
+    end
+    object qryClientesENDERECO: TStringField
+      FieldName = 'ENDERECO'
+      Origin = 'ENDERECO'
+      Size = 200
+    end
+    object qryClientesTELEFONE: TStringField
+      FieldName = 'TELEFONE'
+      Origin = 'TELEFONE'
+      Size = 15
+    end
+  end
+  object BindSourceDB1: TBindSourceDB
+    DataSet = qryClientes
+    ScopeMappings = <>
+    Left = 232
+    Top = 400
+  end
+  object BindingsList1: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 148
+    Top = 461
+    object LinkGridToDataSourceBindSourceDB1: TLinkGridToDataSource
+      Category = 'Quick Bindings'
+      DataSource = BindSourceDB1
+      GridControl = GridBindSourceDB1
+      Columns = <
+        item
+          MemberName = 'CNPJ'
+          Width = 120
+        end
+        item
+          MemberName = 'RAZAOSOCIAL'
+          Header = 'RAZ'#195'O SOCIAL'
+          Width = 200
+        end
+        item
+          MemberName = 'NOMEFANTASIA'
+          Header = 'NOME FANTASIA'
+          Width = 220
+        end>
+    end
+  end
+end

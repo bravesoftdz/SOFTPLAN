@@ -1,0 +1,39 @@
+unit Guarani.Controller.Produto;
+
+interface
+
+uses System.SysUtils, System.Types, System.UITypes, System.Classes,
+     System.Variants, FMX.Dialogs;
+
+type
+  TControlProduto = class
+  private
+
+  public
+    procedure Gravar(Produto: TProduto);
+  end;
+
+implementation
+
+{ TControlProduto }
+
+uses Guarani.Model.Produto;
+
+procedure TControlProduto.Gravar(Produto: TProduto);
+begin
+  if Produto.ID = 0 then
+    raise Exception.Create('Id do produto em branco');
+
+  if Produto.Descricao = '' then
+    raise Exception.Create('Descrição em branco');
+
+  if Produto.Marca = '' then
+    raise Exception.Create('Marca em branco');
+
+  if Produto.Preco <= 0 then
+    raise Exception.Create('Preço em branco');
+
+  Produto.Gravar(Produto);
+end;
+
+end.

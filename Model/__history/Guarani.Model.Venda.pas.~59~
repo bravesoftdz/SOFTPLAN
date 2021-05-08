@@ -1,0 +1,175 @@
+unit Guarani.Model.Venda;
+
+interface
+
+uses SysUtils, System.Generics.Collections,
+     FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
+     FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
+     FireDAC.Phys.FB, FireDAC.Phys.FBDef, FireDAC.FMXUI.Wait, Data.DB,
+     FireDAC.Comp.Client, FireDAC.Stan.Intf, FireDAC.Dapt,
+     Guarani.Model.ClienteJuridica, Guarani.Model.Pedido, Guarani.Model.Produto,
+     Guarani.Model.PedidoItem, Guarani.Model.ConexaoBD;
+
+type
+  TStatus = (Navegacao, Inclusao, Alteracao);
+
+  TVenda = class
+  private
+    FPedido: TPedido;
+    FCliente: TClienteJuridica;
+    FItems: TObjectList<TPedidoItem>;
+    Status: TStatus;
+    procedure LimpaVenda();
+  public
+    constructor Create();
+    property Pedido: TPedido read FPedido write FPedido;
+    property Cliente: TClienteJuridica read FCliente write FCliente;
+    property Items: TObjectList<TPedidoItem> read FItems write FItems;
+
+    function AddCliente(const IdCliente: Integer): Boolean;
+    function AddItem(const Item: TProduto): Boolean;
+
+    {CRUD}
+    function Incluir: Boolean;
+    function Buscar(const IdPedido: Integer): Boolean;
+    function Alterar: Boolean;
+
+    function Gravar: Boolean;
+    function Excluir(const IdPedido: Integer): Boolean;
+  end;
+
+implementation
+
+Var Conexao: TConexao;
+
+
+{ TVenda }
+
+function TVenda.AddCliente(const IdCliente: Integer): Boolean;
+begin
+  Result := False;
+
+  if not FCliente.Buscar(IdCliente) then
+    raise Exception.Create('Cliente não encontrado!');
+
+  Result := True;
+end;
+
+function TVenda.AddItem(const Item: TProduto): Boolean;
+begin
+
+end;
+
+function TVenda.Alterar: Boolean;
+begin
+
+end;
+
+function TVenda.Buscar(const IdPedido: Integer): Boolean;
+Var Query  : TFDQuery;
+    sSQL   : String;
+    Item   : TPedidoItem;
+    idItem : Integer;
+begin
+  if not FPedido.Buscar(IdPedido) then
+    raise Exception.Create('Pedido não encontrado!');
+
+  if not FCliente.Buscar(FPedido.IdCliente) then
+    raise Exception.Create('Erro ao carregar Cliente');
+
+  try
+    Item := Item.Create;
+    sSQL := 'SELECT * FROM PEDIDOITEMS WHERE IDPEDIDO = :IDPEDIDO';
+
+    Conexao := TConexao.Create;
+    Query   := TFDQuery.Create(nil);
+
+    with Query do
+    begin
+      Close;
+      SQL.Clear;
+      SQL.Add(sSQL);
+      Open;
+
+      while not Eof do
+      begin
+        FieldByName('ID').AsInteger;
+
+        FItems.Add(Item);
+        Next;
+      end;
+
+    end;
+
+  finally
+    Conexao.Free;
+    Query.Free;
+  end;
+
+
+end;
+
+constructor TVenda.Create;
+begin
+  FCliente := TClienteJuridica.Create();
+  FPedido  := TPedido.Create();
+  FItems   := TObjectList<TPedidoItem>.Create(True);
+
+  LimpaVenda;
+end;
+
+function TVenda.Excluir(const IdPedido: Integer): Boolean;
+begin
+  Result := False;
+
+  if not Status = Alteracao then exit;
+  
+
+  if FPedido.Buscar(IdPedido) then
+  begin
+    if not FPedido.Apagar then
+      raise Exception.Create('Erro ao excluir o Pedido');
+  end;
+
+  Result := True;
+end;
+
+function TVenda.Gravar: Boolean;
+begin
+
+end;
+
+function TVenda.Incluir: Boolean;
+begin
+  Result := False;
+
+  if not FPedido.Incluir then
+    raise Exception.Create('Houve um erro ao incluir um novo pedido!');
+
+  Result := True;
+  Status := Inclusao;
+end;
+
+procedure TVenda.LimpaVenda;
+begin
+  with FCliente do
+  begin
+    Id := 0;
+    NomeFantisia := '';
+    RazaoSocial  := '';
+    CNPJ         := '';
+    Endereco     := '';
+    Telefone     := '';
+  end;
+
+  with FPedido do
+  begin
+    id         := 0;
+    DataPedido := StrtoDate('01/01/1900');
+    IdCliente  := 0;
+  end;
+
+  FItems.Clear;
+end;
+
+end.

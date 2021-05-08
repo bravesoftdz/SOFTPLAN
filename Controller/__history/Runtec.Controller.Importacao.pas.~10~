@@ -1,0 +1,72 @@
+unit Runtec.Controller.Importacao;
+
+interface
+
+uses idTCPClient, idHTTP, System.JSON, REST.Response.Adapter, System.Classes,
+     SysUtils, Data.DB;
+
+type
+  TRestConsumer = class
+  public
+    HTTP: TidHTTP;
+    constructor Create();
+    destructor Destroy(); override;
+    function GET(servico: string): string;
+    procedure JsonToDataset(aDataset : TDataSet; aJSON : string);
+  end;
+
+implementation
+
+const API = 'https://itunes.apple.com/search?media=music&term=';
+
+{ TRestConsumer }
+
+constructor TRestConsumer.Create;
+begin
+  HTTP := TidHTTP.Create(nil);
+  HTTP.Request.UserAgent := 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Acoo Browser; GTB5; Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1) ; Maxthon; InfoPath.1; .NET CLR 3.5.30729; .NET CLR 3.0.30618)';
+  HTTP.Request.Accept := 'text/javascript';
+  HTTP.Request.ContentType := 'application/json';
+  HTTP.Request.CharSet := 'utf-8';
+  HTTP.Request.ContentEncoding := 'utf-8';
+end;
+
+destructor TRestConsumer.Destroy;
+begin
+  HTTP.Free;
+  inherited;
+end;
+
+function TRestConsumer.GET(servico: string): string;
+begin
+  result := HTTP.Get(API+LowerCase(Trim(servico)));
+end;
+
+procedure TRestConsumer.JsonToDataset(aDataset: TDataSet; aJSON: string);
+var
+  JObj: TJSONArray;
+  vConv : TCustomJSONDataSetAdapter;
+begin
+  if (aJSON = EmptyStr) then
+  begin
+    Exit;
+  end;
+
+  JObj := TJSONObject.ParseJSONValue(aJSON) as TJSONArray;
+  vConv := TCustomJSONDataSetAdapter.Create(Nil);
+
+  try
+    vConv.Dataset := aDataset;
+    vConv.UpdateDataSet(JObj);
+  finally
+    vConv.Free;
+    JObj.Free;
+  end;
+end;
+
+function StringToStream(const AString: string): TStream;
+begin
+   Result := TStringStream.Create(AString);
+end;
+
+end.

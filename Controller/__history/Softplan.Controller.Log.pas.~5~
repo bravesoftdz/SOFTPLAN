@@ -1,0 +1,58 @@
+{-------------------------------------------------------------------------------
+Classe: TControlLog                                              Data:08/05/2021
+Objetivo: Classe de Controle da Model MUSICA
+
+Dev.: Sérgio de Siqueira Silva
+
+Data Alteração:
+Dev.:
+Alteração:
+-------------------------------------------------------------------------------}
+
+unit Softplan.Controller.Log;
+
+interface
+
+uses System.SysUtils, System.Types, System.UITypes, System.Classes,
+     System.Variants, FMX.Dialogs, uEnums, Softplan.Model.Log;
+
+type
+  TControlLog = class
+  private
+    objLog: TLog;
+    FLog: TLog;
+  public
+    constructor Create;
+    destructor Destroy;
+
+    property Log: TLog read objLog write objLog;
+    procedure Acao(Tipo: TAcao; ID: Integer = 0);
+  end;
+
+implementation
+
+
+{ TControlLog }
+
+procedure TControlLog.Acao(Tipo: TAcao; ID: Integer = 0);
+begin
+  case Tipo of
+    tacIncluir:  objLog.Acao(tacIncluir);
+    tacCarregar: objLog.Acao(tacCarregar, ID);
+    tacAlterar:  objLog.Acao(tacAlterar, ID);
+    tacGravar:   objLog.Acao(tacGravar);
+    tacExcluir:  objLog.Acao(tacExcluir, ID);
+  end;
+end;
+
+constructor TControlLog.Create;
+begin
+  objLog := TLog.Create;
+end;
+
+destructor TControlLog.Destroy;
+begin
+  FreeAndNil(objLog);
+end;
+
+end.

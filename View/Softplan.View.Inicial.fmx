@@ -1,0 +1,45 @@
+object frmInicial: TfrmInicial
+  Left = 0
+  Top = 0
+  ClientHeight = 580
+  ClientWidth = 580
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object LayoutContainer: TLayout
+    Align = Client
+    Size.Width = 580.000000000000000000
+    Size.Height = 580.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object LabelAppName: TLabel
+      Align = Bottom
+      StyledSettings = []
+      Margins.Left = 20.000000000000000000
+      Position.X = 20.000000000000000000
+      Position.Y = 541.000000000000000000
+      Size.Width = 560.000000000000000000
+      Size.Height = 17.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      Text = 'APP AVALIA'#199#195'O DELPHI'
+      TabOrder = 0
+    end
+    object LabelDev: TLabel
+      Align = Bottom
+      StyledSettings = []
+      Margins.Left = 20.000000000000000000
+      Margins.Bottom = 5.000000000000000000
+      Position.X = 20.000000000000000000
+      Position.Y = 558.000000000000000000
+      Size.Width = 560.000000000000000000
+      Size.Height = 17.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.StyleExt = {00060000000100000004000000}
+      TextSettings.FontColor = claRoyalblue
+      Text = 'DEV S'#201'RGIO DE SIQUEIRA SILVA'
+      TabOrder = 1
+    end
+  end
+end

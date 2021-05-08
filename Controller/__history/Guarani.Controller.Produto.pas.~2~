@@ -1,0 +1,18 @@
+unit Guarani.Controller.Produto;
+
+interface
+
+uses System.SysUtils, System.Types, System.UITypes, System.Classes,
+     System.Variants, FMX.Dialogs, Guarani.Model.Produto;
+
+type
+  TControlProduto = class
+  private
+
+  public
+    procedure Gravar(Produto: TProduto);
+  end;
+
+implementation
+
+end.

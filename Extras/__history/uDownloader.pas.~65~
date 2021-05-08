@@ -1,0 +1,126 @@
+unit uDownloader;
+
+interface
+
+uses
+  System.Threading, System.Classes, IdHTTP, Winapi.Windows, System.SysUtils,
+  IdComponent, Winapi.Messages, IdSSLOpenSSL;
+
+type
+  TDownloader = class(TThread)
+  private
+    FHTTP: TIdHttp;
+    FURL: String;
+    FDestino: String;
+    SSL: TIdSSLIOHandlerSocketOpenSSL;
+
+    FCancel: Boolean;
+    FProgresso: Int64;
+    FProgressoMax: Int64;
+
+    procedure Download;
+    procedure FHTTPWork(ASender: TObject; AWorkMode: TWorkMode;
+  AWorkCount: Int64);
+    procedure FHTTPWorkBegin(ASender: TObject; AWorkMode: TWorkMode;
+  AWorkCountMax: Int64);
+    procedure FHTTPWorkEnd(Sender: TObject; AWorkMode: TWorkMode);
+  protected
+    procedure Execute; override;
+  public
+    {Atributos}
+    property HTTP: TIdHttp read FHTTP write FHTTP;
+    property CancelarDownload: Boolean read FCancel write FCancel;
+    property Progresso: Int64 read FProgresso write FProgresso;
+    property ProgressoMax: Int64 read FProgressoMax write FProgressoMax;
+
+    {Metodos}
+    constructor Create(URL:String; PathDestino:String);
+    destructor Destroy; override;
+  end;
+
+implementation
+
+{ TDownloader }
+
+
+destructor TDownloader.Destroy;
+begin
+  FHTTP.Disconnect;
+  FreeAndNil(FHTTP);
+  inherited;
+end;
+
+{ TDownloader }
+
+constructor TDownloader.Create(URL: String; PathDestino: String);
+Var Path: String;
+begin
+  inherited Create(True);
+
+  FHTTP := TIdHttp.Create(nil);
+  SSL := TIdSSLIOHandlerSocketOpenSSL.Create(nil);
+  Path := ExtractFileDir(GetCurrentDir) + 'ssleay32.dll';
+  if FileExists(Path) then
+  begin
+    SSL.SSLOptions.Method := sslvSSLv23;
+    SSL.SSLOptions.SSLVersions := [sslvSSLv2,sslvSSLv3,sslvTLSv1,sslvTLSv1_1,sslvTLSv1_2];
+    FHTTP.IOHandler := SSL;
+  end else
+  begin
+    FHTTP.IOHandler := nil;
+  end;
+
+  FHTTP.OnWork := FHTTPWork;
+  FHTTP.OnWorkBegin := FHTTPWorkBegin;
+  FHTTP.OnWorkEnd := FHTTPWorkEnd;
+  FHTTP.ConnectTimeout := 5000;
+  FHTTP.ReadTimeout := 10000;
+
+  FURL := FHTTP.URL.URLEncode(URL);
+  FDestino := PathDestino;
+
+  FreeOnTerminate := True;
+end;
+
+procedure TDownloader.Download;
+var StreamDownload: TFileStream;
+begin
+  try
+
+    StreamDownload := TFileStream.Create(FDestino, fmCreate);
+    FHTTP.Get(FURL, StreamDownload);
+
+  finally
+    if Assigned(StreamDownload) then
+      FreeAndNil(StreamDownload);
+  end;
+end;
+
+procedure TDownloader.Execute;
+begin
+  Download;
+end;
+
+procedure TDownloader.FHTTPWork(ASender: TObject; AWorkMode: TWorkMode;
+  AWorkCount: Int64);
+begin
+  if CancelarDownload then
+  begin
+    FHTTP.Disconnect;
+  end;
+
+  Progresso := AWorkCount;
+end;
+
+procedure TDownloader.FHTTPWorkBegin(ASender: TObject; AWorkMode: TWorkMode;
+  AWorkCountMax: Int64);
+begin
+  CancelarDownload := False;
+end;
+
+procedure TDownloader.FHTTPWorkEnd(Sender: TObject; AWorkMode: TWorkMode);
+begin
+  Progresso := 0;
+end;
+
+end.

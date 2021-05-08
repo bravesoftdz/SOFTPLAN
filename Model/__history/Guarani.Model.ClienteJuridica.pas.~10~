@@ -1,0 +1,250 @@
+unit Guarani.Model.ClienteJuridica;
+
+interface
+
+uses
+  Guarani.Model.Cliente, SysUtils, UITypes, StrUtils, Guarani.Model.ConexaoBD,
+  FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
+  FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
+  FireDAC.Phys.FB, FireDAC.Phys.FBDef, FireDAC.FMXUI.Wait, Data.DB,
+  FireDAC.Comp.Client, FireDAC.Stan.Intf, FireDAC.Dapt;
+
+type
+  TStatus = (Inclusao, Alteracao, Navegacao);
+
+  TClienteJuridica = class(TCliente)
+  private
+    FCNPJ: String;
+    FNomeFantasia: String;
+    FRazaoSocial: String;
+    Status: TStatus;
+    procedure LimpaCliente();
+
+  strict private
+    {CRUD}
+    function Incluir:Boolean;
+    function Buscar(IdCliente: Integer):Boolean;
+    function Alterar(IdCliente: Integer):Boolean;
+
+    function Gravar(ClienteRecebido: TClienteJuridica):Boolean;
+    function Apagar:Boolean;
+  public
+    constructor Create;
+    property CNPJ: String read FCNPJ write FCNPJ;
+    property NomeFantisia: String read FNomeFantasia write FNomeFantasia;
+    property RazaoSocial: String read FRazaoSocial write FRazaoSocial;
+  end;
+
+implementation
+
+var Conexao: TConexao;
+
+{ TClienteJuridica }
+
+
+function TClienteJuridica.Alterar(IdCliente: Integer): Boolean;
+begin
+  Result := False;
+
+  if not Buscar(IdCliente) then exit;
+
+  Status := Alteracao;
+  Result := True;
+end;
+
+function TClienteJuridica.Apagar: Boolean;
+Var Query:   TFDQuery;
+    idAtual: Integer;
+begin
+  Result := False;
+
+  idAtual := Self.Id;
+
+  try
+    Query := TFDQuery.Create(nil);
+    Conexao := TConexao.Create;
+    Query.Connection := Conexao.BD;
+
+    with Query do
+    begin
+      Active := False;
+      SQL.Clear;
+      SQL.Add('DELETE FROM CLIENTES WHERE ID = :ID');
+      ParamByName('ID').AsInteger := idAtual;
+      ExecSQL;
+
+      Active := False;
+      SQL.Clear;
+      SQL.Add('SELECT * FROM CLIENTES WHERE ID = :ID');
+      ParamByName('ID').AsInteger := idAtual;
+      Active := True;
+
+      if RecordCount = 0 then
+        Result := True
+      else
+        Result := False;
+    end;
+  finally
+    Query.Free;
+    Conexao.Free;
+  end;
+end;
+
+function TClienteJuridica.Buscar(IdCliente: Integer): Boolean;
+Var Query: TFDQuery;
+begin
+  Result := False;
+
+  if Status = Inclusao then exit;  
+
+  try
+    Query := TFDQuery.Create(nil);
+    Conexao := TConexao.Create;
+    Query.Connection := Conexao.BD;
+
+    with Query do
+    begin
+      Active := False;
+      SQL.Clear;
+      SQL.Add('SELECT * FROM CLIENTES WHERE ID = :ID');
+      ParamByName('ID').AsInteger := IdCliente;
+      Active := True;
+
+      if RecordCount = 0 then
+        exit
+      else
+        Result := True;
+
+      Self.Id           := FieldByName('ID').AsInteger;
+      Self.NomeFantisia := FieldByName('NOMEFANTASIA').AsString;
+      Self.RazaoSocial  := FieldByName('RAZAOSOCIAL').AsString;
+      Self.CNPJ         := FieldByName('CNPJ').AsString;
+      Self.Endereco     := FieldByName('ENDERECO').AsString;
+      Self.Telefone     := FieldByName('TELEFONE').AsString;
+    end;
+  finally
+    Query.Free;
+    Conexao.Free;
+  end;
+end;
+
+constructor TClienteJuridica.Create;
+begin
+  LimpaCliente;
+end;
+
+function TClienteJuridica.Gravar: Boolean;
+Var Query: TFDQuery;
+begin
+  Result := False;
+
+  if Status = Inclusao then
+  begin
+    try
+      Query := TFDQuery.Create(nil);
+      Conexao := TConexao.Create;
+      Query.Connection := Conexao.BD;
+
+      with Query do
+      begin
+        Active := False;
+        SQL.Clear;
+        SQL.Add('INSERT INTO CLIENTES VALUES(:ID, :NOMEFANTASIA, :RAZAOSOCIAL, :CNPJ, :ENDERECO, :TELEFONE)');
+
+        ParamByName('ID').AsInteger          := Self.Id;
+        ParamByName('NOMEFANTASIA').AsString := Self.NomeFantisia;
+        ParamByName('RAZAOSOCIAL').AsString  := Self.RazaoSocial;
+        ParamByName('CNPJ').AsString         := Self.CNPJ;
+        ParamByName('ENDERECO').AsString     := Self.Endereco;
+        ParamByName('TELEFONE').AsString     := Self.Telefone;
+        ExecSQL;
+
+        if Buscar(Id) then
+          Result := True
+        else
+          Result := False;
+      end;
+    finally
+      Query.Free;
+      Conexao.Free;
+    end;
+  end;
+
+  if Status = Alteracao then
+  begin
+      try
+      Query := TFDQuery.Create(nil);
+      Conexao := TConexao.Create;
+      Query.Connection := Conexao.BD;
+
+      with Query do
+      begin
+        Active := False;
+        SQL.Clear;
+        SQL.Add('UPDATE CLIENTES SET NOMEFANTASIA = :NOMEFANTASIA,'
+                                  +' RAZAOSOCIAL = :RAZAOSOCIAL ,'
+                                  +' CNPJ = :CNPJ,'
+                                  +' ENDERECO = :ENDERECO,'
+                                  +' TELEFONE = :TELEFONE'
+                   +' WHERE ID = :ID');
+
+        ParamByName('ID').AsInteger          := Self.Id;
+        ParamByName('NOMEFANTASIA').AsString := Self.NomeFantisia;
+        ParamByName('RAZAOSOCIAL').AsString  := Self.RazaoSocial;
+        ParamByName('CNPJ').AsString         := Self.CNPJ;
+        ParamByName('ENDERECO').AsString     := Self.Endereco;
+        ParamByName('TELEFONE').AsString     := Self.Telefone;
+        ExecSQL;
+
+        Result := True
+      end;
+    finally
+      Query.Free;
+      Conexao.Free;
+    end;
+  end;
+
+  LimpaCliente;
+end;
+
+function TClienteJuridica.Incluir: Boolean;
+Var Query: TFDQuery;
+begin
+  Result := False;
+
+  try
+    Query := TFDQuery.Create(nil);
+    Conexao := TConexao.Create;
+    Query.Connection := Conexao.BD;
+
+    with Query do
+    begin
+      Active := False;
+      SQL.Clear;
+      SQL.Add('SELECT MAX(ID)+1 AS NOVOID FROM CLIENTES');
+      Active := True;
+
+      LimpaCliente;
+      Id := FieldByName('NOVOID').AsInteger;
+      if Id = 0 then Id := 1;
+    end;
+  finally
+    Query.Free;
+    Conexao.Free;
+  end;
+
+  Status := Inclusao;
+end;
+
+procedure TClienteJuridica.LimpaCliente;
+begin
+  Id           := 0;
+  NomeFantisia := '';
+  RazaoSocial  := '';
+  CNPJ         := '';
+  Endereco     := '';
+  Telefone     := '';
+  Status       := Navegacao;
+end;
+
+end.

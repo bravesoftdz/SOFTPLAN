@@ -1,0 +1,18 @@
+object DM: TDM
+  OldCreateOrder = False
+  Height = 150
+  Width = 215
+  object ConnFBD: TFDConnection
+    ConnectionName = 'ConexaoFB'
+    Params.Strings = (
+      'Database=C:\Users\SERGIO\Documents\GUARANI\DataBase\GUARANI.FDB'
+      'User_Name=SYSDBA'
+      'Password=masterkey'
+      'CharacterSet=WIN1252'
+      'DriverID=FB')
+    Connected = True
+    LoginPrompt = False
+    Left = 72
+    Top = 32
+  end
+end

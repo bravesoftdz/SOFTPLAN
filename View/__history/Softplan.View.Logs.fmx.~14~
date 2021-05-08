@@ -1,0 +1,709 @@
+object frmLogs: TfrmLogs
+  Left = 0
+  Top = 0
+  ClientHeight = 594
+  ClientWidth = 594
+  StyleBook = StyleBook1
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnActivate = FormActivate
+  OnDestroy = FormDestroy
+  DesignerMasterStyle = 0
+  object LayoutContainer: TLayout
+    Align = Client
+    Size.Width = 594.000000000000000000
+    Size.Height = 594.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object TabControl: TTabControl
+      Align = Client
+      Size.Width = 594.000000000000000000
+      Size.Height = 594.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'TabControlClientesStyle1'
+      TabIndex = 0
+      TabOrder = 0
+      TabPosition = None
+      Sizes = (
+        594s
+        594s
+        594s
+        594s)
+      object TabListagemClientes: TTabItem
+        CustomIcon = <
+          item
+          end>
+        IsSelected = True
+        Size.Width = 8.000000000000000000
+        Size.Height = 8.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = ''
+        TabOrder = 0
+        Text = 'Listagem'
+        ExplicitSize.cx = 8.000000000000000000
+        ExplicitSize.cy = 8.000000000000000000
+        object Grid: TStringGrid
+          Align = Top
+          CanFocus = True
+          ClipChildren = True
+          Margins.Left = 20.000000000000000000
+          Margins.Top = 10.000000000000000000
+          Margins.Right = 20.000000000000000000
+          Position.X = 20.000000000000000000
+          Position.Y = 163.000000000000000000
+          Size.Width = 554.000000000000000000
+          Size.Height = 422.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+          RowCount = 0
+          Options = [ColumnResize, ColumnMove, ColLines, RowLines, RowSelect, Tabs, Header, HeaderClick, AutoDisplacement]
+          Viewport.Width = 550.000000000000000000
+          Viewport.Height = 397.000000000000000000
+          object StringColumn1: TStringColumn
+            Header = 'Track ID'
+            Size.Width = 60.000000000000000000
+          end
+          object StringColumn2: TStringColumn
+            Header = 'Artist Name'
+            Size.Width = 135.000000000000000000
+          end
+          object StringColumn3: TStringColumn
+            Header = 'Collection Name'
+            Size.Width = 160.000000000000000000
+          end
+          object StringColumn4: TStringColumn
+            Header = 'Track Name'
+            Size.Width = 140.000000000000000000
+          end
+          object StringColumn5: TStringColumn
+            Header = 'Nota'
+            Size.Width = 35.000000000000000000
+          end
+        end
+        object LayoutAcoesPesquisa: TLayout
+          Align = Top
+          Margins.Left = 20.000000000000000000
+          Margins.Top = 30.000000000000000000
+          Margins.Right = 20.000000000000000000
+          Position.X = 20.000000000000000000
+          Position.Y = 30.000000000000000000
+          Size.Width = 554.000000000000000000
+          Size.Height = 123.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          object Label1: TLabel
+            AutoSize = True
+            StyledSettings = []
+            Position.Y = 16.000000000000000000
+            Size.Width = 41.000000000000000000
+            Size.Height = 16.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            Text = 'BUSCA'
+            TabOrder = 2
+          end
+          object RectangleEdtNomeFantasia: TRectangle
+            Fill.Kind = None
+            Margins.Left = 3.000000000000000000
+            Margins.Top = 3.000000000000000000
+            Margins.Right = 10.000000000000000000
+            Margins.Bottom = 3.000000000000000000
+            Position.X = 48.000000000000000000
+            Position.Y = 8.000000000000000000
+            Size.Width = 505.000000000000000000
+            Size.Height = 34.000000000000000000
+            Size.PlatformDefault = False
+            XRadius = 10.000000000000000000
+            YRadius = 10.000000000000000000
+            object edtPesquisa: TEdit
+              Touch.InteractiveGestures = [LongTap, DoubleTap]
+              Align = Client
+              StyleLookup = 'transparentedit'
+              TabOrder = 0
+              Margins.Left = 2.000000000000000000
+              Margins.Right = 5.000000000000000000
+              Size.Width = 455.000000000000000000
+              Size.Height = 34.000000000000000000
+              Size.PlatformDefault = False
+              TextPrompt = 'SELECIONE UMA OP'#199#195'O E DIGITE AQUI A BUSCA'
+              StyledSettings = []
+              CharCase = ecUpperCase
+              OnKeyDown = edtPesquisaKeyDown
+            end
+            object btnPesquisar: TImage
+              MultiResBitmap.Height = 48
+              MultiResBitmap.Width = 48
+              MultiResBitmap = <
+                item
+                  Width = 48
+                  Height = 48
+                  PNG = {
+                    89504E470D0A1A0A0000000D49484452000000300000003008060000005702F9
+                    87000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+                    01DE494441546843ED98BB4AC440148657B154D0D24B258885A59DA060E10B58
+                    F802BE838ABADA586AE55B58588BF7C7F0025A088AAD6261E1E5FFE5040EC324
+                    2699CC6413E6838FB39B9D3973C924996C271289446AA54F6219A6E0325C8493
+                    70149217F800AFE031BC873DC52CBC803F396559D6A99D017808BFA1ADA359B2
+                    0EEB32472D8CC04B68EB5C119983B982C2594BEBFC195C85BC1E06457EE631FE
+                    66ABC35C41CF044FBDD9895BB800FF836558D6ACCF9C41E0C567AEF96B380CF3
+                    C2B2ACA3733067900BFB1CEA86399B453A9FC03AE699606EAF4C43DD20CDB36C
+                    D2605D331FDBF0C61AD48D9D42579843E7641B4EF44BB4B12431E148A20B660E
+                    B38D4AB9817AB6AA38DDE6B2641BDE7883BAB121E80A73E89C6CC389AC251402
+                    97CDE41F59037896983026D10533C7ABC4D2640DE04962C2BC4417CC1C8F124B
+                    933500EE65342B125D3073787D98857890CD40AFF8DC4A9C40EFF8DACC7DC139
+                    18041FDBE97D188CAA5F683EE1040C4A55AF94ECBCFEBE0B83E1FA527F00C7D5
+                    B1C41D1894A27FABF06EA32F585B99E083205CEBEB901DBC83EFF003F2E9CA63
+                    1BD0769FE7B2B10DA20B1B0367BCB583D8868D8133DEDA416CC1C6C0196FED20
+                    36612A75BF526AF660A3D67E1A5C36B966BF9761C71BDBF9482412690C9DCE2F
+                    042F2C59CBE11DDF0000000049454E44AE426082}
+                  FileName = 
+                    'C:\Users\SERGIO\Documents\GUARANI\Library\baseline_search_black_' +
+                    '24dp.png'
+                end>
+              Align = Right
+              Cursor = crHandPoint
+              Margins.Right = 10.000000000000000000
+              Position.X = 462.000000000000000000
+              Size.Width = 33.000000000000000000
+              Size.Height = 34.000000000000000000
+              Size.PlatformDefault = False
+              OnClick = btnPesquisarClick
+            end
+          end
+          object LayoutAcoes: TLayout
+            Align = Bottom
+            Position.Y = 73.000000000000000000
+            Size.Width = 554.000000000000000000
+            Size.Height = 50.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 4
+            object btnVotar: TRectangle
+              Align = Left
+              Cursor = crHandPoint
+              Fill.Kind = None
+              Size.Width = 97.000000000000000000
+              Size.Height = 50.000000000000000000
+              Size.PlatformDefault = False
+              Stroke.Kind = None
+              OnClick = btnVotarClick
+              object imgAlterar: TImage
+                MultiResBitmap.Height = 48
+                MultiResBitmap.Width = 48
+                MultiResBitmap = <
+                  item
+                    Width = 48
+                    Height = 48
+                    PNG = {
+                      89504E470D0A1A0A0000000D49484452000000300000003008060000005702F9
+                      87000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+                      02D1494441546843EDD84BC80D611CC7F1E34E2CDC6FB9968592CB421252C206
+                      91624572896C5DB2602359C9CEC2AD140B898552B66281055928A4506E91BBA4
+                      502EDFDF39CF537F4F33E7CC99F73CD3999A5F7D9AE7CC3CF33CCFBCEF99799E
+                      39B52A55AA44CD3CA7B439E79432A3F1C351394A7ABB6D8C6CC7006787769429
+                      7DF1127F1D95B5AF3459073F786F3D4A93EB082FE0064A91590807EFCD46D7E7
+                      24ECA09F98F269747586E13BEC05EC36651D1B8EAECD1ED8C14B78517BD195D1
+                      9CF21476F0A29C82FFFC0C31E79FDC59053B704F096FECD5E8487AB96D968C80
+                      BE0E13300A43311E63A0FD8BA063617C1F7A8C2E6E146BAF70079FA049EE832B
+                      BFC15B577E879649BA809D988FC9D00DA7814E42DEF83E34915D6C1433E73574
+                      311FF102B771024DA3BF66D24494974FB8BC6897C6A4B1FD97B4AF507F9CC186
+                      FAA79EC5F631079ACCC641FF5D7D15F5B55359A62029E7B105BFEA9FDAC82124
+                      FD35DAD14E364183B4E71F468FB21961A3EDC89A83B0E7A9CFADE84896E20B6C
+                      0759B54A3F9C853DE72B96A3A39981E7B01D65D12C7AC25D83ADAFA7CD4C44C9
+                      58DC85EDB095B4E8867D005BF71E34B744CD605C81EDB899A46866D6A465EB5D
+                      C51014923E38063B80344959095BE738D466A1D1EF3D76106992A209E9377C9D
+                      05C8959EAC0A17BA6D9E7CC6C346B19EDC6D15710103DD36CC4DB755B4102C3C
+                      E14D9846AF942B1066237C9DF7485BD644C934D8416671195AE1FA4C853D3E1D
+                      8545CB0BDB79567AB5DC0F2D1615BD17F863DBB4A3A8E8D7053BB034F79D70FF
+                      632CC305B34FABDFC2F208764021AD657641EF00A2B2F685F5EC7DA48B2A2423
+                      F107762096D6EE49CB01EDD3B1A473446D46FB15DB660D9206A0E7FA12B48AEA
+                      A86E521B6B113D47603BFD867DD0B2386B5457E7E85CDBD65144CF2DF80E2F61
+                      22F246E7AA0DDF9E5EDAA346B3EA4FE886EBE40B87DA529B6A7B9076C4CA5C1C
+                      807F8E77326A536DAB8F2A55AA5429456AB57F4B118E46310157320000000049
+                      454E44AE426082}
+                    FileName = 
+                      'C:\Users\SERGIO\Documents\RUNTEC\Teste 1\Library\baseline_star_h' +
+                      'alf_black_24dp.png'
+                  end>
+                Align = Left
+                Cursor = crHandPoint
+                Locked = True
+                Hint = 'Votar e Visitar URL'
+                HitTest = False
+                Margins.Left = 10.000000000000000000
+                Position.X = 10.000000000000000000
+                Size.Width = 33.000000000000000000
+                Size.Height = 50.000000000000000000
+                Size.PlatformDefault = False
+                ParentShowHint = False
+                ShowHint = False
+              end
+              object Label14: TLabel
+                Align = Left
+                AutoSize = True
+                StyledSettings = []
+                Locked = True
+                Margins.Left = 5.000000000000000000
+                Position.X = 48.000000000000000000
+                Size.Width = 41.000000000000000000
+                Size.Height = 50.000000000000000000
+                Size.PlatformDefault = False
+                TextSettings.Font.StyleExt = {00070000000000000004000000}
+                Text = 'VOTAR'
+                TabOrder = 1
+              end
+            end
+            object btnExcluir: TRectangle
+              Align = Left
+              Cursor = crHandPoint
+              Fill.Kind = None
+              Margins.Left = 125.000000000000000000
+              Position.X = 222.000000000000000000
+              Size.Width = 104.000000000000000000
+              Size.Height = 50.000000000000000000
+              Size.PlatformDefault = False
+              Stroke.Kind = None
+              OnClick = btnExcluirClick
+              object imgExcluir: TImage
+                MultiResBitmap.Height = 48
+                MultiResBitmap.Width = 48
+                MultiResBitmap = <
+                  item
+                    Width = 48
+                    Height = 48
+                    PNG = {
+                      89504E470D0A1A0A0000000D49484452000000300000003008060000005702F9
+                      87000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+                      00AA494441546843EDD9B10DC23014846187392832029B311A03D0526404B6A0
+                      808E02CED28B4491C246718E90FF934EAF89E47745DC3801C0DF382AAFC2E46F
+                      7F4ACDF2636629D1C52C910F5D52D16EBB98AB45016C5DCD2D346A7D1B55EDC4
+                      4FEC4601370AB851C08D026E1470A3801B05DC28E04601370AB86DB2C023660B
+                      D798C5BE2930C46CE112B3A983F2543E1F2BE6C84DD92B8BC825CECA5D995AA6
+                      2679F193D22B00B02A29BD015F4946E7FF0B92CA0000000049454E44AE426082}
+                    FileName = 
+                      'C:\Users\SERGIO\Documents\RUNTEC\Teste 1\Library\baseline_delete' +
+                      '_black_24dp.png'
+                  end>
+                Align = Left
+                Cursor = crHandPoint
+                Locked = True
+                Hint = 'Excluir M'#250'sica Selecionada'
+                HitTest = False
+                Margins.Left = 5.000000000000000000
+                Position.X = 5.000000000000000000
+                Size.Width = 33.000000000000000000
+                Size.Height = 50.000000000000000000
+                Size.PlatformDefault = False
+                ParentShowHint = False
+                ShowHint = False
+              end
+              object Label15: TLabel
+                Align = Left
+                AutoSize = True
+                StyledSettings = []
+                Locked = True
+                Margins.Left = 5.000000000000000000
+                Position.X = 43.000000000000000000
+                Size.Width = 60.000000000000000000
+                Size.Height = 50.000000000000000000
+                Size.PlatformDefault = False
+                TextSettings.Font.StyleExt = {00070000000000000004000000}
+                Text = 'EXCLUIR'
+                TabOrder = 1
+              end
+            end
+            object btnExcluirAll: TRectangle
+              Align = Left
+              Cursor = crHandPoint
+              Fill.Kind = None
+              Margins.Left = 125.000000000000000000
+              Position.X = 451.000000000000000000
+              Size.Width = 99.000000000000000000
+              Size.Height = 50.000000000000000000
+              Size.PlatformDefault = False
+              Stroke.Kind = None
+              OnClick = btnExcluirAllClick
+              object btnExcluirTodas: TImage
+                MultiResBitmap.Height = 48
+                MultiResBitmap.Width = 48
+                MultiResBitmap = <
+                  item
+                    Width = 48
+                    Height = 48
+                    PNG = {
+                      89504E470D0A1A0A0000000D49484452000000300000003008060000005702F9
+                      87000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+                      00B9494441546843EDD5DD0DC2300C46D1C01A0CCB34DD8369786207C827A512
+                      202B24ADA9FB738F64E5A5756CC9491200001DAE399E3F42DFAC524BF1632CD6
+                      C4A9ACEF54C03F597B4E762EEB66D1008EAE762378DF46DF7B4DCDFF9187431C
+                      6DF30D449E01178C5034CE4087B9EF80592B23148D33D08177C04203D1D6FC0E
+                      349D194628DAAE1BB897D583954B335E8B26B5066E65F5E099ABD925C723876E
+                      8B39A11CCA15421B0F3934025671B5D03FFA37AC7800C0DEA5F402AAB441AB9A
+                      460D1C0000000049454E44AE426082}
+                    FileName = 
+                      'C:\Users\SERGIO\Documents\RUNTEC\Teste 1\Library\baseline_delete' +
+                      '_sweep_black_24dp.png'
+                  end>
+                Align = Left
+                Cursor = crHandPoint
+                Locked = True
+                HitTest = False
+                Margins.Left = 5.000000000000000000
+                Position.X = 5.000000000000000000
+                Size.Width = 33.000000000000000000
+                Size.Height = 50.000000000000000000
+                Size.PlatformDefault = False
+                ParentShowHint = False
+                ShowHint = False
+              end
+              object Label16: TLabel
+                Align = Left
+                AutoSize = True
+                StyledSettings = []
+                Locked = True
+                Margins.Left = 5.000000000000000000
+                Position.X = 43.000000000000000000
+                Size.Width = 60.000000000000000000
+                Size.Height = 50.000000000000000000
+                Size.PlatformDefault = False
+                TextSettings.Font.StyleExt = {00070000000000000004000000}
+                Text = 'EXCLUIR ARTISTA'
+                TabOrder = 1
+              end
+            end
+          end
+          object chkDataIni: TCheckBox
+            Cursor = crHandPoint
+            Position.X = 304.000000000000000000
+            Position.Y = 48.000000000000000000
+            Size.Width = 89.000000000000000000
+            Size.Height = 19.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 8
+            Text = 'DATA INICIO'
+            OnClick = chkDataIniClick
+          end
+          object chkCodigo: TCheckBox
+            Cursor = crHandPoint
+            IsChecked = True
+            Position.X = 56.000000000000000000
+            Position.Y = 48.000000000000000000
+            Size.Width = 73.000000000000000000
+            Size.Height = 19.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 6
+            Text = 'C'#211'DIGO'
+            OnClick = chkCodigoClick
+          end
+          object chkURL: TCheckBox
+            Cursor = crHandPoint
+            Position.X = 184.000000000000000000
+            Position.Y = 48.000000000000000000
+            Size.Width = 49.000000000000000000
+            Size.Height = 19.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 5
+            Text = 'URL'
+            OnClick = chkURLClick
+          end
+          object chkDataFim: TCheckBox
+            Cursor = crHandPoint
+            Position.X = 472.000000000000000000
+            Position.Y = 48.000000000000000000
+            Size.Width = 73.000000000000000000
+            Size.Height = 19.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 7
+            Text = 'DATA FIM'
+            OnChange = chkDataFimChange
+            OnClick = chkDataIniClick
+          end
+        end
+      end
+      object TabCadastroClientes: TTabItem
+        CustomIcon = <
+          item
+          end>
+        IsSelected = False
+        Size.Width = 8.000000000000000000
+        Size.Height = 8.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = ''
+        TabOrder = 0
+        Text = 'Cadastro'
+        ExplicitSize.cx = 8.000000000000000000
+        ExplicitSize.cy = 8.000000000000000000
+        object LayoutCadastroClientes: TLayout
+          Align = Client
+          Margins.Top = 20.000000000000000000
+          Margins.Bottom = 20.000000000000000000
+          Size.Width = 594.000000000000000000
+          Size.Height = 554.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+          object Layout3: TLayout
+            Align = Bottom
+            Position.Y = 504.000000000000000000
+            Size.Width = 594.000000000000000000
+            Size.Height = 50.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 10
+            object btnCancelar: TImage
+              MultiResBitmap.Height = 48
+              MultiResBitmap.Width = 48
+              MultiResBitmap = <
+                item
+                  Width = 48
+                  Height = 48
+                  PNG = {
+                    89504E470D0A1A0A0000000D49484452000000300000003008060000005702F9
+                    87000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+                    00E0494441546843ED98C10A8330104443FB8DFDC542BFB1079B290E7848829A
+                    DD6403F360111566DFA827931042082116E299E79DE7F53FB30599C8C60E1710
+                    FCC9B3E5F9E6B12C812C64221B3B5C4AE0E96001C7AAC4519E835DE69416F596
+                    F0C86C62B970B83CB1583C4D9EF4084C97277744C2C8932B42E1E4C919B1B0F2
+                    A425185E9ED444979027A512C7092D4F6A255CE41FFB51EC2CFD0995E4715EBA
+                    16AE444D1ED75BF7427046306C892B62E14ADC110A53A247647A090B8169252C
+                    170F2FE1B1706889E57FAB2CFF630B20184FC7E3152313D96EF242082184B025
+                    A51F39D704527B70A1FD0000000049454E44AE426082}
+                  FileName = 
+                    'C:\Users\SERGIO\Documents\GUARANI\Library\baseline_close_black_2' +
+                    '4dp.png'
+                end>
+              Align = Right
+              Cursor = crHandPoint
+              Margins.Right = 50.000000000000000000
+              Position.X = 494.000000000000000000
+              Size.Width = 50.000000000000000000
+              Size.Height = 50.000000000000000000
+              Size.PlatformDefault = False
+              OnClick = btnCancelarClick
+            end
+            object btnGravar: TImage
+              MultiResBitmap.Height = 48
+              MultiResBitmap.Width = 48
+              MultiResBitmap = <
+                item
+                  Width = 48
+                  Height = 48
+                  PNG = {
+                    89504E470D0A1A0A0000000D49484452000000300000003008060000005702F9
+                    87000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+                    00D1494441546843ED92410AC2401004176F9ED4BF68FC9957DF25BE401FA3F9
+                    81F6440796902CD93D3833D20585468C5B1D4C8410420821FFC91E9E3E6FE321
+                    F10FF88267F9201279BC3A3B62F57DF5C2015EE16EB80A86C43F61FEE48B4FDF
+                    138CB782F15630DE8A0E32BE960DBCC0E370D58659FC16DEA01CD6C3961166F1
+                    6B7887F9A1B523E4BB724FFE1BE2CFFEF372D0F8F0A523CCE39596116EE2959A
+                    11EEE2952523DCC62BA511EEE395B91121E295A91163DDC62BA511EEE395A911
+                    61E2957C44B87845C2C3C613420821A48D94DE1BD3B1680FBCF15D0000000049
+                    454E44AE426082}
+                  FileName = 
+                    'C:\Users\SERGIO\Documents\GUARANI\Library\baseline_check_black_2' +
+                    '4dp.png'
+                end>
+              Align = Left
+              Cursor = crHandPoint
+              Margins.Left = 50.000000000000000000
+              Position.X = 50.000000000000000000
+              OnClick = btnGravarClick
+            end
+          end
+          object Label7: TLabel
+            AutoSize = True
+            StyledSettings = []
+            Position.X = 80.000000000000000000
+            Position.Y = 8.000000000000000000
+            Size.Width = 57.000000000000000000
+            Size.Height = 16.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.HorzAlign = Trailing
+            Text = 'C'#243'digo'
+            TabOrder = 8
+          end
+          object lblCodigo: TLabel
+            AutoSize = True
+            StyledSettings = []
+            Position.X = 144.000000000000000000
+            Position.Y = 4.000000000000000000
+            Size.Width = 265.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.FontColor = claCrimson
+            Text = '0'
+            TabOrder = 7
+          end
+          object Label8: TLabel
+            AutoSize = True
+            StyledSettings = []
+            Position.X = 16.000000000000000000
+            Position.Y = 96.000000000000000000
+            Size.Width = 121.000000000000000000
+            Size.Height = 16.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.HorzAlign = Trailing
+            Text = 'Data Inicial'
+            TabOrder = 3
+          end
+          object Label9: TLabel
+            AutoSize = True
+            StyledSettings = []
+            Position.X = 32.000000000000000000
+            Position.Y = 138.000000000000000000
+            Size.Width = 105.000000000000000000
+            Size.Height = 16.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.HorzAlign = Trailing
+            Text = 'Data Final'
+            TabOrder = 2
+          end
+          object Label10: TLabel
+            AutoSize = True
+            StyledSettings = []
+            Position.X = 112.000000000000000000
+            Position.Y = 43.000000000000000000
+            Size.Width = 25.000000000000000000
+            Size.Height = 16.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.HorzAlign = Trailing
+            Text = 'URL'
+            TabOrder = 1
+          end
+          object lblDataInicial: TLabel
+            AutoSize = True
+            StyledSettings = []
+            Position.X = 144.000000000000000000
+            Position.Y = 93.000000000000000000
+            Size.Width = 441.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.FontColor = claDimgray
+            Text = '00/00/0000 00:00:00'
+            TabOrder = 6
+          end
+          object lblURL: TLabel
+            AutoSize = True
+            Cursor = crHandPoint
+            StyledSettings = []
+            HitTest = True
+            Position.X = 144.000000000000000000
+            Position.Y = 43.000000000000000000
+            Size.Width = 441.000000000000000000
+            Size.Height = 16.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.FontColor = claBlue
+            Text = 'URL'
+            TabOrder = 4
+            OnClick = lblURLClick
+          end
+          object Image1: TImage
+            MultiResBitmap.Height = 48
+            MultiResBitmap.Width = 48
+            MultiResBitmap = <
+              item
+                Width = 48
+                Height = 48
+                PNG = {
+                  89504E470D0A1A0A0000000D49484452000000300000003008060000005702F9
+                  87000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+                  02C9494441546843ED99CBAF0C41148787201E0B8947723D8288B047B858B1F2
+                  0F88B0B4B7146C118F3DC2DE5FE0261616C4CA82B016F12624C4460889E0F745
+                  D5CD9993D33DD377C64C57CC977CA94EF7A957D75475754F67C284FF9C79291D
+                  94F972973C2077C8AD72959C92F05E7E944FE54379473E90BFE558592F2FC9B7
+                  92C634F1B53C2FD7CA91B3525E933F64D4B8267E9797E50A39128EC84F326ACC
+                  20F2133B24FF190BE47519558E3F8373B793FE7C149BBD22A96BA82C95B76454
+                  E13B79525E34E7F0ABDC9CE4D85E23963CE4B5E7B33372891C0ADC8DA8F1DC45
+                  26E142B948FAC69C93198EED3562C943DE0B321A113A31949160B2FAC25FCA69
+                  993926ED75E6C87299E1D8CF1BF264F6C857D25EC7AB722098B0BED0677283B4
+                  3C9636E6ACF470CEC690C7B2513E9736060FCB39C152E9EFDA0BC9DA6FD9226D
+                  0C4BEB1AE9E19C5F76C96BE1C630BA3686D5694E4B2CC3670BE277BA577A4E48
+                  1B775356C1351B4B5ECF3EE9E7042B5323B8CBFE6E9D9111F7A58D3B2AABE09A
+                  8D256F84FFB9F1B05B27FB8695C116D00659F1FA828DD91B1915324ED93BD1B6
+                  9EEC9651016D90B67511F5882D715BD99FD259A20EB09FB71C97BC3744DE9396
+                  83328AB31263A18C280EA9DBB233A5B3441DD896D2CCA39446F8F599E7462F7C
+                  4CDD1AEFEBF66D0B3B90DFA2323C58AAF095F3D0E9858FA9EB80AFDBB72D8435
+                  D74E9CC5B28A6FD2C6B26BED0531360F655441DD3696B675D1D7B2D4009EA023
+                  25EAC0979466EA86F8734A33CB525A072FFB165F86C5D7EDDB1676E0434A339B
+                  521AE12BF78D8B589DD24C5D077CDDBE6D61079EA434B33DA511BE72BFCD8E68
+                  3202BE6EDFB690D3D24E9C36794A76118D001F9DDACADD94D642A78AD9CC4523
+                  F04BDEF87BD82A68136DEB8BE25F68A0E8574A28FEA51E8AFEAC9229FAC31614
+                  FF69118AFEB89BE16E14FB79DD52EC1F1C96A2FF62B28CFD4F3E3E5D0C03F654
+                  45FECD3A6142D9743A7F00F64AAEA0A7E2C8280000000049454E44AE426082}
+                FileName = 
+                  'C:\Users\SERGIO\Documents\RUNTEC\Teste 1\Library\baseline_langua' +
+                  'ge_black_24dp.png'
+              end>
+            Position.X = 91.000000000000000000
+            Position.Y = 36.000000000000000000
+            Size.Width = 20.000000000000000000
+            Size.Height = 33.000000000000000000
+            Size.PlatformDefault = False
+          end
+          object lblDataFinal: TLabel
+            AutoSize = True
+            StyledSettings = []
+            Position.X = 144.000000000000000000
+            Position.Y = 133.000000000000000000
+            Size.Width = 441.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.FontColor = claDimgray
+            Text = '00/00/0000 00:00:00'
+            TabOrder = 5
+          end
+        end
+      end
+    end
+  end
+  object StyleBook1: TStyleBook
+    Styles = <
+      item
+      end
+      item
+        Platform = 'Windows 10 Desktop'
+        ResourcesBin = {
+          464D585F5354594C4520322E35010618546162436F6E74726F6C436C69656E74
+          65735374796C6531032404005450463007544C61796F757400095374796C654E
+          616D650618546162436F6E74726F6C436C69656E7465735374796C653105416C
+          69676E070643656E7465720A53697A652E576964746805000000000000809408
+          400B53697A652E48656967687405000000000000C09808401453697A652E506C
+          6174666F726D44656661756C7408085461624F726465720200000C5442727573
+          684F626A65637400095374796C654E616D6506107363726F6C6C6261636B6772
+          6F756E640B42727573682E436F6C6F72070978464646304630463000000C5453
+          74796C654F626A6563740005416C69676E0708436F6E74656E74730C536F7572
+          63654C6F6F6B7570061B57696E646F7773203130204465736B746F707374796C
+          652E706E670A53697A652E576964746805000000000000809408400B53697A65
+          2E48656967687405000000000000C09808401453697A652E506C6174666F726D
+          44656661756C74080A536F757263654C696E6B0E010E436170496E736574732E
+          4C6566740500000000000000F002400D436170496E736574732E546F70050000
+          0000000000F002400F436170496E736574732E52696768740500000000000000
+          F0024010436170496E736574732E426F74746F6D0500000000000000F002400F
+          536F75726365526563742E4C6566740500000000000000B005400E536F757263
+          65526563742E546F70050000000000000097064010536F75726365526563742E
+          5269676874050000000000000086064011536F75726365526563742E426F7474
+          6F6D0500000000000000CF064000010E436170496E736574732E4C6566740500
+          000000000000B003400D436170496E736574732E546F700500000000000000B0
+          03400F436170496E736574732E52696768740500000000000000B00340104361
+          70496E736574732E426F74746F6D0500000000000000B00340055363616C6505
+          00000000000000C0FF3F0F536F75726365526563742E4C656674050000000000
+          00009306400E536F75726365526563742E546F700500000000000000E0014010
+          536F75726365526563742E52696768740500000000000000EE064011536F7572
+          6365526563742E426F74746F6D0500000000000000F6054000010E436170496E
+          736574732E4C6566740500000000000000F003400D436170496E736574732E54
+          6F700500000000000000F003400F436170496E736574732E5269676874050000
+          0000000000F0034010436170496E736574732E426F74746F6D05000000000000
+          00F00340055363616C6505000000000000008000400F536F7572636552656374
+          2E4C6566740500000000000000C406400E536F75726365526563742E546F7005
+          00000000000000A0024010536F75726365526563742E52696768740500000000
+          0000009F074011536F75726365526563742E426F74746F6D0500000000000000
+          A406400000064F706171756509000000}
+      end>
+  end
+end

@@ -1,0 +1,39 @@
+unit Guarani.View.Configuracoes;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Layouts,
+  FMX.StdCtrls, FMX.Controls.Presentation, FMX.ScrollBox, FMX.Memo;
+
+type
+  TForm2 = class(TForm)
+    LayoutContainer: TLayout;
+    Memo1: TMemo;
+    StyleBook1: TStyleBook;
+    dCliCNPJ: TLabel;
+    lblCli1: TLabel;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    procedure Memo1Change(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form2: TForm2;
+
+implementation
+
+{$R *.fmx}
+
+procedure TForm2.Memo1Change(Sender: TObject);
+begin
+
+end;
+
+end.

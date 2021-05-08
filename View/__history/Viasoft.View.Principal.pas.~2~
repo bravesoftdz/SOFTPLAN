@@ -1,0 +1,129 @@
+{-------------------------------------------------------------------------------
+Programa: Tela Principal                                         Data:10/02/2021
+Objetivo: Tela Principal com o menu de opções do sistema
+
+Dev.: Sérgio de Siqueira Silva
+-------------------------------------------------------------------------------}
+
+unit Viasoft.View.Principal;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects,
+  FMX.Layouts, FMX.Ani, FMX.Controls.Presentation, FMX.StdCtrls;
+
+type
+  TfrmPrincipal = class(TForm)
+    LayoutMenu: TLayout;
+    ImageFundo: TImage;
+    LayoutMaster: TLayout;
+    ImageMenuSuperior: TImage;
+    RectangleMenuClientes: TRectangle;
+    RectangleSelecionado: TRectangle;
+    FloatAnimation1: TFloatAnimation;
+    RectangleMenuMedia: TRectangle;
+    RectangleMenuComplexo: TRectangle;
+    Label3: TLabel;
+    Image1: TImage;
+    Label2: TLabel;
+    Label1: TLabel;
+    Image2: TImage;
+    procedure FormShow(Sender: TObject);
+    procedure ImageMenuSuperiorClick(Sender: TObject);
+    procedure RectangleMenuClientesClick(Sender: TObject);
+    procedure RectangleMenuMediaClick(Sender: TObject);
+    procedure RectangleMenuComplexoClick(Sender: TObject);
+  private
+    { Private declarations }
+    procedure AnimaSelecaoMenu(Inicio,Fim:TPosition);
+    procedure CarregaLayoutMaster(AParent:TControl {Obj Destino}; AForm:TCustomForm {Obj Alvo});
+  public
+    { Public declarations }
+    FActive: TCustomForm;
+  end;
+
+var
+  frmPrincipal: TfrmPrincipal;
+
+implementation
+
+{$R *.fmx}
+
+uses Viasoft.View.Inicial, Viasoft.View.Simples, Viasoft.View.Media,
+  Viasoft.View.Complexo;
+
+//Procedure para Animação do RectangleSelecionado
+procedure TfrmPrincipal.AnimaSelecaoMenu(Inicio, Fim: TPosition);
+begin
+    FloatAnimation1.StartValue := Inicio.Y;
+    FloatAnimation1.StopValue := Fim.Y;
+    FloatAnimation1.Start;
+end;
+
+//Procedure para exibição dos formulários da aplicação no LayoutMaster
+procedure TfrmPrincipal.CarregaLayoutMaster(AParent:TControl {Obj Destino}; AForm:TCustomForm {Obj Alvo});
+var
+  i : integer;
+  Item : TControl;
+  C: string;
+begin
+  //Limpa LayoutMaster
+  if LayoutMaster.ControlsCount > 0 then
+  begin
+    i := Length(AForm.Name);
+    c := Copy(AForm.Name,1,i-2);
+    if Copy(FActive.Name,1,i-2) = c then
+    begin
+      Exit
+    end else
+    begin
+      i := 0;
+      for i := (LayoutMaster.ControlsCount - 1) downto 0 do
+      begin
+        Item := LayoutMaster.Controls[i];
+        LayoutMaster.RemoveObject(0);
+        Item.Free;
+      end;
+    end;
+    end;
+
+  //Insere no LayoutMaster (FormPrincipal) o LayoutContainer (FormAlvo)
+  while AForm.ChildrenCount > 0 do
+  begin
+    AForm.Children[0].Parent:= AParent;
+  end;
+  FActive := AForm;
+end;
+
+procedure TfrmPrincipal.FormShow(Sender: TObject);
+begin
+  CarregaLayoutMaster(LayoutMaster, TfrmInicial.Create(Self));
+end;
+
+procedure TfrmPrincipal.ImageMenuSuperiorClick(Sender: TObject);
+begin
+  CarregaLayoutMaster(LayoutMaster, TfrmInicial.Create(Self));
+  AnimaSelecaoMenu(RectangleSelecionado.Position,ImageMenuSuperior.Position);
+end;
+
+procedure TfrmPrincipal.RectangleMenuComplexoClick(Sender: TObject);
+begin
+  CarregaLayoutMaster(LayoutMaster, TfrmComplexo.Create(Self));
+  AnimaSelecaoMenu(RectangleSelecionado.Position,RectangleMenuComplexo.Position);
+end;
+
+procedure TfrmPrincipal.RectangleMenuMediaClick(Sender: TObject);
+begin
+  CarregaLayoutMaster(LayoutMaster, TfrmMedia.Create(Self));
+  AnimaSelecaoMenu(RectangleSelecionado.Position,RectangleMenuMedia.Position);
+end;
+
+procedure TfrmPrincipal.RectangleMenuClientesClick(Sender: TObject);
+begin
+  CarregaLayoutMaster(LayoutMaster, TfrmSimples.Create(Self));
+  AnimaSelecaoMenu(RectangleSelecionado.Position,RectangleMenuSimples.Position);
+end;
+
+end.

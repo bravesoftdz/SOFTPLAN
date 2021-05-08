@@ -1,0 +1,135 @@
+unit Guarani.View.Clientes.Listagem;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, System.Rtti,
+  FMX.Grid.Style, FMX.Controls.Presentation, FMX.ScrollBox, FMX.Grid,
+  FMX.Layouts, FMX.Objects, FMX.Edit, FMX.StdCtrls,
+  Guarani.View.Clientes.Cadastro, FireDAC.Stan.Intf, FireDAC.Stan.Option,
+  FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
+  FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, Data.DB,
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, Fmx.Bind.Grid,
+  System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt,
+  Fmx.Bind.DBEngExt, Data.Bind.Components, Data.Bind.Grid, Data.Bind.DBScope;
+
+type
+  TfrmClientesListagem = class(TForm)
+    LayoutContainer: TLayout;
+    Layout1: TLayout;
+    Label1: TLabel;
+    RectangleEdtNomeFantasia: TRectangle;
+    edtNomeFantasia: TEdit;
+    Layout2: TLayout;
+    Image1: TImage;
+    Image2: TImage;
+    Image3: TImage;
+    Image4: TImage;
+    qryClientes: TFDQuery;
+    qryClientesID: TIntegerField;
+    qryClientesNOMEFANTASIA: TStringField;
+    qryClientesRAZAOSOCIAL: TStringField;
+    qryClientesCNPJ: TStringField;
+    qryClientesENDERECO: TStringField;
+    qryClientesTELEFONE: TStringField;
+    BindSourceDB1: TBindSourceDB;
+    GridBindSourceDB1: TGrid;
+    LinkGridToDataSourceBindSourceDB1: TLinkGridToDataSource;
+    BindingsList1: TBindingsList;
+    PanelCadastro: TPanel;
+    LayoutCadastroClientes: TLayout;
+    Rectangle1: TRectangle;
+    Edit1: TEdit;
+    Label2: TLabel;
+    RectangleEdtRazaoSocial: TRectangle;
+    EdtRazaoSocial: TEdit;
+    Label3: TLabel;
+    Layout3: TLayout;
+    Image6: TImage;
+    RectangleEdtCNPJ: TRectangle;
+    edtCNPJ: TEdit;
+    Label4: TLabel;
+    Label5: TLabel;
+    Rectangle2: TRectangle;
+    edtTelefone: TEdit;
+    Label6: TLabel;
+    Rectangle3: TRectangle;
+    edtEndereco: TEdit;
+    Image7: TImage;
+    procedure Image1Click(Sender: TObject);
+    procedure edtNomeFantasiaKeyDown(Sender: TObject; var Key: Word;
+      var KeyChar: Char; Shift: TShiftState);
+    procedure Image4Click(Sender: TObject);
+    procedure Image3Click(Sender: TObject);
+    procedure Image2Click(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    FActive: TCustomForm;
+    procedure TelaCadastro();
+    procedure LocalizarCliente();
+  end;
+
+var
+  frmClientesListagem: TfrmClientesListagem;
+
+implementation
+
+{$R *.fmx}
+
+uses Guarani.View.Principal, Guarani.Model.ClienteJuridica,
+  Guarani.Model.DataModule;
+
+
+procedure TfrmClientesListagem.edtNomeFantasiaKeyDown(Sender: TObject;
+  var Key: Word; var KeyChar: Char; Shift: TShiftState);
+begin
+  if Key = vkReturn then
+    LocalizarCliente;
+end;
+
+procedure TfrmClientesListagem.Image1Click(Sender: TObject);
+begin
+  TelaCadastro;
+end;
+
+procedure TfrmClientesListagem.Image2Click(Sender: TObject);
+var Cliente: TClienteJuridica;
+begin
+  try
+    Cliente := TClienteJuridica.Create;
+    Cliente.Buscar(qryClientes.FieldByName('ID').AsInteger);
+
+    if MessageDlg('Deseja realmente apagar o cliente '+ Cliente.RazaoSocial +' ?', System.UITypes.TMsgDlgType.mtConfirmation,
+               [System.UITypes.TMsgDlgBtn.mbYes, System.UITypes.TMsgDlgBtn.mbNO], 0) = mrYes then
+      Cliente.Apagar;
+  finally
+    Cliente.Free;
+  end;
+  qryClientes.Refresh;
+end;
+
+procedure TfrmClientesListagem.Image3Click(Sender: TObject);
+begin
+  TelaCadastro;
+end;
+
+procedure TfrmClientesListagem.Image4Click(Sender: TObject);
+begin
+  LocalizarCliente;
+end;
+
+procedure TfrmClientesListagem.LocalizarCliente;
+begin
+  if edtNomeFantasia.Text <> '' then
+    qryClientes.Locate('NOMEFANTASIA',edtNomeFantasia.Text,[loCaseInsensitive,loPartialKey]);
+end;
+
+procedure TfrmClientesListagem.TelaCadastro();
+begin
+  Panel1.Position.Y := Width + 100;
+end;
+
+end.
