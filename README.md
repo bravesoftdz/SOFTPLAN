@@ -1,2 +1,21 @@
 # SOFTPLAN
-Gerenciador de Downloads | Object Pascal Delphi
+### Gerenciador de Downloads | Object Pascal (Delphi)
+
+* __OBJETIVO:__  
+  FAZER O DOWNLOAD DE ARQUIVOS E GERAR LOGS
+  
+  
+ 
+ * __BANCO DE DADOS:__   
+   SQLite GERADO AUTOMATICAMENTO PELA CLASSE TCONEXAO NA RAIZ DO .EXE
+   
+   
+   
+ * __ARQUITETURA:__   
+   MVC  
+   
+   
+  
+ * __CLASSES:__   
+   TLOG: CLASSE QUE CONTEM AS REGRAS DE NEGOCIO E FAZ A PERSISTÊNCIA   
+   TCONTROLLOG: CLASSE DE CONTROLE DO MODELO MVC
