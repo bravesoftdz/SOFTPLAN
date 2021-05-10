@@ -134,7 +134,7 @@ begin
     FloatAnimation1.Start;
 end;
 
-{Fechar o sistema}
+{Menu: Sair fecha o sistema}
 procedure TfrmPrincipal.RectangleMenuSairClick(Sender: TObject);
 begin
     Close;

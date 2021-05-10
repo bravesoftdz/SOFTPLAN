@@ -1,12 +1,15 @@
 {-------------------------------------------------------------------------------
-Classe: TConexao                                                 Data:01/05/2021
+Classe: TConexao                                                 Data:12/08/2015
 Objetivo: Fornecer uma conexão com o BD
+
+Obs. Aqui pode fornecer varias conexões (Firedac, Unidac, etc.) nesse caso mudar
+     os metodos internos (Exe. TConexao.ConnFD, TConexao.ConnORA e etc.)
 
 Dev.: Sérgio de Siqueira Silva
 
-Data Alteração:
-Dev.:
-Alteração:
+Data Alteração: 08/05/2021
+Dev.: Sérgio de Siqueira Silva
+Alteração: Alterado para simplificar para prova da SOFTPLAN
 -------------------------------------------------------------------------------}
 
 unit Softplan.Model.ConexaoBD;
@@ -51,6 +54,7 @@ begin
 
   DriverSQLite := TFDPhysSQLiteDriverLink.Create(nil);
 
+  //Verifica se o arquivo de dados .DB existe para criar
   if not FileExists(Path) then
     CriarBD := True;
 
@@ -61,6 +65,7 @@ begin
   FConexao.LoginPrompt := False;
   FConexao.Connected := True;
 
+  //Se não achou o .DB executa a instrução CREATE TABLE
   if CriarBD then
     FConexao.ExecSQL(sSQL);
 end;

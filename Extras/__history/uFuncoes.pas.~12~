@@ -1,0 +1,267 @@
+{-------------------------------------------------------------------------------
+Unit Simples: uFuncoes                                           Data:07/05/2021
+Objetivo: Fornecer um pool de uso comum de funções
+
+Dev.: Sérgio de Siqueira Silva
+
+Data Alteração: 09/05/2021
+Dev.: Sérgio de Siqueira Silva
+Alteração: Nova feature "GetURLFileName" que extrai o nome do arquivo de uma URL
+-------------------------------------------------------------------------------}
+
+unit uFuncoes;
+
+{$WARNINGS OFF}
+{$HINTS OFF}
+
+interface
+
+uses System.SysUtils, System.Classes, FMX.Graphics, System.json, Soap.EncdDecd,
+     System.NetEncoding, DateUtils, ShellApi, FMX.Edit, FMX.Dialogs,
+     System.UITypes;
+
+function BMPtoBase64(Bitmap: TBitmap): string;
+function Base64toBMP(const base64: string): TBitmap;
+function QtdeCaracteres(Char, Texto: String): Integer;
+function ValidaEmail(email: String): Boolean;
+function GeraSenha (aQuant: integer): string;
+procedure ConvertBase64ToFile(Base64, FileName: string);
+function ConvertFileToBase64(AInFileName : String) : String;
+function ApplyMask(aMask, aValue: String): String;
+procedure MaskCNPJ(Sender: TObject);
+procedure MaskTelefone(Sender: TObject);
+function GetURLFileName(URL: String): String;
+
+implementation
+
+{Função transforma uma Bitmap em uma String64}
+function BMPtoBase64(Bitmap: TBitmap): string;
+var
+  Input: TBytesStream;
+  Output: TStringStream;
+begin
+  Input := TBytesStream.Create;
+  try
+    Bitmap.SaveToStream(Input);
+    Input.Position := 0;
+    Output := TStringStream.Create('', TEncoding.ASCII);
+    try
+      Soap.EncdDecd.EncodeStream(Input, Output);
+      Result := Output.DataString;
+    finally
+      Output.Free;
+    end;
+  finally
+    Input.Free;
+  end;
+end;
+
+{Função transforma uma String64 em uma Bitmap}
+function Base64toBMP(const base64: string): TBitmap;
+var
+  Input: TStringStream;
+  Output: TBytesStream;
+begin
+  Input := TStringStream.Create(base64, TEncoding.ASCII);
+  try
+    Output := TBytesStream.Create;
+    try
+      Soap.EncdDecd.DecodeStream(Input, Output);
+      Output.Position := 0;
+      Result := TBitmap.Create;
+      try
+        Result.LoadFromStream(Output);
+      except
+        Result.Free;
+        raise;
+      end;
+    finally
+      Output.Free;
+    end;
+  finally
+    Input.Free;
+  end;
+end;
+
+{Retorna Quantos caracteres tem um String}
+function QtdeCaracteres(Char, Texto: String): Integer;
+Var i, total : Integer;
+begin
+  total := 0;
+  Texto := Trim(Texto);
+
+  for i := 1 to Length(Texto) do
+  begin
+    if Texto[i] = Char then
+      Inc(total);
+  end;
+
+  Result := total;
+end;
+
+{Retorna pelo menos se o e-mail tem @ e os .}
+function ValidaEmail(email: String): Boolean;
+begin
+  if (Pos(' ', email) > 0) or (Pos('.', email) = 0) or (QtdeCaracteres('@', email) <> 1) then
+    Result:= False
+  else
+    Result:= True;
+end;
+
+{Gerador de Senhas aleatorias com um numero especifico de caracteres. Exe. GeraSenha(8)}
+function GeraSenha (aQuant: integer): string;
+var
+  i: integer;
+const
+  str = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+begin
+  for i:= 1 to aQuant do
+  begin
+    Randomize;
+    Result := Result + str[Random(Length(str))+1];
+  end ;
+end;
+
+{Converte Base64 para Arquivo}
+procedure ConvertBase64ToFile(Base64, FileName: string);
+var
+  inStream    : TStream;
+  outStream   : TStream;
+  vFile       : String;
+  vStringList : TStringList;
+begin
+  vStringList := TStringList.Create;
+  try
+    vFile    := FormatDateTime('hhmmss',Now);
+    vStringList.Add(Base64);
+    vStringList.SaveToFile(vFile);
+    inStream := TFileStream.Create(vFile, fmOpenRead);
+    try
+      outStream := TFileStream.Create(FileName, fmCreate);
+      try
+        TNetEncoding.Base64.Decode(inStream, outStream);
+      finally
+        outStream.Free;
+      end;
+    finally
+      inStream.Free;
+    end;
+  finally
+    DeleteFile(PChar(vFile));
+    FreeAndNil(vStringList);
+  end;
+end;
+
+{Converte Arquivo JPG para Base64}
+function ConvertFileToBase64(AInFileName : String) : String;
+var
+  inStream    : TStream;
+  outStream   : TStream;
+  vFile       : String;
+  vStringList : TStringList;
+begin
+  inStream    := TFileStream.Create(AInFileName, fmOpenRead);
+  vStringList := TStringList.Create;
+  try
+    vFile := FormatDateTime('hhmmss',Now);
+    outStream := TFileStream.Create(vFile, fmCreate);
+    try
+      TNetEncoding.Base64.Encode(inStream, outStream);
+    finally
+      outStream.Free;
+    end;
+
+    vStringList.LoadFromFile(vFile);
+
+    Result := vStringList.Text;
+  finally
+    DeleteFile(Pchar(vFile));
+    inStream.Free;
+  end;
+end;
+
+{Mascara Telefone}
+procedure MaskTelefone(Sender: TObject);
+Var
+  i: Integer;
+  t: String;
+begin
+  TThread.Queue(Nil,
+   Procedure
+   begin
+   if Length(TEdit(Sender).Text) > 5 then
+     t := Copy(TEdit(Sender).Text,6,1);
+
+   //Verifica se é celular pra mudar a mascara
+   if  t <> '9' then
+   begin
+      TEdit(Sender).Text := ApplyMask('(##) ####-####', TEdit(Sender).Text);
+   end else
+   begin
+      TEdit(Sender).Text := ApplyMask('(##) #.####-####', TEdit(Sender).Text);
+   end;
+   TEdit(Sender).CaretPosition := TEdit(Sender).Text.Length;
+   End);
+end;
+
+{Mascara CNPJ}
+procedure MaskCNPJ(Sender: TObject);
+begin
+   TThread.Queue(Nil,
+   Procedure
+   begin
+   TEdit(Sender).Text := ApplyMask('##.###.###/####-##', TEdit(Sender).Text);
+   TEdit(Sender).CaretPosition := TEdit(Sender).Text.Length;
+   End);
+end;
+
+{Mascaras para numeros  CNPJ(##.###.###/####-##) TEL((##) #.####-####)}
+function ApplyMask(aMask, aValue: String): String;
+Var
+   M, V : Integer;
+   Texto : String;
+begin
+    Result := '';
+    Texto  := '';
+    aMask  := aMask.ToUpper;
+    for V := 0 to aValue.Length-1 do
+       if aValue.Chars[V] In ['0'..'9'] Then
+          Texto := Texto + aValue.Chars[V];
+    M := 0;
+    V := 0;
+    while (V < Texto.Length) And (M < aMask.Length) do
+       Begin
+       While aMask.Chars[M] <> '#' Do
+          Begin
+          Result := Result + aMask.Chars[M];
+          Inc(M);
+          End;
+       Result := Result + Texto.Chars[V];
+       Inc(M);
+       Inc(V);
+       End;
+end;
+
+{Mensagem de Alerta}
+procedure MensagemAlerta(const Mensagem: String);
+begin
+  MessageDlg(Mensagem, TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
+end;
+
+{Retorna o nome do arquivo em um link para Download}
+function GetURLFileName(URL: string): string;
+var
+  i: integer;
+  s: string;
+ begin
+  s := URL;
+  i := Pos('/', s);
+     while i <> 0 do
+  begin
+    Delete(s, 1, i);
+    i := Pos('/', s);
+  end;
+  Result := s;
+end;
+
+end.

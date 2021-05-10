@@ -4,10 +4,9 @@ Objetivo: Tela para download e geração do LOG
 
 Dev.: Sérgio de Siqueira Silva
 
-Data Alteração: 08/05/2021
+Data Alteração: 09/05/2021
 Dev.: Sérgio de Siqueira Silva
-Alteração: Substituição do componente IdHTTP (Indy) por NetHTTP (Net) para o
-           o request em paginas HTTPS
+Alteração: Uso de uma nova classe TDownloadThread
 -------------------------------------------------------------------------------}
 
 unit Softplan.View.Dowload;
@@ -20,9 +19,12 @@ uses
   FMX.Controls.Presentation, FMX.StdCtrls, FMX.Memo, System.IOUtils, FMX.Edit,
   FMX.Objects, FMX.ScrollBox, uEnums, uFuncoes, DateUtils, System.Net.URLClient,
   System.Net.HttpClient, System.Net.HttpClientComponent, Softplan.Controller.Log,
-  System.Threading;
+  uThreadDownload;
 
 type
+  //Enum de opções dos controles
+  TControlesBotoes = (tIniciarDownload, tFimDownload);
+
   TfrmDownload = class(TForm)
     LayoutContainer: TLayout;
     LayoutAcoesPesquisa: TLayout;
@@ -54,17 +56,14 @@ type
     FLog: TControlLog;
     FCodigoLog: Int64;
 
-    FClient: THTTPClient;
-    FGlobalStart: Cardinal;
-    FDownloadStream: TStream;
-    FAsyncResult: IAsyncResult;
-
-    procedure Download(const PathDownload, URL: String);
-    procedure ProcFinalDownload(const AsyncResult: IAsyncResult);
-    procedure ThreadSincronizacaoGUI(const Sender: TObject; AContentLength,
-      AReadCount: Int64; var Abort: Boolean);
+    procedure Controles(const Acao: TControlesBotoes);
+    procedure DadosThread(const Sender: TObject; Tamanho: Int64; Processado: Int64; var Abort: Boolean);
   public
     { Public declarations }
+    [volatile] FParar:  Boolean;
+    [volatile] FFechar: Boolean;
+
+    procedure Download(URL, PathDownload: String);
   end;
 
 var
@@ -76,36 +75,43 @@ implementation
 
 { TfrmImportacao }
 
-{Cancelar: Pede a confirmação e seta FAsyncResult para cancelado abortando Thread}
+{Cancelar: Pede a confirmação para abortar Thread "Download"}
 procedure TfrmDownload.btnCancelarClick(Sender: TObject);
 begin
   if MessageDlg('Deseja realmente abortar o download?',
                 TMsgDlgType.mtWarning,
                 [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], 0) = mrNo then exit;
 
-  btnCancelar.Enabled := False;
-  FAsyncResult.Cancel;
+  //Para a Thread "Download"
+  FParar := True;
+
+  //Informa no memo de resumo que o download foi abortado
+  Memo.Lines.Add('Download abortado!');
+	Application.ProcessMessages;
+
+  Controles(tFimDownload);
 end;
 
 {Download: Confirma se tem algum link digitado, limpa o histórico do download
            anterior, seta o path para download, cria um novo log por fim start
-           a Thread paralela atraves do IAsyncResult}
+           a Thread "Downlaod"}
 procedure TfrmDownload.btnDownloadClick(Sender: TObject);
 var PathDownload: String;
+    URL: String;
 begin
   if edtURL.Text = EmptyStr then
   begin
     ShowMessage('Preencha o link para download!');
     exit;
   end;
+  URL := edtURL.Text;
 
+  //Limpa o memo de resumo do download
   Memo.Lines.Clear;
 
-  //Seleção do diretorio para o download
+  //Seleção do path para o download
   SelectDirectory('Selecione uma pasta de destino','',PathDownload);
   PathDownload := PathDownload + '\' + GetURLFileName(edtURL.Text);
-
-  btnDownload.Enabled := False;
 
   //Inclusão dos dados no objeto de controle do Log
   try
@@ -115,151 +121,192 @@ begin
     FLog.Log.DataIni := Now;
     FLog.Acao(tacGravar);
   except
-    btnDownload.Enabled := True;
-    btnCancelar.Enabled := False;
+    Controles(tFimDownload);
   end;
 
-  //Procedure de Download com 1º Parametro Path para download 2º URL
-  Download(PathDownload, edtURL.Text);
+  //Inicializa a processo de download
+  Controles(tIniciarDownload);
+  FParar      := False;
+  TThread.CreateAnonymousThread(procedure
+  begin
+    Download(URL,PathDownload);
+  end).Start;
 end;
 
-{Exibe o progresso atual}
+{Exibir mensagem: Exibi progresso atual}
 procedure TfrmDownload.btnProgressoAtualClick(Sender: TObject);
+Var Progresso: Single;
 begin
-  ShowMessage('Total de bytes até o momento: ' + ProgressBar.Value.ToString +' bytes');
+  Progresso := ProgressBar.Value / (ProgressBar.Max / 100);
+
+  ShowMessage(Round(Progresso).ToString + '% concluido');
 end;
 
-{Procedure para executar no FINAL do download}
-procedure TfrmDownload.ProcFinalDownload(const AsyncResult: IAsyncResult);
-var LAsyncResponse: IHTTPResponse;
+{Controles Visuais: Botões e Edits}
+procedure TfrmDownload.Controles(const Acao: TControlesBotoes);
 begin
-  try
-    LAsyncResponse := THTTPClient.EndAsyncHTTP(AsyncResult);
+  case Acao of
+    tIniciarDownload  :begin
+                         btnDownload.Enabled       := False;
+                         edtURL.Enabled            := False;
 
-    //Thread de sincronização com a GUI para exibir o resumo do download
+                         btnProgressoAtual.Enabled := True;
+                         btnCancelar.Enabled       := True;
+                       end;
+    tFimDownload       :begin
+                         btnDownload.Enabled       := True;
+                         edtURL.Enabled            := True;
+
+                         btnProgressoAtual.Enabled := False;
+                         btnCancelar.Enabled       := False;
+                       end;
+  end;
+end;
+
+{Download: Procedure para download com dois parametros 1º URL do download 2º
+           path aonde o arquivo ira ser salvo}
+procedure TfrmDownload.Download(URL, PathDownload: String);
+var
+  HTTPClient: THTTPClient;
+  Response: IHTTPResponse;
+  TamTotalDownload: Int64;
+  Stream: TFileStream;
+  Downloader: TDownloadThread;
+  Abortar: Boolean;
+begin
+  //Na Memo de resumo informar o destino do download e a URL solicitada
+  TThread.Synchronize(nil, procedure
+  begin
+    Memo.Lines.Add('Local do arquivo = ' + PathDownload);
+    Memo.Lines.Add('Downloading ' + URL + ' ...');
+    Application.ProcessMessages;
+  end);
+
+  try
+    HTTPClient := THTTPClient.Create;
+
+    if HTTPClient.CheckDownloadResume(URL) then
+    begin
+      Response := HTTPClient.Head(URL);
+
+      //Total de Bytes do download
+      TamTotalDownload := Response.ContentLength;
+
+      //Stream que recebera o donwload
+      try
+        Stream   := TFileStream.Create(PathDownload, fmCreate);
+      finally
+        Stream.Free;
+      end;
+
+      //Estancia da Thread em suspensão
+      Downloader := TDownloadThread.Create(URL,PathDownload);
+      Downloader.ThreadDados := DadosThread;
+
+      TThread.Synchronize(nil, procedure
+      begin
+        ProgressBar.Max := TamTotalDownload;
+        ProgressBar.Min := 0;
+        ProgressBar.Value := 0;
+
+        Controles(tIniciarDownload);
+      end);
+
+      //Inicia a Thread de Download
+      Downloader.Start;
+
+      //Monitoramento de solicitações de Abortar e Fechar (Destroy)
+      Abortar := False;
+      while not Abortar and not FFechar do
+      begin
+        Abortar := True;
+        Abortar := Abortar and Downloader.Finished;
+      end;
+    end else
+    begin
+      {Se HTTPClient não conseguir uma reposta positiva para o download
+      informamos na memo de resumo essa informação}
+      TThread.Synchronize(nil, procedure
+      begin
+        Memo.Lines.Add('Download indisponível!');
+      end);
+    end;
+
+  finally
+    HTTPClient.Free;
+
+    TThread.Synchronize(nil, procedure
+    begin
+     //Verifica se completou o download para gravar no Log
+     if ProgressBar.Max = ProgressBar.Value then
+     begin
+       FLog.Acao(tacCarregar,FCodigoLog);
+       FLog.Acao(tacAlterar);
+       FLog.Log.DataFim := Now;
+       FLog.Acao(tacGravar);
+
+       Memo.Lines.Add('Download concluído!');
+     end;
+
+     //Controle dos botões
+     Controles(tFimDownload);
+    end);
+    FParar := True;
+  end;
+
+end;
+
+{Processa o retorno de dados da Thread "Download" atualizado o progresso}
+procedure TfrmDownload.DadosThread(const Sender: TObject; Tamanho, Processado: Int64; var Abort: Boolean);
+var
+  Cancelado: Boolean;
+begin
+  //Verifica uma solicitação de fechar
+  Cancelado := Abort or FFechar;
+
+  if not Cancelado then
     TThread.Synchronize(nil,
       procedure
       begin
-        if ProgressBar.Max = ProgressBar.Value then
-        begin
-          Memo.Lines.Add('Arquivo baixado!');
-        end else
-        begin
-          Memo.Lines.Add('Download abortado!');
-        end;
+        Cancelado := not btnCancelar.Enabled;
+
+        //Atualizar o ProgressBar
+        ProgressBar.Value := Processado;
       end);
-
-  finally
-    LAsyncResponse := nil;
-    FreeandNil(FDownloadStream);
-
-    //Grava no Log a Data e Hora final do download
-    if ProgressBar.Value = ProgressBar.Max then
-    begin
-    if FLog.Acao(tacCarregar, FCodigoLog) then
-      begin
-        FLog.Acao(tacAlterar);
-        FLog.Log.DataFim := Now;
-        FLog.Acao(tacGravar);
-      end;
-    end;
-
-    //Controle dos botões
-    btnDownload.Enabled       := True;
-    btnProgressoAtual.Enabled := False;
-    btnCancelar.Enabled       := False;
-  end;
-
+  Abort := Cancelado;
 end;
 
-{Download: Procedure para download com dois parametros 1º path aonde o arquivo
-           ira ser salvo e 2º URL do arquivo a ser baixado}
-procedure TfrmDownload.Download(const PathDownload, URL: String);
-var HTTPResponse   :IHTTPResponse;
-    TamanhoArquivo :Int64;
-begin
-  try
-    //Verifica o retorno da URL e armazena no response o tamanho
-    HTTPResponse := FClient.Head(URL);
-    TamanhoArquivo := HTTPResponse.ContentLength;
-    Memo.Lines.Add(Format('Status do serviço: %d - %s', [HTTPResponse.StatusCode, HTTPResponse.StatusText]));
-    HTTPResponse := nil;
 
-    //Manipulação inicial do ProgressBar
-    ProgressBar.Max := TamanhoArquivo;
-    ProgressBar.Min := 0;
-    ProgressBar.Value := 0;
-
-    //Informa o inicio do download no memo
-    Memo.Lines.Add(Format('Fazendo download de: "%s" (%d Bytes)' , [GetURLFileName(URL), TamanhoArquivo]));
-
-    //Criação do arquivo (Stream) que recebera o download
-    FDownloadStream := TFileStream.Create(PathDownload, fmCreate);
-    FDownloadStream.Position := 0;
-
-    //Tempo em milissegundos de start da Thread para calculo do tempo decorrido
-    FGlobalStart := TThread.GetTickCount;
-
-    {IAsyncResult e uma interface que internamente isola o processo em uma Thread
-    paralela aonde inicio o download através do request e já deixa registrado um
-    processo para o final desse processo paralelo}
-    FAsyncResult := FClient.BeginGet(ProcFinalDownload, URL, FDownloadStream);
-
-  finally
-    //Controle dos botões
-    btnDownload.Enabled       := FAsyncResult = nil;
-    btnCancelar.Enabled       := FAsyncResult <> nil;
-    btnProgressoAtual.Enabled := FAsyncResult <> nil;
-  end;
-end;
-
-//Procedure com Thread de sincronização da GUI
-procedure TfrmDownload.ThreadSincronizacaoGUI(const Sender: TObject;
-          AContentLength, AReadCount: Int64; var Abort: Boolean);
-var
-  LTime: Cardinal;
-  LSpeed: Integer;
-begin
-  //Tempo e velocidade se quiser mostrar na tela
-  LTime := TThread.GetTickCount - FGlobalStart;
-  LSpeed := (AReadCount * 1000) div LTime;
-
-  //Atualiza ProgressBar
-  TThread.Queue(nil,
-    procedure
-    begin
-      ProgressBar.Value := AReadCount;
-    end);
-end;
-
-{Na criação do form já instancia o componente de HTTP para o Resquest
- e ja seta a procedure com Thread de sincronização da GUI e cria o objeto
- de controle do Log}
+{Create: Cria o objeto de controle do Log}
 procedure TfrmDownload.FormCreate(Sender: TObject);
 begin
-  FClient := THTTPClient.Create;
-  FClient.OnReceiveData := ThreadSincronizacaoGUI;
-
   FLog := TControlLog.Create;
 end;
 
-//Na destruição faz a liberação dos objetos da memoria
+//Destroy: Na destruição confirma o
 procedure TfrmDownload.FormDestroy(Sender: TObject);
+var
+  I: Integer;
 begin
   if not btnDownload.Enabled then
   begin
     if MessageDlg('Deseja realmente abortar o download?',
-                TMsgDlgType.mtWarning,
-                [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], 0) = mrNo then abort;
+                  TMsgDlgType.mtWarning,
+                  [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], 0) = mrNo then Abort
   end;
+  Application.ProcessMessages;
 
-  //Liberação de objetos da memoria
-  try
-    FLog.Free;
-    FDownloadStream.Free;
-    FClient.Free;
-  except
-    //Anula freak de memoria para usuário
+  //Finaliza a Thread "Download"
+  FFechar := True;
+
+  //Confirma se ainda existe o download
+  if not btnDownload.Enabled then
+  begin
+    while not FParar do
+    begin
+      Application.ProcessMessages;
+      Sleep(1);
+    end;
   end;
 end;
 

@@ -11,7 +11,8 @@ uses
   uFuncoes in 'Extras\uFuncoes.pas',
   Softplan.Model.Log in 'Model\Softplan.Model.Log.pas',
   Softplan.Controller.Log in 'Controller\Softplan.Controller.Log.pas',
-  Softplan.View.Logs in 'View\Softplan.View.Logs.pas' {frmLogs};
+  Softplan.View.Logs in 'View\Softplan.View.Logs.pas' {frmLogs},
+  uThreadDownload in 'Extras\uThreadDownload.pas';
 
 {$R *.res}
 

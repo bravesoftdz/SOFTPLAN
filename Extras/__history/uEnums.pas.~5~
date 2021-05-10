@@ -1,0 +1,14 @@
+unit uEnums;
+
+interface
+
+type
+  //Enum para ações de CRUD
+  TAcao = (tacIncluir, tacCarregar, tacAlterar, tacGravar, tacExcluir);
+
+  //Enum para o status das classes que precisam de CRUD
+  TStatus = (tstNavegando, tstInclusao, tstAlteracao);
+
+implementation
+
+end.

@@ -400,6 +400,7 @@
             <Form>frmLogs</Form>
             <FormType>fmx</FormType>
         </DCCReference>
+        <DCCReference Include="Extras\uThreadDownload.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

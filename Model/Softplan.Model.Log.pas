@@ -1,6 +1,6 @@
 {-------------------------------------------------------------------------------
 Classe: TLog                                                     Data:08/05/2021
-Objetivo: Classe para manipulação da entidade MUSICA
+Objetivo: Classe para manipulação da entidade LOG
 
 Dev.: Sérgio de Siqueira Silva
 

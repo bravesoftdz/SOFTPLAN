@@ -66,13 +66,13 @@ type
     btExcluirTodos: TRectangle;
     imgExluirTodos: TImage;
     Label2: TLabel;
-    StyleBook1: TStyleBook;
     eCodigo: TEdit;
     eDataInicial: TEdit;
     eDataFinal: TEdit;
     eURL: TMemo;
     Label3: TLabel;
     eTotalTempo: TEdit;
+    StyleBook1: TStyleBook;
     procedure edtPesquisaKeyDown(Sender: TObject; var Key: Word;
       var KeyChar: Char; Shift: TShiftState);
     procedure btnPesquisarClick(Sender: TObject);
@@ -88,8 +88,6 @@ type
     procedure eURLClick(Sender: TObject);
   private
     { Private declarations }
-    Show: Boolean;
-
     CtrlLog: TControlLog;
     Query: TFDQuery;
     Conexao: TConexao;
@@ -202,7 +200,7 @@ begin
   FreeAndNil(Query);
 end;
 
-{Procedure de carga de dados dos LOGS para exibição no GRID}
+{Procedure de carga de dados na Query dos LOGS para exibição no GRID}
 procedure TfrmLogs.CarregaLogs(TipoBusca:TTipoBusca);
 var sSQL: String;
 begin
@@ -405,7 +403,7 @@ begin
   end;
 end;
 
-{Procedure para popular a GRID com os dados das pesquisas pela Procedure
+{Procedure para popular a GRID com os dados carregados na Query pela procedure
  CarregaLogs}
 procedure TfrmLogs.PopularGrid;
 var iAux: Integer;

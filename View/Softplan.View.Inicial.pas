@@ -1,12 +1,12 @@
 {-------------------------------------------------------------------------------
-Tela: frmInicial                                                 Data:01/05/2021
-Objetivo: Tela de apresentação da HOME com o logo da empresa
+Tela: frmInicial                                                 Data:08/05/2021
+Objetivo: Tela de apresentação
 
 Dev.: Sérgio de Siqueira Silva
 
-Data Alteração: 02/05/2021
-Dev.: Sérgio de Siqueira Silva
-Alteração: Inclusão de MEMO com algumas informações sobre o projeto do sistema
+Data Alteração:
+Dev.:
+Alteração:
 -------------------------------------------------------------------------------}
 
 unit Softplan.View.Inicial;

@@ -1,3 +1,14 @@
+{-------------------------------------------------------------------------------
+Unit Simples: uFuncoes                                           Data:23/07/2016
+Objetivo: Fornecer um pool de uso comum de funções
+
+Dev.: Sérgio de Siqueira Silva
+
+Data Alteração: 09/05/2021
+Dev.: Sérgio de Siqueira Silva
+Alteração: Nova feature "GetURLFileName" que extrai o nome do arquivo de uma URL
+-------------------------------------------------------------------------------}
+
 unit uFuncoes;
 
 {$WARNINGS OFF}
@@ -237,7 +248,7 @@ begin
   MessageDlg(Mensagem, TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
 end;
 
-{Retorna o nome do arquivo em um link para Download}
+{Retorna o nome do arquivo em uma URL para Download}
 function GetURLFileName(URL: string): string;
 var
   i: integer;

@@ -57,8 +57,8 @@ object frmDownload: TfrmDownload
           StyleLookup = 'transparentedit'
           TabOrder = 0
           Text = 
-            'https://releases.ubuntu.com/20.04/ubuntu-20.04.2.0-desktop-amd64' +
-            '.iso'
+            'https://novaknup.com.br/suporte/assets/driver-adaptador-wireless' +
+            '---aw-151.rar'
           Margins.Left = 2.000000000000000000
           Margins.Right = 5.000000000000000000
           Size.Width = 514.000000000000000000
